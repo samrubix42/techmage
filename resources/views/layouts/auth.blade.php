@@ -17,6 +17,8 @@
             {{ $slot }}
         </main>
 
+        <x-mobile-restriction-popup />
+
         @livewireScripts
     </body>
 </html>
