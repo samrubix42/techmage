@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <title>{{ $title ?? 'Admin Dashboard - ' . config('app.name', 'TechMage') }}</title>
+        <title>{{ $title ?? 'Employee Portal - ' . config('app.name', 'TechMage') }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
@@ -14,13 +14,13 @@
     </head>
     <body class="h-full antialiased font-sans bg-slate-50 text-slate-900" x-data="{ sidebarOpen: false }">
         <div class="min-h-screen flex flex-col md:flex-row">
-            <!-- Admin Sidebar -->
-            <livewire:admin.sidebar />
+            <!-- Employee Sidebar -->
+            <livewire:employee.sidebar />
 
             <!-- Main Content Container -->
             <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-                <!-- Admin Header -->
-                <livewire:admin.header />
+                <!-- Employee Header -->
+                <livewire:employee.header />
 
                 <!-- Page Content -->
                 <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50">
