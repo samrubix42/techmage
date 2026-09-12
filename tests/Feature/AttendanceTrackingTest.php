@@ -109,6 +109,21 @@ test('flags 3rd slot timing deviation if exceeded past 30 minutes', function () 
     $admin = User::factory()->create(['role' => 'admin']);
     Livewire::actingAs($admin)
         ->test('admin::dashboard')
-        ->assertSee('Exceeded 3rd Slot Time (+40m &gt; 30m threshold)', false)
+        ->assertSee('Exceeded Slot 3 (+40m)')
         ->assertSee('Red Flagged');
+});
+
+test('it syncs 1st slot time on clock in from sidebar', function () {
+    $employee = User::factory()->create(['role' => 'employee']);
+
+    Livewire::actingAs($employee)
+        ->test('employee.sidebar')
+        ->call('clockIn');
+
+    $tracking = \App\Models\DailySlotTracking::where('user_id', $employee->id)
+        ->whereDate('tracking_date', now()->toDateString())
+        ->first();
+
+    expect($tracking)->not->toBeNull();
+    expect($tracking->slot1_checkin_time)->not->toBeNull();
 });

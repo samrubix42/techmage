@@ -3,6 +3,7 @@
 use App\Models\DailySlotTracking;
 use App\Models\User;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -10,14 +11,37 @@ new #[Layout('layouts.admin')] #[Title('Admin Dashboard - TechMage')] class exte
 {
     public string $search = '';
 
+    public string $selectedDate = '';
+
     public string $statusFilter = 'all'; // 'all', 'flagged', 'slot2_flagged', 'lunch_exceeded', 'slot3_flagged'
+
+    #[On('slot-updated')]
+    public function refreshDashboard(): void
+    {
+        // Live update when employee slot tracking changes
+    }
+
+    public function mount(): void
+    {
+        $this->selectedDate = now()->toDateString();
+    }
+
+    public function setToday(): void
+    {
+        $this->selectedDate = now()->toDateString();
+    }
+
+    public function setYesterday(): void
+    {
+        $this->selectedDate = now()->subDay()->toDateString();
+    }
 
     public function render()
     {
-        $today = now()->toDateString();
+        $date = $this->selectedDate ?: now()->toDateString();
 
         $query = DailySlotTracking::with(['user.department'])
-            ->whereDate('tracking_date', $today);
+            ->whereDate('tracking_date', $date);
 
         if ($this->search) {
             $query->whereHas('user', function ($q) {
@@ -43,9 +67,9 @@ new #[Layout('layouts.admin')] #[Title('Admin Dashboard - TechMage')] class exte
         $trackings = $query->latest()->get();
 
         $totalEmployees = User::where('role', 'employee')->count();
-        $clockedInToday = DailySlotTracking::whereDate('tracking_date', $today)->whereNotNull('slot1_checkin_time')->count();
-        $lunchExceededCount = DailySlotTracking::whereDate('tracking_date', $today)->where('lunch_exceeded', true)->count();
-        $totalRedFlagsCount = DailySlotTracking::whereDate('tracking_date', $today)
+        $clockedInToday = DailySlotTracking::whereDate('tracking_date', $date)->whereNotNull('slot1_checkin_time')->count();
+        $lunchExceededCount = DailySlotTracking::whereDate('tracking_date', $date)->where('lunch_exceeded', true)->count();
+        $totalRedFlagsCount = DailySlotTracking::whereDate('tracking_date', $date)
             ->where(function ($q) {
                 $q->where('slot2_is_flagged', true)
                     ->orWhere('lunch_exceeded', true)

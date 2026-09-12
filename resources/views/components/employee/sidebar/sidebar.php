@@ -25,16 +25,24 @@ new class extends Component
             [
                 'status' => 'present',
                 'clock_in_time' => $now,
-                'slot1_start_time' => $now,
             ]
         );
 
-        if (! $attendance->clock_in_time || ! $attendance->slot1_start_time) {
+        if (! $attendance->clock_in_time) {
             $attendance->update([
-                'clock_in_time' => $attendance->clock_in_time ?? $now,
-                'slot1_start_time' => $attendance->slot1_start_time ?? $now,
+                'clock_in_time' => $now,
                 'status' => 'present',
             ]);
+        }
+
+        // Sync 1st slot time in DailySlotTracking
+        $tracking = \App\Models\DailySlotTracking::firstOrCreate(
+            ['user_id' => $user->id, 'tracking_date' => $today],
+            ['slot1_checkin_time' => $now]
+        );
+
+        if (! $tracking->slot1_checkin_time) {
+            $tracking->update(['slot1_checkin_time' => $now]);
         }
 
         $activeLog = AttendanceLog::where('attendance_id', $attendance->id)
@@ -50,6 +58,8 @@ new class extends Component
 
             session()->flash('attendance_status', 'Clocked in at '.$now->format('g:i A'));
         }
+
+        $this->dispatch('slot-updated');
     }
 
     public function clockOut(): void
@@ -86,6 +96,7 @@ new class extends Component
             ]);
 
             session()->flash('attendance_status', 'Clocked out at '.$now->format('g:i A'));
+            $this->dispatch('slot-updated');
         }
     }
 

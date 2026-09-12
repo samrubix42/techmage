@@ -4,11 +4,18 @@ use App\Models\Attendance;
 use App\Models\DailySlotTracking;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
 new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class extends Component
 {
+    #[On('slot-updated')]
+    public function refreshDashboard(): void
+    {
+        // Triggers component re-render when slot-updated event is dispatched
+    }
+
     public function getTodayTracking(): ?DailySlotTracking
     {
         $user = Auth::user();
@@ -48,6 +55,7 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
         }
 
         session()->flash('attendance_status', 'Clocked in at '.$now->format('g:i A').'. Slot 2 check-in will be available after 1.5 hours.');
+        $this->dispatch('slot-updated');
     }
 
     public function save2HrCheckin(): void
