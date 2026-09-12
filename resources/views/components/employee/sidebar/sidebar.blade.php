@@ -2,7 +2,7 @@
     class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between transition-transform duration-300 md:translate-x-0 fixed md:static inset-y-0 left-0 z-40"
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
 >
-    <!-- Top Header / Branding -->
+    <!-- Top Header / Branding & Attendance Widget -->
     <div>
         <div class="h-16 flex items-center justify-between px-6 border-b border-slate-200">
             <div class="flex items-center gap-3">
@@ -21,6 +21,77 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
             </button>
+        </div>
+
+        <!-- Today's Attendance Clock In/Out Tracking Section -->
+        <div class="p-4 border-b border-slate-100 bg-slate-50/80">
+            <div class="bg-white border border-slate-200 rounded-lg p-3.5 shadow-2xs space-y-3">
+                <!-- Date Header & Status Badge -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-1.5 text-xs font-bold text-slate-700">
+                        <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span>{{ $todayDateFormatted }}</span>
+                    </div>
+
+                    @if($activeLog)
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Working
+                        </span>
+                    @elseif($todayAttendance && $todayLogs->isNotEmpty())
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                            On Break / Out
+                        </span>
+                    @else
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                            Not Clocked In
+                        </span>
+                    @endif
+                </div>
+
+                <!-- Flash Message Notification -->
+                @if(session()->has('attendance_status'))
+                    <p class="text-[11px] font-medium text-emerald-700 bg-emerald-50 p-1.5 rounded border border-emerald-200 text-center">
+                        {{ session('attendance_status') }}
+                    </p>
+                @endif
+
+                <!-- Dynamic Clock Action Button -->
+                <div>
+                    @if(!$activeLog)
+                        <button 
+                            wire:click="clockIn" 
+                            wire:loading.attr="disabled"
+                            class="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-md text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-95 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                        >
+                            <svg wire:loading.remove wire:target="clockIn" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                            </svg>
+                            <svg wire:loading wire:target="clockIn" class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>Clock In Now</span>
+                        </button>
+                    @else
+                        <button 
+                            wire:click="clockOut" 
+                            wire:loading.attr="disabled"
+                            class="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-md text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 active:scale-95 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                        >
+                            <svg wire:loading.remove wire:target="clockOut" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                            <svg wire:loading wire:target="clockOut" class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>Clock Out Now</span>
+                        </button>
+                    @endif
+                </div>
+            </div>
         </div>
 
         <!-- Navigation Links -->
@@ -45,6 +116,7 @@
                 </svg>
                 My Profile
             </a>
+
             <a href="{{ route('employee.settings') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('employee.settings') ? 'bg-slate-100 text-slate-900 font-semibold border border-slate-200' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
                 <svg class="w-5 h-5 {{ request()->routeIs('employee.settings') ? 'text-slate-700' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>

@@ -21,6 +21,7 @@ return new class extends Migration
 
             $table->enum('status', [
                 'present',
+                'absent',
                 'half_day',
                 'on_leave',
                 'holiday',
@@ -33,7 +34,6 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['user_id', 'attendance_date']);
-            $table->timestamps();
         });
     }
 
