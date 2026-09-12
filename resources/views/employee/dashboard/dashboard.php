@@ -39,7 +39,7 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
         $today = $now->toDateString();
 
         // Ensure Attendance record exists
-        Attendance::firstOrCreate(
+        $attendance = Attendance::firstOrCreate(
             ['user_id' => $user->id, 'attendance_date' => $today],
             ['status' => 'present', 'clock_in_time' => $now]
         );
@@ -47,11 +47,17 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
         // Ensure DailySlotTracking record exists
         $tracking = DailySlotTracking::firstOrCreate(
             ['user_id' => $user->id, 'tracking_date' => $today],
-            ['slot1_checkin_time' => $now]
+            [
+                'attendance_id' => $attendance->id,
+                'slot1_checkin_time' => $now,
+            ]
         );
 
-        if (! $tracking->slot1_checkin_time) {
-            $tracking->update(['slot1_checkin_time' => $now]);
+        if (! $tracking->slot1_checkin_time || ! $tracking->attendance_id) {
+            $tracking->update([
+                'attendance_id' => $attendance->id,
+                'slot1_checkin_time' => $now,
+            ]);
         }
 
         session()->flash('attendance_status', 'Clocked in at '.$now->format('g:i A').'. Slot 2 check-in will be available after 1.5 hours.');

@@ -120,10 +120,12 @@ test('it syncs 1st slot time on clock in from sidebar', function () {
         ->test('employee.sidebar')
         ->call('clockIn');
 
-    $tracking = \App\Models\DailySlotTracking::where('user_id', $employee->id)
+    $tracking = DailySlotTracking::where('user_id', $employee->id)
         ->whereDate('tracking_date', now()->toDateString())
         ->first();
 
     expect($tracking)->not->toBeNull();
     expect($tracking->slot1_checkin_time)->not->toBeNull();
+    expect($tracking->attendance_id)->not->toBeNull();
+    expect($tracking->attendance)->not->toBeNull();
 });

@@ -32,4 +32,9 @@ class DailySlotTracking extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function attendance(): BelongsTo
+    {
+        return $this->belongsTo(Attendance::class);
+    }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -42,5 +41,10 @@ class Attendance extends Model
     public function activeLog(): HasOne
     {
         return $this->hasOne(AttendanceLog::class)->whereNull('clock_out_time')->latestOfMany();
+    }
+
+    public function dailySlotTracking(): HasOne
+    {
+        return $this->hasOne(DailySlotTracking::class);
     }
 }

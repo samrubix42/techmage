@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('daily_slot_trackings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('attendance_id')->nullable()->constrained('attendances')->cascadeOnDelete();
             $table->date('tracking_date');
 
             // Slot 1 (Shift Clock-In)

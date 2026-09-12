@@ -2,6 +2,7 @@
 
 use App\Models\Attendance;
 use App\Models\AttendanceLog;
+use App\Models\DailySlotTracking;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -36,13 +37,19 @@ new class extends Component
         }
 
         // Sync 1st slot time in DailySlotTracking
-        $tracking = \App\Models\DailySlotTracking::firstOrCreate(
+        $tracking = DailySlotTracking::firstOrCreate(
             ['user_id' => $user->id, 'tracking_date' => $today],
-            ['slot1_checkin_time' => $now]
+            [
+                'attendance_id' => $attendance->id,
+                'slot1_checkin_time' => $now,
+            ]
         );
 
-        if (! $tracking->slot1_checkin_time) {
-            $tracking->update(['slot1_checkin_time' => $now]);
+        if (! $tracking->slot1_checkin_time || ! $tracking->attendance_id) {
+            $tracking->update([
+                'attendance_id' => $attendance->id,
+                'slot1_checkin_time' => $now,
+            ]);
         }
 
         $activeLog = AttendanceLog::where('attendance_id', $attendance->id)
