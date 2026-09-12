@@ -43,9 +43,11 @@ Route::post('/logout', function () {
 // Protected Admin Routes
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->as('admin.')->group(function () {
     Route::livewire('/dashboard', 'admin::dashboard')->name('dashboard');
+    Route::livewire('/employees', 'admin::employee-management')->name('employees');
 });
 
 // Protected Employee Routes
 Route::middleware(['auth', 'role:employee'])->prefix('employee')->as('employee.')->group(function () {
     Route::livewire('/dashboard', 'employee::dashboard')->name('dashboard');
+    Route::livewire('/settings', 'employee::setting')->name('settings');
 });

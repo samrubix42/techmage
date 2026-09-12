@@ -37,3 +37,7 @@
 .border-primary {
     border-color: var(--color-primary);
 }
+
+[x-cloak] {
+    display: none !important;
+}
