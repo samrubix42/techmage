@@ -25,12 +25,14 @@ new class extends Component
             [
                 'status' => 'present',
                 'clock_in_time' => $now,
+                'slot1_start_time' => $now,
             ]
         );
 
-        if (! $attendance->clock_in_time) {
+        if (! $attendance->clock_in_time || ! $attendance->slot1_start_time) {
             $attendance->update([
-                'clock_in_time' => $now,
+                'clock_in_time' => $attendance->clock_in_time ?? $now,
+                'slot1_start_time' => $attendance->slot1_start_time ?? $now,
                 'status' => 'present',
             ]);
         }

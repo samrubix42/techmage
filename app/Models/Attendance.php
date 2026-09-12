@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['user_id', 'attendance_date', 'status', 'clock_in_time', 'clock_out_time'])]
 class Attendance extends Model
 {
     use HasFactory;
+
+    protected $guarded = [];
 
     /**
      * Get the attributes that should be cast.
