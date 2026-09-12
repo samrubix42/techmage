@@ -44,6 +44,7 @@ Route::post('/logout', function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->as('admin.')->group(function () {
     Route::livewire('/dashboard', 'admin::dashboard')->name('dashboard');
     Route::livewire('/employees', 'admin::employee-management')->name('employees');
+    Route::livewire('/departments', 'admin::department-management')->name('departments');
 });
 
 // Protected Employee Routes
