@@ -15,11 +15,20 @@ new #[Layout('layouts.employee')] #[Title('Daily Task Reports - TechMage')] clas
 
     public string $dateFilter = '';
 
-    public ?DailyTaskReport $selectedReport = null;
+    public ?int $selectedReportId = null;
 
     public bool $showDetailModal = false;
 
     public ?int $confirmingDeleteId = null;
+
+    public function getSelectedReportProperty(): ?DailyTaskReport
+    {
+        if (! $this->selectedReportId) {
+            return null;
+        }
+
+        return DailyTaskReport::where('user_id', Auth::id())->find($this->selectedReportId);
+    }
 
     public function updatingSearch(): void
     {
@@ -36,14 +45,14 @@ new #[Layout('layouts.employee')] #[Title('Daily Task Reports - TechMage')] clas
         $report = DailyTaskReport::where('user_id', Auth::id())->find($id);
 
         if ($report) {
-            $this->selectedReport = $report;
+            $this->selectedReportId = $report->id;
             $this->showDetailModal = true;
         }
     }
 
     public function closeDetailModal(): void
     {
-        $this->selectedReport = null;
+        $this->selectedReportId = null;
         $this->showDetailModal = false;
     }
 
@@ -70,10 +79,9 @@ new #[Layout('layouts.employee')] #[Title('Daily Task Reports - TechMage')] clas
             ]);
         }
 
-
         $this->confirmingDeleteId = null;
 
-        if ($this->selectedReport?->id === $id) {
+        if ($this->selectedReportId === $id) {
             $this->closeDetailModal();
         }
     }

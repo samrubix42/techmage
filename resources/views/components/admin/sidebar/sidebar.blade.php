@@ -38,15 +38,11 @@
                 <span>Departments</span>
             </a>
 
-            <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
-                <i class="ri-bar-chart-2-line text-base text-slate-400"></i>
-                <span>System Analytics</span>
+            <a href="{{ route('admin.daily-task-reports') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors {{ request()->routeIs('admin.daily-task-reports') ? 'bg-amber-600 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                <i class="ri-file-paper-2-line text-base {{ request()->routeIs('admin.daily-task-reports') ? 'text-white' : 'text-slate-400' }}"></i>
+                <span>Daily Task Reports</span>
             </a>
 
-            <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
-                <i class="ri-settings-4-line text-base text-slate-400"></i>
-                <span>Settings</span>
-            </a>
         </nav>
     </div>
 

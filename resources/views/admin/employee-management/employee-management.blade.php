@@ -135,6 +135,7 @@
                 <thead class="text-xs uppercase bg-slate-50 text-slate-500 border-b border-slate-200">
                     <tr>
                         <th class="px-6 py-3.5 font-semibold">Employee</th>
+                        <th class="px-6 py-3.5 font-semibold">Department</th>
                         <th class="px-6 py-3.5 font-semibold">Role</th>
                         <th class="px-6 py-3.5 font-semibold">Account Status</th>
                         <th class="px-6 py-3.5 font-semibold">Created Date</th>
@@ -156,6 +157,18 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4">
+                                @if($employee->department)
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0h4m-4 0H7"/>
+                                        </svg>
+                                        {{ $employee->department->name }}
+                                    </span>
+                                @else
+                                    <span class="text-xs text-slate-400 italic">Unassigned</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4">
                                 @if($employee->isAdmin())
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">
                                         Admin
@@ -166,6 +179,7 @@
                                     </span>
                                 @endif
                             </td>
+
                             <td class="px-6 py-4">
                                 @if($employee->is_active)
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -354,6 +368,21 @@
                             @error('password') <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p> @enderror
                         </div>
 
+                        <!-- Department -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Department</label>
+                            <select 
+                                wire:model="department_id" 
+                                class="w-full px-3.5 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white"
+                            >
+                                <option value="">Select Department (Optional)</option>
+                                @foreach($departments as $dept)
+                                    <option value="{{ $dept->id }}">{{ $dept->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('department_id') <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p> @enderror
+                        </div>
+
                         <!-- Role & Status Grid -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
@@ -380,6 +409,7 @@
                                 @error('is_active') <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p> @enderror
                             </div>
                         </div>
+
                     </div>
 
                     <!-- Modal Footer -->
@@ -503,6 +533,21 @@
                             @error('password') <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p> @enderror
                         </div>
 
+                        <!-- Department -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Department</label>
+                            <select 
+                                wire:model="department_id" 
+                                class="w-full px-3.5 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white"
+                            >
+                                <option value="">Select Department (Optional)</option>
+                                @foreach($departments as $dept)
+                                    <option value="{{ $dept->id }}">{{ $dept->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('department_id') <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p> @enderror
+                        </div>
+
                         <!-- Role & Status Grid -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
@@ -530,6 +575,7 @@
                             </div>
                         </div>
                     </div>
+
 
                     <!-- Modal Footer -->
                     <div class="flex items-center justify-end gap-3 px-6 py-4 bg-slate-50 border-t border-slate-200">
@@ -638,6 +684,12 @@
                                 <span class="font-mono text-slate-800">#{{ $selectedEmployee->id }}</span>
                             </div>
                             <div class="flex justify-between py-1 border-b border-slate-100">
+                                <span class="text-xs font-semibold text-slate-500 uppercase">Department</span>
+                                <span class="text-slate-800 font-medium">
+                                    {{ $selectedEmployee->department?->name ?? 'Unassigned' }}
+                                </span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-100">
                                 <span class="text-xs font-semibold text-slate-500 uppercase">Email Verified</span>
                                 <span class="text-slate-800 font-medium">
                                     {{ $selectedEmployee->email_verified_at ? $selectedEmployee->email_verified_at->format('M d, Y H:i') : 'Unverified' }}
@@ -650,6 +702,7 @@
                                 </span>
                             </div>
                         </div>
+
                     </div>
 
                     <!-- Footer -->

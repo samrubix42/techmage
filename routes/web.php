@@ -45,6 +45,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->as('admin.')->group(
     Route::livewire('/dashboard', 'admin::dashboard')->name('dashboard');
     Route::livewire('/employees', 'admin::employee-management')->name('employees');
     Route::livewire('/departments', 'admin::department-management')->name('departments');
+    Route::livewire('/daily-task-reports', 'admin::daily-task-report-management')->name('daily-task-reports');
 });
 
 // Protected Employee Routes

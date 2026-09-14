@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Department;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -27,6 +28,8 @@ test('non-admin employee cannot access employee management page', function () {
 test('admin can open create modal and create an employee', function () {
     $admin = User::factory()->create(['role' => 'admin', 'is_active' => true]);
 
+    $department = Department::create(['name' => 'Engineering', 'is_active' => true]);
+
     Livewire::actingAs($admin)
         ->test('admin::employee-management')
         ->assertSet('showCreateModal', false)
@@ -36,6 +39,7 @@ test('admin can open create modal and create an employee', function () {
         ->set('email', 'john@example.com')
         ->set('password', 'password123')
         ->set('role', 'employee')
+        ->set('department_id', $department->id)
         ->set('is_active', true)
         ->call('createEmployee')
         ->assertSet('showCreateModal', false)
@@ -45,6 +49,7 @@ test('admin can open create modal and create an employee', function () {
         'name' => 'John Doe',
         'email' => 'john@example.com',
         'role' => 'employee',
+        'department_id' => $department->id,
         'is_active' => true,
     ]);
 });

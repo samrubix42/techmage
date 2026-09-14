@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Department;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -38,6 +39,8 @@ new #[Layout('layouts.admin')] #[Title('Employee Management - TechMage')] class 
 
     public string $role = 'employee';
 
+    public ?int $department_id = null;
+
     public ?User $selectedEmployee = null;
 
     public function updatingSearch(): void
@@ -63,6 +66,7 @@ new #[Layout('layouts.admin')] #[Title('Employee Management - TechMage')] class 
         $this->password = '';
         $this->is_active = true;
         $this->role = 'employee';
+        $this->department_id = null;
         $this->resetErrorBag();
     }
 
@@ -90,6 +94,7 @@ new #[Layout('layouts.admin')] #[Title('Employee Management - TechMage')] class 
             'password' => ['required', 'string', 'min:8'],
             'is_active' => ['boolean'],
             'role' => ['required', 'in:employee,admin'],
+            'department_id' => ['nullable', 'exists:departments,id'],
         ]);
 
         User::create([
@@ -98,7 +103,14 @@ new #[Layout('layouts.admin')] #[Title('Employee Management - TechMage')] class 
             'password' => Hash::make($validated['password']),
             'is_active' => $validated['is_active'],
             'role' => $validated['role'],
+            'department_id' => $validated['department_id'] ?: null,
             'email_verified_at' => now(),
+        ]);
+
+        $this->dispatch('toast-show', [
+            'message' => 'Employee created successfully.',
+            'type' => 'success',
+            'position' => 'top-right',
         ]);
 
         session()->flash('message', 'Employee created successfully.');
@@ -115,6 +127,7 @@ new #[Layout('layouts.admin')] #[Title('Employee Management - TechMage')] class 
         $this->email = $employee->email;
         $this->is_active = (bool) $employee->is_active;
         $this->role = $employee->role;
+        $this->department_id = $employee->department_id;
         $this->password = '';
 
         $this->showEditModal = true;
@@ -128,6 +141,7 @@ new #[Layout('layouts.admin')] #[Title('Employee Management - TechMage')] class 
             'password' => ['nullable', 'string', 'min:8'],
             'is_active' => ['boolean'],
             'role' => ['required', 'in:employee,admin'],
+            'department_id' => ['nullable', 'exists:departments,id'],
         ]);
 
         $employee = User::findOrFail($this->employeeId);
@@ -137,6 +151,7 @@ new #[Layout('layouts.admin')] #[Title('Employee Management - TechMage')] class 
             'email' => $validated['email'],
             'is_active' => $validated['is_active'],
             'role' => $validated['role'],
+            'department_id' => $validated['department_id'] ?: null,
         ];
 
         if (! empty($validated['password'])) {
@@ -145,19 +160,25 @@ new #[Layout('layouts.admin')] #[Title('Employee Management - TechMage')] class 
 
         $employee->update($updateData);
 
+        $this->dispatch('toast-show', [
+            'message' => 'Employee updated successfully.',
+            'type' => 'success',
+            'position' => 'top-right',
+        ]);
+
         session()->flash('message', 'Employee updated successfully.');
         $this->closeModals();
     }
 
     public function openViewModal(int $id): void
     {
-        $this->selectedEmployee = User::findOrFail($id);
+        $this->selectedEmployee = User::with('department')->findOrFail($id);
         $this->showViewModal = true;
     }
 
     public function openDeleteModal(int $id): void
     {
-        $this->selectedEmployee = User::findOrFail($id);
+        $this->selectedEmployee = User::with('department')->findOrFail($id);
         $this->showDeleteModal = true;
     }
 
@@ -168,6 +189,11 @@ new #[Layout('layouts.admin')] #[Title('Employee Management - TechMage')] class 
         }
 
         if ($this->selectedEmployee->id === auth()->id()) {
+            $this->dispatch('toast-show', [
+                'message' => 'You cannot delete your own logged-in admin account.',
+                'type' => 'danger',
+                'position' => 'top-right',
+            ]);
             session()->flash('error', 'You cannot delete your own logged-in admin account.');
             $this->closeModals();
 
@@ -175,6 +201,12 @@ new #[Layout('layouts.admin')] #[Title('Employee Management - TechMage')] class 
         }
 
         $this->selectedEmployee->delete();
+
+        $this->dispatch('toast-show', [
+            'message' => 'Employee deleted successfully.',
+            'type' => 'success',
+            'position' => 'top-right',
+        ]);
 
         session()->flash('message', 'Employee deleted successfully.');
         $this->closeModals();
@@ -185,6 +217,11 @@ new #[Layout('layouts.admin')] #[Title('Employee Management - TechMage')] class 
         $employee = User::findOrFail($id);
 
         if ($employee->id === auth()->id()) {
+            $this->dispatch('toast-show', [
+                'message' => 'You cannot deactivate your own logged-in admin account.',
+                'type' => 'danger',
+                'position' => 'top-right',
+            ]);
             session()->flash('error', 'You cannot deactivate your own logged-in admin account.');
 
             return;
@@ -194,12 +231,18 @@ new #[Layout('layouts.admin')] #[Title('Employee Management - TechMage')] class 
             'is_active' => ! $employee->is_active,
         ]);
 
+        $this->dispatch('toast-show', [
+            'message' => 'Employee status updated successfully.',
+            'type' => 'success',
+            'position' => 'top-right',
+        ]);
+
         session()->flash('message', 'Employee status updated successfully.');
     }
 
     public function render()
     {
-        $query = User::query();
+        $query = User::with('department');
 
         if ($this->roleFilter !== 'all') {
             $query->where('role', $this->roleFilter);
@@ -218,9 +261,11 @@ new #[Layout('layouts.admin')] #[Title('Employee Management - TechMage')] class 
         }
 
         $employees = $query->latest()->paginate(10);
+        $departments = Department::where('is_active', true)->orderBy('name')->get();
 
         return view('admin.employee-management.employee-management', [
             'employees' => $employees,
+            'departments' => $departments,
         ]);
     }
 };

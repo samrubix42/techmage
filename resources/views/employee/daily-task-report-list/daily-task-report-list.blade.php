@@ -88,6 +88,7 @@
                             <th class="py-3 px-5">Report Date</th>
                             <th class="py-3 px-5">Projects Submitted</th>
                             <th class="py-3 px-5">Projects Overview</th>
+                            <th class="py-3 px-5">Admin Review Status</th>
                             <th class="py-3 px-5 text-right">Actions</th>
                         </tr>
                     </thead>
@@ -133,6 +134,22 @@
                                         @endforeach
                                     </div>
                                 </td>
+
+                                <!-- Admin Review Status -->
+                                <td class="py-4 px-5 whitespace-nowrap">
+                                    @if($report->is_checked)
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            <i class="ri-checkbox-circle-fill text-emerald-600"></i>
+                                            <span>Reviewed & Done</span>
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                            <i class="ri-time-line text-amber-500"></i>
+                                            <span>Pending Review</span>
+                                        </span>
+                                    @endif
+                                </td>
+
 
                                 <!-- Actions -->
                                 <td class="py-4 px-5 text-right whitespace-nowrap">
@@ -197,7 +214,10 @@
     </div>
 
     <!-- Report Detail Modal -->
-    @if($showDetailModal && $selectedReport)
+    @if($showDetailModal && $this->selectedReport)
+        @php
+            $modalReport = $this->selectedReport;
+        @endphp
         <div 
             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs"
             x-data
@@ -212,15 +232,15 @@
                                 Daily Report
                             </span>
                             <span class="text-xs font-bold text-slate-700">
-                                {{ $selectedReport->date ? $selectedReport->date->format('F d, Y') : 'N/A' }}
+                                {{ $modalReport->date ? $modalReport->date->format('F d, Y') : 'N/A' }}
                             </span>
                         </div>
                         <div class="flex items-center gap-3 text-[11px] text-slate-500 mt-1">
-                            <span>Submitted: {{ $selectedReport->created_at ? $selectedReport->created_at->format('M d, Y at g:i A') : '' }}</span>
-                            @if($selectedReport->updated_at && $selectedReport->updated_at->gt($selectedReport->created_at))
+                            <span>Submitted: {{ $modalReport->created_at ? $modalReport->created_at->format('M d, Y at g:i A') : '' }}</span>
+                            @if($modalReport->updated_at && $modalReport->updated_at->gt($modalReport->created_at))
                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
                                     <i class="ri-history-line"></i>
-                                    Last Edited: {{ $selectedReport->updated_at->format('M d, Y at g:i A') }}
+                                    Last Edited: {{ $modalReport->updated_at->format('M d, Y at g:i A') }}
                                 </span>
                             @endif
                         </div>
@@ -237,7 +257,7 @@
                 <!-- Modal Body -->
                 <div class="p-6 overflow-y-auto space-y-6 flex-1">
                     @php
-                        $modalItems = is_array($selectedReport->title_description) ? $selectedReport->title_description : [];
+                        $modalItems = is_array($modalReport->title_description) ? $modalReport->title_description : [];
                     @endphp
 
                     @foreach($modalItems as $index => $item)
@@ -259,18 +279,10 @@
                 </div>
 
                 <!-- Modal Footer -->
-                <div class="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
-                    <button 
-                        wire:click="deleteReport({{ $selectedReport->id }})"
-                        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors"
-                    >
-                        <i class="ri-delete-bin-line"></i>
-                        <span>Delete Report</span>
-                    </button>
-
+                <div class="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-end">
                     <div class="flex items-center gap-2">
                         <a 
-                            href="{{ route('employee.daily-task-report-edit', $selectedReport) }}"
+                            href="{{ route('employee.daily-task-report-edit', $modalReport) }}"
                             class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-100 transition-colors shadow-xs"
                         >
                             <i class="ri-edit-line"></i>
