@@ -41,6 +41,8 @@ new #[Layout('layouts.admin')] #[Title('Employee Management - TechMage')] class 
 
     public ?int $department_id = null;
 
+    public string $saturday_off_policy = 'sunday_only';
+
     public ?User $selectedEmployee = null;
 
     public function updatingSearch(): void
@@ -67,6 +69,7 @@ new #[Layout('layouts.admin')] #[Title('Employee Management - TechMage')] class 
         $this->is_active = true;
         $this->role = 'employee';
         $this->department_id = null;
+        $this->saturday_off_policy = 'sunday_only';
         $this->resetErrorBag();
     }
 
@@ -95,6 +98,7 @@ new #[Layout('layouts.admin')] #[Title('Employee Management - TechMage')] class 
             'is_active' => ['boolean'],
             'role' => ['required', 'in:employee,admin'],
             'department_id' => ['nullable', 'exists:departments,id'],
+            'saturday_off_policy' => ['required', 'in:sunday_only,sunday_2nd_4th_saturday'],
         ]);
 
         User::create([
@@ -104,6 +108,7 @@ new #[Layout('layouts.admin')] #[Title('Employee Management - TechMage')] class 
             'is_active' => $validated['is_active'],
             'role' => $validated['role'],
             'department_id' => $validated['department_id'] ?: null,
+            'saturday_off_policy' => $validated['saturday_off_policy'],
             'email_verified_at' => now(),
         ]);
 
@@ -128,6 +133,7 @@ new #[Layout('layouts.admin')] #[Title('Employee Management - TechMage')] class 
         $this->is_active = (bool) $employee->is_active;
         $this->role = $employee->role;
         $this->department_id = $employee->department_id;
+        $this->saturday_off_policy = $employee->saturday_off_policy ?: 'sunday_only';
         $this->password = '';
 
         $this->showEditModal = true;
@@ -142,6 +148,7 @@ new #[Layout('layouts.admin')] #[Title('Employee Management - TechMage')] class 
             'is_active' => ['boolean'],
             'role' => ['required', 'in:employee,admin'],
             'department_id' => ['nullable', 'exists:departments,id'],
+            'saturday_off_policy' => ['required', 'in:sunday_only,sunday_2nd_4th_saturday'],
         ]);
 
         $employee = User::findOrFail($this->employeeId);
@@ -152,6 +159,7 @@ new #[Layout('layouts.admin')] #[Title('Employee Management - TechMage')] class 
             'is_active' => $validated['is_active'],
             'role' => $validated['role'],
             'department_id' => $validated['department_id'] ?: null,
+            'saturday_off_policy' => $validated['saturday_off_policy'],
         ];
 
         if (! empty($validated['password'])) {

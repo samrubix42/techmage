@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Carbon\Carbon;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'is_active', 'role', 'department_id'])]
+#[Fillable(['name', 'email', 'password', 'is_active', 'role', 'department_id', 'saturday_off_policy'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -41,6 +42,33 @@ class User extends Authenticatable
     public function isEmployee(): bool
     {
         return $this->role === 'employee';
+    }
+
+    /**
+     * Determine if a specific date is an off day for this employee.
+     */
+    public function isOffDay($date): bool
+    {
+        $carbon = $date instanceof Carbon ? $date : Carbon::parse($date);
+
+        // Sunday is always off for everyone in the company
+        if ($carbon->isSunday()) {
+            return true;
+        }
+
+        // Check Saturday policy
+        if ($carbon->isSaturday()) {
+            if ($this->saturday_off_policy === 'sunday_2nd_4th_saturday') {
+                $day = $carbon->day;
+
+                // 2nd Saturday (8-14) or 4th Saturday (22-28)
+                return ($day >= 8 && $day <= 14) || ($day >= 22 && $day <= 28);
+            }
+
+            return false; // Only Sunday off policy -> Saturday is working
+        }
+
+        return false;
     }
 
     public function department(): BelongsTo

@@ -383,6 +383,20 @@
                             @error('department_id') <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p> @enderror
                         </div>
 
+                        <!-- Saturday Off Policy -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Weekend Off Policy <span class="text-rose-500">*</span></label>
+                            <select 
+                                wire:model="saturday_off_policy" 
+                                class="w-full px-3.5 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white font-medium text-slate-800"
+                            >
+                                <option value="sunday_only">Only Sunday Off (All Saturdays Working - Default)</option>
+                                <option value="sunday_2nd_4th_saturday">Sunday + 2nd & 4th Saturday Off</option>
+                            </select>
+                            <p class="text-[11px] text-slate-500 mt-1">Defines weekend off days for employee's calendar and shift tracking.</p>
+                            @error('saturday_off_policy') <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p> @enderror
+                        </div>
+
                         <!-- Role & Status Grid -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
@@ -546,6 +560,20 @@
                                 @endforeach
                             </select>
                             @error('department_id') <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p> @enderror
+                        </div>
+
+                        <!-- Saturday Off Policy -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Weekend Off Policy <span class="text-rose-500">*</span></label>
+                            <select 
+                                wire:model="saturday_off_policy" 
+                                class="w-full px-3.5 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white font-medium text-slate-800"
+                            >
+                                <option value="sunday_only">Only Sunday Off (All Saturdays Working - Default)</option>
+                                <option value="sunday_2nd_4th_saturday">Sunday + 2nd & 4th Saturday Off</option>
+                            </select>
+                            <p class="text-[11px] text-slate-500 mt-1">Defines weekend off days for employee's calendar and shift tracking.</p>
+                            @error('saturday_off_policy') <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p> @enderror
                         </div>
 
                         <!-- Role & Status Grid -->
