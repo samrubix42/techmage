@@ -62,4 +62,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(DailySlotTracking::class)->where('tracking_date', now()->toDateString());
     }
+
+    public function dailyTaskReports(): HasMany
+    {
+        return $this->hasMany(DailyTaskReport::class);
+    }
 }
