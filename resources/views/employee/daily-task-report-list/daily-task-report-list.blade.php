@@ -15,19 +15,6 @@
         </a>
     </div>
 
-    <!-- Flash Success Message -->
-    @if (session()->has('success'))
-        <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between gap-3 text-xs font-medium text-emerald-800">
-            <div class="flex items-center gap-2">
-                <i class="ri-checkbox-circle-fill text-emerald-600 text-base"></i>
-                <span>{{ session('success') }}</span>
-            </div>
-            <button type="button" onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-900">
-                <i class="ri-close-line text-base"></i>
-            </button>
-        </div>
-    @endif
-
     <!-- Filters & Search Bar -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
         <!-- Search Input -->

@@ -63,8 +63,13 @@ new #[Layout('layouts.employee')] #[Title('Daily Task Reports - TechMage')] clas
 
         if ($report) {
             $report->delete();
-            session()->flash('success', 'Daily task report deleted successfully.');
+            $this->dispatch('toast-show', [
+                'message' => 'Daily task report deleted successfully.',
+                'type' => 'success',
+                'position' => 'top-right',
+            ]);
         }
+
 
         $this->confirmingDeleteId = null;
 

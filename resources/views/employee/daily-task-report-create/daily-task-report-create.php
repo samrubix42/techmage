@@ -97,7 +97,7 @@ new #[Layout('layouts.employee')] #[Title('Daily Task Report - TechMage')] class
                 'title_description' => $titleDescription,
             ]);
 
-            session()->flash('success', 'Daily Task Report updated successfully!');
+            $message = 'Daily Task Report updated successfully!';
         } else {
             DailyTaskReport::create([
                 'user_id' => Auth::id(),
@@ -105,10 +105,23 @@ new #[Layout('layouts.employee')] #[Title('Daily Task Report - TechMage')] class
                 'title_description' => $titleDescription,
             ]);
 
-            session()->flash('success', 'Daily Task Report submitted successfully!');
+            $message = 'Daily Task Report submitted successfully!';
         }
 
+        $this->dispatch('toast-show', [
+            'message' => $message,
+            'type' => 'success',
+            'position' => 'top-right',
+        ]);
+
+        session()->flash('toast', [
+            'message' => $message,
+            'type' => 'success',
+            'position' => 'top-right',
+        ]);
+
         return redirect()->route('employee.daily-task-report-list');
+
     }
 
     public function render()

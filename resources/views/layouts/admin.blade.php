@@ -31,7 +31,10 @@
         </div>
 
         <x-mobile-restriction-popup />
+        @include('components.toaster')
 
         @livewireScripts
     </body>
 </html>
+
+
