@@ -10,7 +10,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-new #[Layout('layouts.admin')] #[Title('Attendance & Work Hours - TechMage')] class extends Component
+new #[Layout('layouts.admin')] #[Title('Employee Working Hours & Slots - TechMage')] class extends Component
 {
     use WithPagination;
 

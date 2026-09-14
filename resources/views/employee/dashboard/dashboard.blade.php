@@ -15,21 +15,25 @@
             </div>
 
             <div>
-                <div class="bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-right">
+                <div class="bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-right space-y-1">
                     <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Shift Status</span>
                     @if(!$tracking)
-                        <span class="text-xs font-bold text-slate-600">Not Clocked In</span>
+                        <span class="text-xs font-bold text-slate-600 block">Not Clocked In</span>
                     @elseif($tracking->slot3_end_time)
-                        <span class="text-xs font-bold text-emerald-600">Shift Finished</span>
+                        <span class="text-xs font-bold text-emerald-600 block">Shift Finished</span>
                     @elseif($tracking->lunch_start_time && !$tracking->lunch_end_time)
-                        <span class="text-xs font-bold text-amber-600">On Lunch Break (1h)</span>
+                        <span class="text-xs font-bold text-amber-600 block">On Lunch Break (1h)</span>
                     @elseif($tracking->slot3_start_time)
-                        <span class="text-xs font-bold text-indigo-600">In 3rd Working Slot</span>
+                        <span class="text-xs font-bold text-indigo-600 block">In 3rd Working Slot</span>
                     @elseif($tracking->slot1_2hr_checkin_time)
-                        <span class="text-xs font-bold text-blue-600">Completed 2-Hr Slot</span>
+                        <span class="text-xs font-bold text-blue-600 block">Completed 2-Hr Slot</span>
                     @else
-                        <span class="text-xs font-bold text-blue-600">Slot 1 Active</span>
+                        <span class="text-xs font-bold text-blue-600 block">Slot 1 Active</span>
                     @endif
+
+                    <a href="{{ route('employee.attendance-logs') }}" class="text-[11px] font-bold text-amber-700 hover:text-amber-800 underline inline-flex items-center gap-1 mt-1">
+                        <i class="ri-history-line"></i> View Past Slot Records
+                    </a>
                 </div>
             </div>
         </div>

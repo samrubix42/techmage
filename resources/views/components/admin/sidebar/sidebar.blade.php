@@ -45,7 +45,7 @@
 
             <a href="{{ route('admin.attendance-logs') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors {{ request()->routeIs('admin.attendance-logs') ? 'bg-amber-600 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
                 <i class="ri-time-line text-base {{ request()->routeIs('admin.attendance-logs') ? 'text-white' : 'text-slate-400' }}"></i>
-                <span>Attendance & Logs</span>
+                <span>Employee Working Hours & Slots</span>
             </a>
 
         </nav>

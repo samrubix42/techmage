@@ -55,5 +55,6 @@ Route::middleware(['auth', 'role:employee'])->prefix('employee')->as('employee.'
     Route::livewire('/daily-task-reports', 'employee::daily-task-report-list')->name('daily-task-report-list');
     Route::livewire('/daily-task-reports/create', 'employee::daily-task-report-create')->name('daily-task-report-create');
     Route::livewire('/daily-task-reports/{report}/edit', 'employee::daily-task-report-create')->name('daily-task-report-edit');
+    Route::livewire('/attendance-logs', 'employee::attendance-logs')->name('attendance-logs');
     Route::livewire('/settings', 'employee::setting')->name('settings');
 });

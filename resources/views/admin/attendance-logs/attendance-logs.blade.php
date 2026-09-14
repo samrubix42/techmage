@@ -6,12 +6,12 @@
                 <div class="flex items-center gap-2 mb-2">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
                         <i class="ri-time-line text-amber-600"></i>
-                        Attendance & Working Hours Portal
+                        Employee Working Hours & Slot Portal
                     </span>
                     <span class="text-xs text-slate-500 font-medium">{{ \Carbon\Carbon::parse($selectedDate ?: now())->format('l, F j, Y') }}</span>
                 </div>
-                <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Employee Clock-In & Work Logs</h1>
-                <p class="text-slate-600 mt-1 text-sm">Monitor daily employee attendance, calculated working hours across break clock-outs, and slot progress chains.</p>
+                <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Employee Working Hours & Slot Tracking</h1>
+                <p class="text-slate-600 mt-1 text-sm">Monitor calculated employee working hours across break clock-outs and 4-step slot progress chains.</p>
             </div>
 
             <div class="flex items-center gap-3">
