@@ -208,6 +208,16 @@
                                         </svg>
                                     </button>
 
+                                    <!-- Calendar Button (Navigates to Separate Page) -->
+                                    <a 
+                                        href="{{ route('admin.employee-calendar', $employee->id) }}"
+                                        wire:navigate
+                                        title="View Attendance & Leave Calendar"
+                                        class="p-1.5 text-amber-700 hover:text-amber-900 hover:bg-amber-50 rounded-md transition-colors inline-flex items-center justify-center"
+                                    >
+                                        <i class="ri-calendar-event-line text-sm"></i>
+                                    </a>
+
                                     <!-- Edit Button -->
                                     <button 
                                         wire:click="openEditModal({{ $employee->id }})"

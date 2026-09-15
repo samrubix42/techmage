@@ -2,40 +2,30 @@
 
 use App\Models\Attendance;
 use App\Models\DailySlotTracking;
+use App\Models\LeaveRequest;
+use App\Models\User;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Component;
-use Livewire\WithPagination;
 
-new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMage')] class extends Component
+new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - TechMage')] class extends Component
 {
-    use WithPagination;
-
-    public string $viewMode = 'calendar'; // 'calendar' or 'list'
+    public User $user;
 
     public int $currentYear;
 
     public int $currentMonth;
 
-    public string $dateFilter = '';
-
-    public ?int $selectedTrackingId = null;
+    public string $viewMode = 'calendar'; // 'calendar' or 'list'
 
     public ?string $selectedDateForModal = null;
 
     public bool $showDetailModal = false;
 
-    #[On('slot-updated')]
-    public function refreshComponent(): void
+    public function mount(User $user): void
     {
-        // Re-render when employee updates status
-    }
-
-    public function mount(): void
-    {
+        $this->user = $user->load('department');
         $this->currentYear = (int) now()->format('Y');
         $this->currentMonth = (int) now()->format('m');
     }
@@ -65,69 +55,41 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
         $this->viewMode = $mode;
     }
 
-    public function updatingDateFilter(): void
-    {
-        $this->resetPage();
-    }
-
-    public function resetFilters(): void
-    {
-        $this->dateFilter = '';
-        $this->resetPage();
-    }
-
-    public function openDetailModal(int $trackingId): void
-    {
-        $this->selectedTrackingId = $trackingId;
-        $this->selectedDateForModal = null;
-        $this->showDetailModal = true;
-    }
-
     public function openDateModal(string $dateString): void
     {
         $this->selectedDateForModal = $dateString;
-        $this->selectedTrackingId = null;
         $this->showDetailModal = true;
     }
 
     public function closeDetailModal(): void
     {
-        $this->selectedTrackingId = null;
         $this->selectedDateForModal = null;
         $this->showDetailModal = false;
     }
 
-    public function getSelectedTrackingDetailProperty(): ?array
+    public function getSelectedDateDetailProperty(): ?array
     {
-        $user = Auth::user();
-        if (! $user || (! $this->selectedTrackingId && ! $this->selectedDateForModal)) {
+        if (! $this->selectedDateForModal) {
             return null;
         }
 
-        $tracking = null;
-        $targetDate = null;
+        $targetDate = $this->selectedDateForModal;
 
-        if ($this->selectedTrackingId) {
-            $tracking = DailySlotTracking::where('user_id', $user->id)
-                ->where('id', $this->selectedTrackingId)
-                ->first();
-            $targetDate = $tracking?->tracking_date?->toDateString();
-        } else {
-            $targetDate = $this->selectedDateForModal;
-            $tracking = DailySlotTracking::where('user_id', $user->id)
-                ->whereDate('tracking_date', $targetDate)
-                ->first();
-        }
-
-        if (! $targetDate) {
-            return null;
-        }
+        $tracking = DailySlotTracking::where('user_id', $this->user->id)
+            ->whereDate('tracking_date', $targetDate)
+            ->first();
 
         $attendance = Attendance::with(['logs' => function ($q) {
             $q->orderBy('clock_in_time', 'asc');
         }])
-            ->where('user_id', $user->id)
+            ->where('user_id', $this->user->id)
             ->whereDate('attendance_date', $targetDate)
+            ->first();
+
+        $leaveRequest = LeaveRequest::where('user_id', $this->user->id)
+            ->where('status', 'approved')
+            ->whereDate('start_date', '<=', $targetDate)
+            ->whereDate('end_date', '>=', $targetDate)
             ->first();
 
         $logs = $attendance ? $attendance->logs : collect();
@@ -164,6 +126,7 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
             'targetDate' => $targetDate,
             'tracking' => $tracking,
             'attendance' => $attendance,
+            'leaveRequest' => $leaveRequest,
             'logs' => $logs,
             'formattedTotalHours' => "{$hours}h {$minutes}m",
             'totalBreaksMinutes' => $totalBreaksMinutes,
@@ -173,9 +136,6 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
 
     public function render()
     {
-        $user = Auth::user();
-
-        // 1. Calendar Grid Data Generation
         $currentMonthCarbon = Carbon::create($this->currentYear, $this->currentMonth, 1);
         $gridStart = $currentMonthCarbon->copy()->startOfWeek(Carbon::MONDAY);
         $gridEnd = $currentMonthCarbon->copy()->endOfMonth()->endOfWeek(Carbon::SUNDAY);
@@ -183,19 +143,23 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
         $attendancesInMonth = Attendance::with(['logs' => function ($q) {
             $q->orderBy('clock_in_time', 'asc');
         }])
-            ->where('user_id', $user->id)
+            ->where('user_id', $this->user->id)
             ->whereBetween('attendance_date', [$gridStart->toDateString(), $gridEnd->toDateString()])
             ->get()
-            ->keyBy(function ($item) {
-                return $item->attendance_date->toDateString();
-            });
+            ->keyBy(fn ($item) => $item->attendance_date->toDateString());
 
-        $trackingsInMonth = DailySlotTracking::where('user_id', $user->id)
+        $trackingsInMonth = DailySlotTracking::where('user_id', $this->user->id)
             ->whereBetween('tracking_date', [$gridStart->toDateString(), $gridEnd->toDateString()])
             ->get()
-            ->keyBy(function ($item) {
-                return $item->tracking_date->toDateString();
-            });
+            ->keyBy(fn ($item) => $item->tracking_date->toDateString());
+
+        $leaveRequestsInMonth = LeaveRequest::where('user_id', $this->user->id)
+            ->where('status', 'approved')
+            ->where(function ($q) use ($gridStart, $gridEnd) {
+                $q->whereBetween('start_date', [$gridStart->toDateString(), $gridEnd->toDateString()])
+                    ->orWhereBetween('end_date', [$gridStart->toDateString(), $gridEnd->toDateString()]);
+            })
+            ->get();
 
         $calendarDays = [];
         $cursor = $gridStart->copy();
@@ -210,11 +174,15 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
             $att = $attendancesInMonth->get($dateStr);
             $tr = $trackingsInMonth->get($dateStr);
 
+            // Find matching approved leave request if any
+            $matchingLeave = $leaveRequestsInMonth->first(function ($l) use ($dateStr) {
+                return $l->start_date->toDateString() <= $dateStr && $l->end_date->toDateString() >= $dateStr;
+            });
+
             $isCurrentMonth = ($cursor->month === $this->currentMonth);
             $isToday = ($dateStr === now()->toDateString());
-            $isOffDay = $user->isOffDay($cursor);
+            $isOffDay = $this->user->isOffDay($cursor);
 
-            // Calculate worked hours for calendar day
             $workedMins = 0;
             if ($att && $att->logs->isNotEmpty()) {
                 foreach ($att->logs as $log) {
@@ -229,7 +197,6 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
 
             $formattedHours = $workedMins > 0 ? (floor($workedMins / 60).'h '.($workedMins % 60).'m') : null;
 
-            // Determine status badge
             $status = 'none';
             if ($att) {
                 $status = $att->status ?: 'present';
@@ -261,6 +228,7 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
                 'isWeekend' => $isOffDay,
                 'attendance' => $att,
                 'tracking' => $tr,
+                'leaveRequest' => $matchingLeave,
                 'status' => $status,
                 'formattedHours' => $formattedHours,
             ];
@@ -268,56 +236,25 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
             $cursor->addDay();
         }
 
-        // 2. List View Query
-        $query = DailySlotTracking::where('user_id', $user->id)
-            ->orderBy('tracking_date', 'desc');
+        // List view query for monthly logs
+        $monthlyLogs = Attendance::with(['logs' => function ($q) {
+            $q->orderBy('clock_in_time', 'asc');
+        }])
+            ->where('user_id', $this->user->id)
+            ->whereMonth('attendance_date', $this->currentMonth)
+            ->whereYear('attendance_date', $this->currentYear)
+            ->orderBy('attendance_date', 'desc')
+            ->get();
 
-        if ($this->dateFilter !== '') {
-            $query->whereDate('tracking_date', $this->dateFilter);
-        }
-
-        $trackings = $query->paginate(10);
-
-        $trackingStats = [];
-        foreach ($trackings as $trItem) {
-            $attItem = Attendance::with(['logs' => function ($q) {
-                $q->orderBy('clock_in_time', 'asc');
-            }])
-                ->where('user_id', $user->id)
-                ->whereDate('attendance_date', $trItem->tracking_date->toDateString())
-                ->first();
-
-            $logs = $attItem ? $attItem->logs : collect();
-            $totalWorked = 0;
-            foreach ($logs as $log) {
-                if ($log->clock_out_time) {
-                    $totalWorked += $log->duration_minutes ?: (int) $log->clock_in_time->diffInMinutes($log->clock_out_time);
-                } elseif ($log->clock_in_time) {
-                    $ref = ($trItem->tracking_date->toDateString() === now()->toDateString()) ? now() : $log->clock_in_time;
-                    $totalWorked += (int) $log->clock_in_time->diffInMinutes($ref);
-                }
-            }
-
-            $h = floor($totalWorked / 60);
-            $m = $totalWorked % 60;
-
-            $trackingStats[$trItem->id] = [
-                'formattedHours' => "{$h}h {$m}m",
-                'attendance' => $attItem,
-                'sessionCount' => $logs->count(),
-            ];
-        }
-
-        return view('employee.attendance-logs.attendance-logs', [
+        return view('admin.employee-calendar.employee-calendar', [
             'calendarDays' => $calendarDays,
             'currentMonthLabel' => $currentMonthCarbon->format('F Y'),
             'presentDaysCount' => $presentDaysCount,
             'leaveDaysCount' => $leaveDaysCount,
             'halfDayDaysCount' => $halfDayDaysCount,
             'absentDaysCount' => $absentDaysCount,
-            'trackings' => $trackings,
-            'trackingStats' => $trackingStats,
-            'selectedTrackingDetail' => $this->selectedTrackingDetail,
+            'monthlyLogs' => $monthlyLogs,
+            'selectedDateDetail' => $this->selectedDateDetail,
         ]);
     }
 };

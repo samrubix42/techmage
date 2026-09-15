@@ -47,4 +47,9 @@ class Attendance extends Model
     {
         return $this->hasOne(DailySlotTracking::class);
     }
+
+    public function leaveRequest(): BelongsTo
+    {
+        return $this->belongsTo(LeaveRequest::class);
+    }
 }

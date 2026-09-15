@@ -81,6 +81,13 @@
                         Leave: <strong>{{ $leaveDaysCount }} days</strong>
                     </span>
 
+                    @if(isset($halfDayDaysCount) && $halfDayDaysCount > 0)
+                        <span class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                            Half Day: <strong>{{ $halfDayDaysCount }} days</strong>
+                        </span>
+                    @endif
+
                     @if($absentDaysCount > 0)
                         <span class="px-3 py-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-800 border border-red-200 flex items-center gap-1.5">
                             <span class="w-2 h-2 rounded-full bg-red-500"></span>

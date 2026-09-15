@@ -44,9 +44,11 @@ Route::post('/logout', function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->as('admin.')->group(function () {
     Route::livewire('/dashboard', 'admin::dashboard')->name('dashboard');
     Route::livewire('/employees', 'admin::employee-management')->name('employees');
+    Route::livewire('/employees/{user}/calendar', 'admin::employee-calendar')->name('employee-calendar');
     Route::livewire('/departments', 'admin::department-management')->name('departments');
     Route::livewire('/daily-task-reports', 'admin::daily-task-report-management')->name('daily-task-reports');
     Route::livewire('/attendance-logs', 'admin::attendance-logs')->name('attendance-logs');
+    Route::livewire('/leave-requests', 'admin::leave-requests')->name('leave-requests');
 });
 
 // Protected Employee Routes
@@ -56,5 +58,6 @@ Route::middleware(['auth', 'role:employee'])->prefix('employee')->as('employee.'
     Route::livewire('/daily-task-reports/create', 'employee::daily-task-report-create')->name('daily-task-report-create');
     Route::livewire('/daily-task-reports/{report}/edit', 'employee::daily-task-report-create')->name('daily-task-report-edit');
     Route::livewire('/attendance-logs', 'employee::attendance-logs')->name('attendance-logs');
+    Route::livewire('/leave-requests', 'employee::leave-requests')->name('leave-requests');
     Route::livewire('/settings', 'employee::setting')->name('settings');
 });

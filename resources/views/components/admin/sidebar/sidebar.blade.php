@@ -28,8 +28,8 @@
                 <span>Dashboard</span>
             </a>
 
-            <a href="{{ route('admin.employees') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors {{ request()->routeIs('admin.employees') ? 'bg-amber-600 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
-                <i class="ri-team-line text-base {{ request()->routeIs('admin.employees') ? 'text-white' : 'text-slate-400' }}"></i>
+            <a href="{{ route('admin.employees') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors {{ request()->routeIs('admin.employee*') ? 'bg-amber-600 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                <i class="ri-team-line text-base {{ request()->routeIs('admin.employee*') ? 'text-white' : 'text-slate-400' }}"></i>
                 <span>Employee Management</span>
             </a>
 
@@ -48,6 +48,10 @@
                 <span>Employee Working Hours & Slots</span>
             </a>
 
+            <a href="{{ route('admin.leave-requests') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors {{ request()->routeIs('admin.leave-requests') ? 'bg-amber-600 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                <i class="ri-calendar-todo-line text-base {{ request()->routeIs('admin.leave-requests') ? 'text-white' : 'text-slate-400' }}"></i>
+                <span>Leave Requests</span>
+            </a>
         </nav>
     </div>
 

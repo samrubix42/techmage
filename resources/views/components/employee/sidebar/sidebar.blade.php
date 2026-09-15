@@ -109,6 +109,11 @@
                 <span>Working Hours & Slots</span>
             </a>
 
+            <a href="{{ route('employee.leave-requests') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors {{ request()->routeIs('employee.leave-requests') ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                <i class="ri-calendar-check-line text-base {{ request()->routeIs('employee.leave-requests') ? 'text-white' : 'text-slate-400' }}"></i>
+                <span>Leave Requests</span>
+            </a>
+
             <a href="{{ route('employee.settings') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors {{ request()->routeIs('employee.settings') ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
                 <i class="ri-settings-4-line text-base {{ request()->routeIs('employee.settings') ? 'text-white' : 'text-slate-400' }}"></i>
                 <span>Schedule Settings</span>

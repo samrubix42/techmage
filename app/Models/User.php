@@ -95,4 +95,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(DailyTaskReport::class);
     }
+
+    public function leaveRequests(): HasMany
+    {
+        return $this->hasMany(LeaveRequest::class);
+    }
 }
