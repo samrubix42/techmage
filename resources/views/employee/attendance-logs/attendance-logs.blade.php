@@ -1,23 +1,23 @@
 <div class="space-y-6" wire:poll.10s>
     <!-- Header Card with View Switcher -->
-    <div class="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-xs relative overflow-hidden">
+    <div class="bg-white border border-slate-200/80 rounded-md p-6 sm:p-8 shadow-xs relative overflow-hidden">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <div class="flex items-center gap-2 mb-2">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
-                        <i class="ri-calendar-check-line text-amber-600"></i>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                        <i class="ri-calendar-check-line text-slate-500"></i>
                         Attendance & Working Hours Calendar
                     </span>
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Working Hours & Slot History</h1>
-                <p class="text-slate-600 mt-1 text-sm">Clean monthly calendar view showing your present days, leaves, worked hours, and 4-slot progress chains.</p>
+                <p class="text-slate-500 mt-1 text-xs sm:text-sm">Clean monthly calendar view showing your present days, leaves, worked hours, and 4-slot progress chains.</p>
             </div>
 
             <!-- View Toggle Switcher -->
-            <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200 shrink-0">
+            <div class="flex items-center gap-1.5 bg-slate-100/80 p-1.5 rounded-md border border-slate-200/80 shrink-0">
                 <button 
                     wire:click="setViewMode('calendar')" 
-                    class="px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-2xs cursor-pointer flex items-center gap-1.5 {{ $viewMode === 'calendar' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-slate-900' }}"
+                    class="px-3.5 py-2 rounded-md text-xs font-semibold transition-all shadow-2xs cursor-pointer flex items-center gap-1.5 {{ $viewMode === 'calendar' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900' }}"
                 >
                     <i class="ri-calendar-event-line"></i>
                     <span>Calendar View</span>
@@ -25,7 +25,7 @@
 
                 <button 
                     wire:click="setViewMode('list')" 
-                    class="px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-2xs cursor-pointer flex items-center gap-1.5 {{ $viewMode === 'list' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-slate-900' }}"
+                    class="px-3.5 py-2 rounded-md text-xs font-semibold transition-all shadow-2xs cursor-pointer flex items-center gap-1.5 {{ $viewMode === 'list' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900' }}"
                 >
                     <i class="ri-list-check-2"></i>
                     <span>List History</span>
@@ -34,28 +34,28 @@
         </div>
     </div>
 
-    <!-- View Mode 1: Clean Monthly Calendar View -->
+    <!-- View Mode 1: Calendar View -->
     @if($viewMode === 'calendar')
-        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-6">
+        <div class="bg-white border border-slate-200/80 rounded-md p-6 shadow-xs space-y-6">
             <!-- Calendar Navigation & Summary Bar -->
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-md bg-slate-50/80 border border-slate-200/90">
                 <!-- Left: Month Navigation -->
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 sm:gap-3">
                     <button 
                         wire:click="previousMonth" 
-                        class="w-9 h-9 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
+                        class="w-8 h-8 rounded-md bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
                         title="Previous Month"
                     >
                         <i class="ri-arrow-left-s-line text-lg"></i>
                     </button>
 
-                    <h2 class="text-base font-extrabold text-slate-900 tracking-tight min-w-[140px] text-center">
+                    <h2 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight min-w-[130px] text-center">
                         {{ $currentMonthLabel }}
                     </h2>
 
                     <button 
                         wire:click="nextMonth" 
-                        class="w-9 h-9 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
+                        class="w-8 h-8 rounded-md bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
                         title="Next Month"
                     >
                         <i class="ri-arrow-right-s-line text-lg"></i>
@@ -63,7 +63,7 @@
 
                     <button 
                         wire:click="goToToday" 
-                        class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors shadow-2xs cursor-pointer ml-1"
+                        class="px-2.5 py-1.5 rounded-md text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors shadow-2xs cursor-pointer ml-1"
                     >
                         Today
                     </button>
@@ -71,27 +71,27 @@
 
                 <!-- Right: Monthly Attendance Summary Pills -->
                 <div class="flex flex-wrap items-center gap-2">
-                    <span class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        Present: <strong>{{ $presentDaysCount }} days</strong>
+                    <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        Present: <strong>{{ $presentDaysCount }}d</strong>
                     </span>
 
-                    <span class="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                        Leave: <strong>{{ $leaveDaysCount }} days</strong>
+                    <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        Leave: <strong>{{ $leaveDaysCount }}d</strong>
                     </span>
 
                     @if(isset($halfDayDaysCount) && $halfDayDaysCount > 0)
-                        <span class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200 flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                            Half Day: <strong>{{ $halfDayDaysCount }} days</strong>
+                        <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-200 flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                            Half Day: <strong>{{ $halfDayDaysCount }}d</strong>
                         </span>
                     @endif
 
                     @if($absentDaysCount > 0)
-                        <span class="px-3 py-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-800 border border-red-200 flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-red-500"></span>
-                            Absent: <strong>{{ $absentDaysCount }} days</strong>
+                        <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-red-50 text-red-800 border border-red-200 flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                            Absent: <strong>{{ $absentDaysCount }}d</strong>
                         </span>
                     @endif
                 </div>
@@ -99,7 +99,7 @@
 
             <!-- Calendar Days Grid -->
             <div class="space-y-2">
-                <!-- Day of Week Header Grid (Mon - Sun) -->
+                <!-- Day of Week Header Grid -->
                 <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold uppercase tracking-wider text-slate-500 py-2 border-b border-slate-100">
                     <div>Mon</div>
                     <div>Tue</div>
@@ -121,50 +121,50 @@
                         @endphp
                         <div 
                             wire:click="openDateModal('{{ $day['date'] }}')" 
-                            class="min-h-[105px] p-2.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between relative group
+                            class="min-h-[100px] p-2.5 rounded-md border transition-all cursor-pointer flex flex-col justify-between relative group
                             {{ !$day['isCurrentMonth'] ? 'bg-slate-50/40 opacity-40 border-slate-100' : '' }}
-                            {{ $day['isToday'] ? 'ring-2 ring-amber-500 border-amber-400 bg-amber-50/20' : '' }}
-                            {{ $day['isCurrentMonth'] && !$day['isToday'] ? 'bg-white border-slate-200 hover:border-amber-400 hover:shadow-md' : '' }}
+                            {{ $day['isToday'] ? 'ring-2 ring-slate-900 border-slate-900 bg-slate-50/50' : '' }}
+                            {{ $day['isCurrentMonth'] && !$day['isToday'] ? 'bg-white border-slate-200 hover:border-slate-400 hover:shadow-xs' : '' }}
                             "
                         >
-                            <!-- Day Number & Indicators -->
+                            <!-- Day Number -->
                             <div class="flex items-start justify-between">
-                                <span class="text-xs font-extrabold {{ $day['isToday'] ? 'text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded-md' : ($day['isCurrentMonth'] ? 'text-slate-900' : 'text-slate-400') }}">
+                                <span class="text-xs font-bold {{ $day['isToday'] ? 'text-slate-900 bg-slate-200 px-1.5 py-0.5 rounded-md' : ($day['isCurrentMonth'] ? 'text-slate-900' : 'text-slate-400') }}">
                                     {{ $day['dayNumber'] }}
                                 </span>
 
                                 @if($day['isToday'])
-                                    <span class="text-[9px] font-bold uppercase text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">Today</span>
+                                    <span class="text-[9px] font-bold uppercase text-slate-700 bg-slate-100 px-1 py-0.5 rounded-md">Today</span>
                                 @endif
                             </div>
 
-                            <!-- Attendance & Slot Status Badge -->
+                            <!-- Attendance Badge -->
                             <div class="mt-2 space-y-1">
                                 @if($st === 'present')
-                                    <div class="px-2 py-1 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center justify-between gap-1 shadow-2xs">
+                                    <div class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-between gap-1">
                                         <span class="truncate">✓ Present</span>
                                         @if($day['formattedHours'])
-                                            <span class="text-[9px] font-extrabold opacity-90 shrink-0">{{ $day['formattedHours'] }}</span>
+                                            <span class="text-[9px] font-bold opacity-90 shrink-0">{{ $day['formattedHours'] }}</span>
                                         @endif
                                     </div>
                                 @elseif($st === 'on_leave' || $st === 'leave')
-                                    <div class="px-2 py-1 rounded-md text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1 shadow-2xs">
+                                    <div class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1">
                                         <span>🏖 On Leave</span>
                                     </div>
                                 @elseif($st === 'half_day')
-                                    <div class="px-2 py-1 rounded-md text-[10px] font-bold bg-blue-100 text-blue-900 border border-blue-200 flex items-center justify-between gap-1 shadow-2xs">
+                                    <div class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-between gap-1">
                                         <span>½ Half Day</span>
                                     </div>
                                 @elseif($st === 'holiday')
-                                    <div class="px-2 py-1 rounded-md text-[10px] font-bold bg-indigo-100 text-indigo-900 border border-indigo-200 flex items-center gap-1 shadow-2xs">
+                                    <div class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200 flex items-center gap-1">
                                         <span>🎉 Holiday</span>
                                     </div>
                                 @elseif($st === 'absent')
-                                    <div class="px-2 py-1 rounded-md text-[10px] font-bold bg-red-100 text-red-800 border border-red-200 flex items-center gap-1">
+                                    <div class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-red-50 text-red-700 border border-red-200 flex items-center gap-1">
                                         <span>✖ Absent</span>
                                     </div>
                                 @elseif($day['isWeekend'])
-                                    <div class="px-2 py-0.5 rounded text-[10px] font-semibold text-slate-400 bg-slate-100 text-center">
+                                    <div class="px-2 py-0.5 rounded-md text-[10px] font-medium text-slate-400 bg-slate-100 text-center">
                                         Off Day
                                     </div>
                                 @else
@@ -173,13 +173,13 @@
                                     </div>
                                 @endif
 
-                                <!-- Slot Progress Chain Stepper Pill (Mini) -->
+                                <!-- Slot Progress Stepper Pill -->
                                 @if($tr && $st === 'present')
                                     <div class="flex items-center justify-center gap-0.5 pt-0.5">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-600" title="Step 1: Clock In"></span>
-                                        <span class="w-1.5 h-1.5 rounded-full {{ $tr->slot2_is_flagged ? 'bg-red-500' : ($tr->slot2_checkin_time ? 'bg-emerald-600' : 'bg-slate-300') }}" title="Step 2: Slot 2"></span>
-                                        <span class="w-1.5 h-1.5 rounded-full {{ $tr->lunch_exceeded ? 'bg-red-500' : ($tr->lunch_end_time ? 'bg-emerald-600' : 'bg-slate-300') }}" title="Step 3: Lunch"></span>
-                                        <span class="w-1.5 h-1.5 rounded-full {{ $tr->slot3_is_flagged ? 'bg-red-500' : ($tr->slot3_end_time ? 'bg-emerald-600' : 'bg-slate-300') }}" title="Step 4: 3rd Slot"></span>
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500" title="Step 1: Clock In"></span>
+                                        <span class="w-1.5 h-1.5 rounded-full {{ $tr->slot2_is_flagged ? 'bg-red-500' : ($tr->slot2_checkin_time ? 'bg-emerald-500' : 'bg-slate-300') }}" title="Step 2: Slot 2"></span>
+                                        <span class="w-1.5 h-1.5 rounded-full {{ $tr->lunch_exceeded ? 'bg-red-500' : ($tr->lunch_end_time ? 'bg-emerald-500' : 'bg-slate-300') }}" title="Step 3: Lunch"></span>
+                                        <span class="w-1.5 h-1.5 rounded-full {{ $tr->slot3_is_flagged ? 'bg-red-500' : ($tr->slot3_end_time ? 'bg-emerald-500' : 'bg-slate-300') }}" title="Step 4: 3rd Slot"></span>
                                     </div>
                                 @endif
                             </div>
@@ -190,25 +190,25 @@
         </div>
     @endif
 
-    <!-- View Mode 2: Clean List History View -->
+    <!-- View Mode 2: List History View -->
     @if($viewMode === 'list')
-        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
+        <div class="bg-white border border-slate-200/80 rounded-md p-6 shadow-xs space-y-4">
             <!-- Date Filter Bar -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-md bg-slate-50/80 border border-slate-200/90">
                 <div class="flex items-center gap-2">
-                    <i class="ri-calendar-event-line text-slate-500"></i>
-                    <label class="text-xs font-bold text-slate-700 uppercase tracking-wide">Filter by Date:</label>
+                    <i class="ri-calendar-event-line text-slate-400"></i>
+                    <label class="text-xs font-semibold text-slate-700 uppercase tracking-wide">Filter by Date:</label>
                     <input 
                         type="date" 
                         wire:model.live="dateFilter" 
-                        class="py-1.5 px-3 text-xs font-bold rounded-lg border border-slate-300 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white text-slate-900 shadow-xs"
+                        class="py-1.5 px-3 text-xs font-semibold rounded-md border border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 bg-white text-slate-900 shadow-2xs"
                     />
                 </div>
 
                 @if($dateFilter)
                     <button 
                         wire:click="resetFilters" 
-                        class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 bg-white hover:bg-slate-100 border border-slate-200 transition-colors"
+                        class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-600 bg-white hover:bg-slate-100 border border-slate-200 transition-colors"
                     >
                         <i class="ri-refresh-line"></i> Clear Date Filter
                     </button>
@@ -216,9 +216,9 @@
             </div>
 
             <!-- Slot Chain Records Table -->
-            <div class="overflow-x-auto border border-slate-200 rounded-lg">
+            <div class="overflow-x-auto border border-slate-200 rounded-md">
                 <table class="w-full text-left text-xs text-slate-700">
-                    <thead class="uppercase bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+                    <thead class="uppercase bg-slate-50/80 text-slate-500 font-bold border-b border-slate-200">
                         <tr>
                             <th class="px-4 py-3">Tracking Date</th>
                             <th class="px-4 py-3">Net Worked Hours</th>
@@ -235,20 +235,20 @@
                             @endphp
                             <tr class="hover:bg-slate-50/80 transition-colors {{ $isFlagged ? 'bg-red-50/20' : '' }}">
                                 <!-- Tracking Date -->
-                                <td class="px-4 py-3.5 align-middle font-bold text-slate-900">
+                                <td class="px-4 py-3.5 align-middle font-semibold text-slate-900">
                                     <div class="flex items-center gap-2">
                                         <i class="ri-calendar-line text-slate-400"></i>
                                         <span>{{ $tr->tracking_date?->format('D, M d, Y') }}</span>
                                         @if($tr->tracking_date?->toDateString() === now()->toDateString())
-                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">Today</span>
+                                            <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-800 border border-slate-200">Today</span>
                                         @endif
                                     </div>
                                 </td>
 
                                 <!-- Net Worked Hours -->
                                 <td class="px-4 py-3.5 align-middle">
-                                    <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-slate-100 text-slate-800 border border-slate-200 inline-flex items-center gap-1">
-                                        <i class="ri-time-line text-slate-500"></i>
+                                    <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200 inline-flex items-center gap-1">
+                                        <i class="ri-time-line text-slate-400"></i>
                                         <span>{{ $st['formattedHours'] ?? '0h 0m' }}</span>
                                     </span>
                                 </td>
@@ -257,25 +257,25 @@
                                 <td class="px-4 py-3.5 align-middle">
                                     <div class="flex items-center gap-1.5">
                                         <!-- Step 1 -->
-                                        <span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white bg-emerald-600" title="Step 1: Clocked In at {{ $tr->slot1_checkin_time?->format('g:i A') }}">
+                                        <span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white bg-slate-900" title="Step 1: Clocked In at {{ $tr->slot1_checkin_time?->format('g:i A') }}">
                                             1
                                         </span>
                                         <span class="w-3 h-0.5 bg-slate-300"></span>
 
                                         <!-- Step 2 -->
-                                        <span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold {{ $tr->slot2_is_flagged ? 'bg-red-600 text-white' : ($tr->slot2_checkin_time ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-500') }}" title="Step 2: Slot 2 Check-in">
+                                        <span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold {{ $tr->slot2_is_flagged ? 'bg-red-600 text-white' : ($tr->slot2_checkin_time ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-500') }}" title="Step 2: Slot 2 Check-in">
                                             2
                                         </span>
                                         <span class="w-3 h-0.5 bg-slate-300"></span>
 
                                         <!-- Step 3 (Lunch) -->
-                                        <span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold {{ $tr->lunch_exceeded ? 'bg-red-600 text-white' : ($tr->lunch_end_time ? 'bg-emerald-600 text-white' : ($tr->lunch_start_time ? 'bg-amber-500 text-white animate-pulse' : 'bg-slate-200 text-slate-500')) }}" title="Step 3: Lunch Break">
+                                        <span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold {{ $tr->lunch_exceeded ? 'bg-red-600 text-white' : ($tr->lunch_end_time ? 'bg-slate-900 text-white' : ($tr->lunch_start_time ? 'bg-amber-500 text-white animate-pulse' : 'bg-slate-200 text-slate-500')) }}" title="Step 3: Lunch Break">
                                             3
                                         </span>
                                         <span class="w-3 h-0.5 bg-slate-300"></span>
 
                                         <!-- Step 4 -->
-                                        <span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold {{ $tr->slot3_is_flagged ? 'bg-red-600 text-white' : ($tr->slot3_end_time ? 'bg-emerald-600 text-white' : ($tr->slot3_start_time ? 'bg-indigo-600 text-white animate-pulse' : 'bg-slate-200 text-slate-500')) }}" title="Step 4: 3rd Slot & Shift End">
+                                        <span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold {{ $tr->slot3_is_flagged ? 'bg-red-600 text-white' : ($tr->slot3_end_time ? 'bg-slate-900 text-white' : ($tr->slot3_start_time ? 'bg-indigo-600 text-white animate-pulse' : 'bg-slate-200 text-slate-500')) }}" title="Step 4: 3rd Slot & Shift End">
                                             4
                                         </span>
                                     </div>
@@ -284,15 +284,15 @@
                                 <!-- Shift Status -->
                                 <td class="px-4 py-3.5 align-middle">
                                     @if($isFlagged)
-                                        <span class="px-2.5 py-0.5 rounded text-[11px] font-bold bg-red-100 text-red-800 border border-red-200 inline-flex items-center gap-1">
-                                            <i class="ri-error-warning-fill"></i> Exception Flagged
+                                        <span class="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-red-50 text-red-700 border border-red-200 inline-flex items-center gap-1">
+                                            <i class="ri-error-warning-line"></i> Exception Flagged
                                         </span>
                                     @elseif($tr->slot3_end_time)
-                                        <span class="px-2.5 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 inline-flex items-center gap-1">
+                                        <span class="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-flex items-center gap-1">
                                             <i class="ri-checkbox-circle-line"></i> Shift Completed
                                         </span>
                                     @else
-                                        <span class="px-2.5 py-0.5 rounded text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200 inline-flex items-center gap-1">
+                                        <span class="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200 inline-flex items-center gap-1">
                                             <i class="ri-time-line"></i> Shift Active
                                         </span>
                                     @endif
@@ -302,9 +302,9 @@
                                 <td class="px-4 py-3.5 align-middle text-right">
                                     <button 
                                         wire:click="openDetailModal({{ $tr->id }})" 
-                                        class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-800 bg-white hover:bg-amber-50 hover:text-amber-800 border border-slate-200 hover:border-amber-300 transition-colors shadow-2xs inline-flex items-center gap-1.5 cursor-pointer"
+                                        class="px-3 py-1.5 rounded-md text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 transition-colors shadow-2xs inline-flex items-center gap-1.5 cursor-pointer"
                                     >
-                                        <i class="ri-eye-line text-amber-600"></i>
+                                        <i class="ri-eye-line text-slate-400"></i>
                                         <span>View Details</span>
                                     </button>
                                 </td>
@@ -314,7 +314,7 @@
                                 <td colspan="5" class="px-4 py-12 text-center text-slate-500">
                                     <div class="max-w-sm mx-auto space-y-2">
                                         <i class="ri-calendar-line text-4xl text-slate-300 block"></i>
-                                        <p class="font-bold text-slate-700">No slot chain records found.</p>
+                                        <p class="font-semibold text-slate-700">No slot chain records found.</p>
                                         <p class="text-xs text-slate-400">Perform shift clock-ins to start recording your daily slot roadmaps.</p>
                                     </div>
                                 </td>
@@ -331,7 +331,7 @@
         </div>
     @endif
 
-    <!-- Employee Detail Modal (Clean Minimal UX) -->
+    <!-- Detail Modal -->
     @if($showDetailModal && $selectedTrackingDetail)
         @php
             $dt = $selectedTrackingDetail;
@@ -345,18 +345,18 @@
             x-data
             @keydown.escape.window="$wire.closeDetailModal()"
         >
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-xl w-full p-6 space-y-6 text-left relative max-h-[88vh] overflow-y-auto transform transition-all">
+            <div class="bg-white rounded-md border border-slate-200 shadow-xl max-w-xl w-full p-6 space-y-6 text-left relative max-h-[88vh] overflow-y-auto transform transition-all">
                 <!-- Modal Header -->
                 <div class="flex items-center justify-between pb-4 border-b border-slate-100">
                     <div>
                         <div class="flex items-center gap-2">
                             <h2 class="text-base font-bold text-slate-900">Work Logs for {{ \Carbon\Carbon::parse($targetDate)->format('F j, Y') }}</h2>
                             @if($att && $att->status === 'present')
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Present</span>
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Present</span>
                             @elseif($att && ($att->status === 'on_leave' || $att->status === 'leave'))
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-200">On Leave</span>
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">On Leave</span>
                             @elseif($att && $att->status === 'absent')
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-800 border border-red-200">Absent</span>
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-red-50 text-red-700 border border-red-200">Absent</span>
                             @endif
                         </div>
                         <p class="text-xs text-slate-500 mt-0.5">Check-in timestamps, working hours, and 4-slot progress chain.</p>
@@ -364,7 +364,7 @@
 
                     <button 
                         wire:click="closeDetailModal" 
-                        class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+                        class="w-8 h-8 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
                     >
                         <i class="ri-close-line text-lg"></i>
                     </button>
@@ -372,14 +372,14 @@
 
                 <!-- Stats Summary Cards -->
                 <div class="grid grid-cols-2 gap-3 text-center">
-                    <div class="p-3.5 bg-slate-50 border border-slate-200/70 rounded-xl">
+                    <div class="p-3.5 bg-slate-50 border border-slate-200/70 rounded-md">
                         <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total Worked</span>
-                        <span class="text-lg font-extrabold text-slate-900">{{ $dt['formattedTotalHours'] }}</span>
+                        <span class="text-lg font-bold text-slate-900">{{ $dt['formattedTotalHours'] }}</span>
                     </div>
 
-                    <div class="p-3.5 bg-amber-50/50 border border-amber-200/60 rounded-xl">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 block">Sessions & Breaks</span>
-                        <span class="text-lg font-extrabold text-amber-900">{{ $dt['sessionCount'] }} Session(s)</span>
+                    <div class="p-3.5 bg-slate-50 border border-slate-200/70 rounded-md">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Sessions & Breaks</span>
+                        <span class="text-lg font-bold text-slate-900">{{ $dt['sessionCount'] }} Session(s)</span>
                     </div>
                 </div>
 
@@ -388,39 +388,39 @@
                     <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">4-Step Slot Roadmap Progress</h3>
                     
                     @if($tr)
-                        <div class="bg-slate-50 border border-slate-200/70 rounded-xl p-4">
+                        <div class="bg-slate-50 border border-slate-200/70 rounded-md p-4">
                             <div class="grid grid-cols-4 gap-2 text-center">
                                 <!-- Step 1 -->
                                 <div class="space-y-1">
-                                    <div class="w-7 h-7 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center mx-auto">1</div>
-                                    <div class="text-[11px] font-bold text-slate-800">Clock-In</div>
+                                    <div class="w-7 h-7 rounded-md bg-slate-900 text-white font-bold text-xs flex items-center justify-center mx-auto">1</div>
+                                    <div class="text-[11px] font-semibold text-slate-800">Clock-In</div>
                                     <div class="text-[10px] text-slate-500">{{ $tr->slot1_checkin_time ? $tr->slot1_checkin_time?->format('g:i A') : 'Pending' }}</div>
                                 </div>
 
                                 <!-- Step 2 -->
                                 <div class="space-y-1">
-                                    <div class="w-7 h-7 rounded-full font-bold text-xs flex items-center justify-center mx-auto {{ $tr->slot2_is_flagged ? 'bg-red-600 text-white' : ($tr->slot2_checkin_time ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-500') }}">2</div>
-                                    <div class="text-[11px] font-bold text-slate-800">Slot 2</div>
-                                    <div class="text-[10px] {{ $tr->slot2_is_flagged ? 'text-red-600 font-bold' : 'text-slate-500' }}">{{ $tr->slot2_checkin_time ? $tr->slot2_checkin_time?->format('g:i A') : 'Pending' }}</div>
+                                    <div class="w-7 h-7 rounded-md font-bold text-xs flex items-center justify-center mx-auto {{ $tr->slot2_is_flagged ? 'bg-red-600 text-white' : ($tr->slot2_checkin_time ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-500') }}">2</div>
+                                    <div class="text-[11px] font-semibold text-slate-800">Slot 2</div>
+                                    <div class="text-[10px] {{ $tr->slot2_is_flagged ? 'text-red-600 font-semibold' : 'text-slate-500' }}">{{ $tr->slot2_checkin_time ? $tr->slot2_checkin_time?->format('g:i A') : 'Pending' }}</div>
                                 </div>
 
                                 <!-- Step 3 -->
                                 <div class="space-y-1">
-                                    <div class="w-7 h-7 rounded-full font-bold text-xs flex items-center justify-center mx-auto {{ $tr->lunch_exceeded ? 'bg-red-600 text-white' : ($tr->lunch_end_time ? 'bg-emerald-600 text-white' : ($tr->lunch_start_time ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-500')) }}">3</div>
-                                    <div class="text-[11px] font-bold text-slate-800">Lunch (1h)</div>
-                                    <div class="text-[10px] {{ $tr->lunch_exceeded ? 'text-red-600 font-bold' : 'text-slate-500' }}">{{ $tr->lunch_duration_minutes ? $tr->lunch_duration_minutes.'m' : 'Pending' }}</div>
+                                    <div class="w-7 h-7 rounded-md font-bold text-xs flex items-center justify-center mx-auto {{ $tr->lunch_exceeded ? 'bg-red-600 text-white' : ($tr->lunch_end_time ? 'bg-slate-900 text-white' : ($tr->lunch_start_time ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-500')) }}">3</div>
+                                    <div class="text-[11px] font-semibold text-slate-800">Lunch (1h)</div>
+                                    <div class="text-[10px] {{ $tr->lunch_exceeded ? 'text-red-600 font-semibold' : 'text-slate-500' }}">{{ $tr->lunch_duration_minutes ? $tr->lunch_duration_minutes.'m' : 'Pending' }}</div>
                                 </div>
 
                                 <!-- Step 4 -->
                                 <div class="space-y-1">
-                                    <div class="w-7 h-7 rounded-full font-bold text-xs flex items-center justify-center mx-auto {{ $tr->slot3_is_flagged ? 'bg-red-600 text-white' : ($tr->slot3_end_time ? 'bg-emerald-600 text-white' : ($tr->slot3_start_time ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500')) }}">4</div>
-                                    <div class="text-[11px] font-bold text-slate-800">3rd Slot</div>
-                                    <div class="text-[10px] {{ $tr->slot3_is_flagged ? 'text-red-600 font-bold' : 'text-slate-500' }}">{{ $tr->slot3_end_time ? $tr->slot3_end_time?->format('g:i A') : 'Pending' }}</div>
+                                    <div class="w-7 h-7 rounded-md font-bold text-xs flex items-center justify-center mx-auto {{ $tr->slot3_is_flagged ? 'bg-red-600 text-white' : ($tr->slot3_end_time ? 'bg-slate-900 text-white' : ($tr->slot3_start_time ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500')) }}">4</div>
+                                    <div class="text-[11px] font-semibold text-slate-800">3rd Slot</div>
+                                    <div class="text-[10px] {{ $tr->slot3_is_flagged ? 'text-red-600 font-semibold' : 'text-slate-500' }}">{{ $tr->slot3_end_time ? $tr->slot3_end_time?->format('g:i A') : 'Pending' }}</div>
                                 </div>
                             </div>
                         </div>
                     @else
-                        <div class="p-4 text-center text-slate-400 text-xs bg-slate-50 border border-slate-200/60 rounded-xl">
+                        <div class="p-4 text-center text-slate-400 text-xs bg-slate-50 border border-slate-200/60 rounded-md">
                             No slot structure tracking initialized for {{ \Carbon\Carbon::parse($targetDate)->format('M d, Y') }}.
                         </div>
                     @endif
@@ -430,11 +430,11 @@
                 <div class="space-y-2.5">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Clock Sessions & Breaks</h3>
 
-                    <div class="border border-slate-200/70 rounded-xl overflow-hidden divide-y divide-slate-100">
+                    <div class="border border-slate-200/70 rounded-md overflow-hidden divide-y divide-slate-100">
                         @forelse($logs as $idx => $log)
                             <div class="p-3 bg-white flex items-center justify-between text-xs">
-                                <span class="font-bold text-slate-800">Session #{{ $idx + 1 }}: {{ $log->clock_in_time?->format('g:i A') }} → {{ $log->clock_out_time ? $log->clock_out_time?->format('g:i A') : 'Active' }}</span>
-                                <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold text-[11px]">
+                                <span class="font-semibold text-slate-800">Session #{{ $idx + 1 }}: {{ $log->clock_in_time?->format('g:i A') }} → {{ $log->clock_out_time ? $log->clock_out_time?->format('g:i A') : 'Active' }}</span>
+                                <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-semibold text-[11px]">
                                     {{ floor(($log->duration_minutes ?: $log->clock_in_time->diffInMinutes($log->clock_out_time ?: now())) / 60) }}h {{ ($log->duration_minutes ?: $log->clock_in_time->diffInMinutes($log->clock_out_time ?: now())) % 60 }}m
                                 </span>
                             </div>
@@ -448,7 +448,7 @@
                 <div class="flex items-center justify-end pt-3 border-t border-slate-100">
                     <button 
                         wire:click="closeDetailModal" 
-                        class="px-4 py-2 text-xs font-bold rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
+                        class="px-4 py-2 text-xs font-semibold rounded-md border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
                     >
                         Close
                     </button>

@@ -51,7 +51,7 @@
             </span>
             <h2 class="text-xl font-bold text-slate-900 tracking-tight">Desktop Device Required</h2>
             <p class="text-sm text-slate-600 mt-2 leading-relaxed">
-                For security and workspace optimization, accessing and logging into <strong>TechMage</strong> is strictly prohibited on mobile devices and phone hardware.
+                For security and workspace optimization, accessing and logging into <strong>this portal</strong> is strictly prohibited on mobile devices and phone hardware.
             </p>
         </div>
 

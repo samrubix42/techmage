@@ -1,29 +1,31 @@
 <div class="max-w-6xl mx-auto space-y-6">
-    <!-- Header Section -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Daily Task Reports</h1>
-            <p class="text-xs text-slate-500 mt-1">View and manage all your submitted daily work logs and project reports.</p>
-        </div>
+    <!-- Header Section (Shadcn UI style) -->
+    <div class="bg-white border border-slate-200/80 rounded-md p-6 sm:p-8 shadow-xs">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Daily Task Reports</h1>
+                <p class="text-xs text-slate-500 mt-1">View and manage all your submitted daily work logs and project reports.</p>
+            </div>
 
-        <a 
-            href="{{ route('employee.daily-task-report-create') }}"
-            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 transition-colors shadow-xs"
-        >
-            <i class="ri-add-line text-sm"></i>
-            <span>Add Daily Task Report</span>
-        </a>
+            <a 
+                href="{{ route('employee.daily-task-report-create') }}"
+                class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-md text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 transition-all shadow-xs shrink-0"
+            >
+                <i class="ri-add-line text-sm"></i>
+                <span>Add Daily Task Report</span>
+            </a>
+        </div>
     </div>
 
-    <!-- Filters & Search Bar -->
-    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+    <!-- Filters & Search Bar (Shadcn UI style) -->
+    <div class="bg-white border border-slate-200/80 rounded-md p-4 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
         <!-- Search Input -->
         <div class="relative w-full sm:w-80">
             <input 
                 type="text" 
                 wire:model.live.debounce.300ms="search"
                 placeholder="Search projects or topics..."
-                class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all"
+                class="w-full pl-9 pr-4 py-2 bg-slate-50/80 border border-slate-200 rounded-md text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all"
             />
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                 <i class="ri-search-line"></i>
@@ -36,7 +38,7 @@
                 <input 
                     type="date" 
                     wire:model.live="dateFilter"
-                    class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all"
+                    class="w-full pl-9 pr-3 py-2 bg-slate-50/80 border border-slate-200 rounded-md text-xs font-medium text-slate-900 focus:bg-white focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all"
                 />
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                     <i class="ri-filter-3-line"></i>
@@ -47,7 +49,7 @@
                 <button 
                     type="button" 
                     wire:click="$set('search', ''); $set('dateFilter', '')"
-                    class="px-3 py-2 rounded-lg text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors whitespace-nowrap"
+                    class="px-3 py-2 rounded-md text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors whitespace-nowrap"
                 >
                     Clear Filters
                 </button>
@@ -55,11 +57,11 @@
         </div>
     </div>
 
-    <!-- Reports Table / Cards List -->
-    <div class="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
+    <!-- Reports Table / Cards List (Shadcn UI style) -->
+    <div class="bg-white border border-slate-200/80 rounded-md shadow-xs overflow-hidden">
         @if($reports->isEmpty())
             <div class="p-12 text-center space-y-3">
-                <div class="w-12 h-12 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center mx-auto text-slate-400">
+                <div class="w-12 h-12 rounded-md bg-slate-100 border border-slate-200 flex items-center justify-center mx-auto text-slate-400">
                     <i class="ri-file-paper-2-line text-2xl"></i>
                 </div>
                 <h3 class="text-sm font-bold text-slate-900">No Daily Reports Found</h3>
@@ -73,7 +75,7 @@
                 <div class="pt-2">
                     <a 
                         href="{{ route('employee.daily-task-report-create') }}"
-                        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 transition-colors shadow-xs"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-md text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 transition-colors shadow-xs"
                     >
                         <i class="ri-add-line"></i>
                         <span>Create Daily Task Report</span>
@@ -84,7 +86,7 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                        <tr class="bg-slate-50/80 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                             <th class="py-3 px-5">Report Date</th>
                             <th class="py-3 px-5">Projects Submitted</th>
                             <th class="py-3 px-5">Projects Overview</th>
@@ -100,7 +102,7 @@
                             @endphp
                             <tr class="hover:bg-slate-50/80 transition-colors">
                                 <!-- Date Column -->
-                                <td class="py-4 px-5 font-bold text-slate-900 whitespace-nowrap">
+                                <td class="py-4 px-5 font-semibold text-slate-900 whitespace-nowrap">
                                     <div class="flex items-center gap-2">
                                         <i class="ri-calendar-check-line text-slate-400"></i>
                                         <span>{{ $report->date ? $report->date->format('M d, Y') : 'N/A' }}</span>
@@ -118,8 +120,8 @@
 
                                 <!-- Projects Count -->
                                 <td class="py-4 px-5 whitespace-nowrap">
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-                                        <i class="ri-folder-3-line text-slate-500"></i>
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                                        <i class="ri-folder-3-line text-slate-400"></i>
                                         <span>{{ $projectCount }} {{ Str::plural('Project', $projectCount) }}</span>
                                     </span>
                                 </td>
@@ -128,7 +130,7 @@
                                 <td class="py-4 px-5">
                                     <div class="flex flex-wrap gap-1.5 max-w-md">
                                         @foreach($items as $item)
-                                            <span class="px-2 py-0.5 rounded bg-slate-50 text-slate-700 border border-slate-200 font-medium text-[11px] truncate max-w-[200px]" title="{{ $item['title'] ?? 'Untitled' }}">
+                                            <span class="px-2 py-0.5 rounded-md bg-slate-50 text-slate-700 border border-slate-200 font-medium text-[11px] truncate max-w-[200px]" title="{{ $item['title'] ?? 'Untitled' }}">
                                                 {{ $item['title'] ?? 'Untitled' }}
                                             </span>
                                         @endforeach
@@ -138,50 +140,49 @@
                                 <!-- Admin Review Status -->
                                 <td class="py-4 px-5 whitespace-nowrap">
                                     @if($report->is_checked)
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                             <i class="ri-checkbox-circle-fill text-emerald-600"></i>
                                             <span>Reviewed & Done</span>
                                         </span>
                                     @else
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
                                             <i class="ri-time-line text-amber-500"></i>
                                             <span>Pending Review</span>
                                         </span>
                                     @endif
                                 </td>
 
-
                                 <!-- Actions -->
                                 <td class="py-4 px-5 text-right whitespace-nowrap">
                                     <div class="flex items-center justify-end gap-2">
                                         <button 
                                             wire:click="viewReport({{ $report->id }})"
-                                            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
+                                            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 transition-colors shadow-2xs cursor-pointer"
                                         >
-                                            <i class="ri-eye-line text-slate-500"></i>
+                                            <i class="ri-eye-line text-slate-400"></i>
                                             <span>View Details</span>
                                         </button>
 
                                         <a 
                                             href="{{ route('employee.daily-task-report-edit', $report) }}"
-                                            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
+                                            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 transition-colors shadow-2xs"
                                             title="Edit Report"
                                         >
-                                            <i class="ri-edit-line text-slate-500"></i>
+                                            <i class="ri-edit-line text-slate-400"></i>
                                             <span>Edit</span>
                                         </a>
 
                                         @if($confirmingDeleteId === $report->id)
-                                            <div class="inline-flex items-center gap-1 bg-red-50 p-1 rounded-lg border border-red-200">
+                                            <div class="inline-flex items-center gap-1 bg-red-50 p-1 rounded-md border border-red-200">
                                                 <button 
                                                     wire:click="deleteReport({{ $report->id }})"
-                                                    class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-[11px] font-bold transition-colors"
+                                                    class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded-md text-[11px] font-semibold transition-colors"
                                                 >
                                                     Confirm
                                                 </button>
                                                 <button 
                                                     wire:click="cancelDelete"
-                                                    class="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-[11px] font-bold transition-colors"
+                                                    class="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-md text-[11px] font-semibold transition-colors"
                                                 >
                                                     Cancel
                                                 </button>
@@ -189,7 +190,7 @@
                                         @else
                                             <button 
                                                 wire:click="confirmDelete({{ $report->id }})"
-                                                class="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                                                class="p-1.5 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                                                 title="Delete Report"
                                             >
                                                 <i class="ri-delete-bin-line text-base"></i>
@@ -197,7 +198,6 @@
                                         @endif
                                     </div>
                                 </td>
-
                             </tr>
                         @endforeach
                     </tbody>
@@ -206,14 +206,14 @@
 
             <!-- Pagination Container -->
             @if($reports->hasPages())
-                <div class="p-4 border-t border-slate-200 bg-slate-50">
+                <div class="p-4 border-t border-slate-200 bg-slate-50/50">
                     {{ $reports->links() }}
                 </div>
             @endif
         @endif
     </div>
 
-    <!-- Report Detail Modal -->
+    <!-- Report Detail Modal (Shadcn UI style) -->
     @if($showDetailModal && $this->selectedReport)
         @php
             $modalReport = $this->selectedReport;
@@ -223,22 +223,22 @@
             x-data
             @keydown.escape.window="$wire.closeDetailModal()"
         >
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-150">
+            <div class="bg-white rounded-md border border-slate-200 shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-150">
                 <!-- Modal Header -->
-                <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="px-2.5 py-0.5 rounded text-[11px] font-bold bg-slate-900 text-white uppercase tracking-wider">
+                            <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-900 text-white uppercase tracking-wider">
                                 Daily Report
                             </span>
-                            <span class="text-xs font-bold text-slate-700">
+                            <span class="text-xs font-bold text-slate-900">
                                 {{ $modalReport->date ? $modalReport->date->format('F d, Y') : 'N/A' }}
                             </span>
                         </div>
                         <div class="flex items-center gap-3 text-[11px] text-slate-500 mt-1">
                             <span>Submitted: {{ $modalReport->created_at ? $modalReport->created_at->format('M d, Y at g:i A') : '' }}</span>
                             @if($modalReport->updated_at && $modalReport->updated_at->gt($modalReport->created_at))
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
                                     <i class="ri-history-line"></i>
                                     Last Edited: {{ $modalReport->updated_at->format('M d, Y at g:i A') }}
                                 </span>
@@ -248,7 +248,7 @@
 
                     <button 
                         wire:click="closeDetailModal"
-                        class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 flex items-center justify-center transition-colors"
+                        class="w-8 h-8 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200 flex items-center justify-center transition-colors"
                     >
                         <i class="ri-close-line text-xl"></i>
                     </button>
@@ -261,9 +261,9 @@
                     @endphp
 
                     @foreach($modalItems as $index => $item)
-                        <div class="border border-slate-200 rounded-xl p-5 bg-slate-50/50 space-y-3">
+                        <div class="border border-slate-200 rounded-md p-5 bg-slate-50/50 space-y-3">
                             <div class="flex items-center gap-2 border-b border-slate-200 pb-2.5">
-                                <span class="w-5 h-5 rounded-full bg-slate-800 text-white text-[11px] font-bold flex items-center justify-center shrink-0">
+                                <span class="w-5 h-5 rounded-md bg-slate-900 text-white text-[11px] font-bold flex items-center justify-center shrink-0">
                                     {{ $index + 1 }}
                                 </span>
                                 <h3 class="text-sm font-bold text-slate-900 tracking-tight">
@@ -271,7 +271,7 @@
                                 </h3>
                             </div>
 
-                            <div class="prose prose-slate prose-sm max-w-none text-xs leading-relaxed text-slate-700 bg-white p-4 rounded-lg border border-slate-200 shadow-2xs">
+                            <div class="prose prose-slate prose-sm max-w-none text-xs leading-relaxed text-slate-700 bg-white p-4 rounded-md border border-slate-200 shadow-2xs">
                                 {!! $item['description'] ?? '<p class="text-slate-400 italic">No description provided.</p>' !!}
                             </div>
                         </div>
@@ -279,11 +279,11 @@
                 </div>
 
                 <!-- Modal Footer -->
-                <div class="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-end">
+                <div class="p-4 border-t border-slate-200 bg-slate-50/80 flex items-center justify-end">
                     <div class="flex items-center gap-2">
                         <a 
                             href="{{ route('employee.daily-task-report-edit', $modalReport) }}"
-                            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-100 transition-colors shadow-xs"
+                            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-100 transition-colors shadow-2xs"
                         >
                             <i class="ri-edit-line"></i>
                             <span>Edit Report</span>
@@ -291,7 +291,7 @@
 
                         <button 
                             wire:click="closeDetailModal"
-                            class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition-colors"
+                            class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-semibold transition-colors shadow-xs"
                         >
                             Close
                         </button>

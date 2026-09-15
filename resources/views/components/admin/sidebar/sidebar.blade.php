@@ -6,13 +6,8 @@
     <div>
         <div class="h-16 flex items-center justify-between px-5 border-b border-slate-200">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-amber-600 text-white flex items-center justify-center font-bold shadow-xs">
-                    TM
-                </div>
-                <div>
-                    <span class="font-bold text-slate-900 tracking-tight text-sm block leading-tight">TechMage</span>
-                    <span class="text-[10px] font-semibold text-amber-600 uppercase tracking-wider">Admin Portal</span>
-                </div>
+                <img src="{{ asset('logo.png') }}" alt="Logo" class="h-9 w-auto rounded-md object-contain shrink-0">
+                <span class="text-[10px] font-bold text-amber-600 uppercase tracking-wider">Admin Portal</span>
             </div>
 
             <!-- Mobile Close Button -->
