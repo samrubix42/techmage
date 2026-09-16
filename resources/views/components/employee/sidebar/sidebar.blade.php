@@ -3,9 +3,9 @@
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
 >
     <div>
-        <!-- Brand Header with logo.png only -->
-        <div class="h-16 flex items-center justify-between px-5 border-b border-slate-200">
-            <div class="flex items-center gap-3">
+        <!-- Brand Header with stacked Logo and Employee Portal in col -->
+        <div class="py-4 flex items-center justify-between px-5 border-b border-slate-200">
+            <div class="flex flex-col items-start gap-1">
                 <img src="{{ asset('logo.png') }}" alt="Logo" class="h-9 w-auto rounded-md object-contain shrink-0">
                 <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Employee Portal</span>
             </div>

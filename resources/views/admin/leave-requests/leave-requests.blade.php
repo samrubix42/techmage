@@ -1,10 +1,10 @@
 <div class="space-y-6">
     <!-- Page Header -->
-    <div class="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-xs relative overflow-hidden">
+    <div class="bg-white border border-slate-200/80 rounded-md p-6 sm:p-8 shadow-xs relative overflow-hidden">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <div class="flex items-center gap-2 mb-2">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
                         <i class="ri-calendar-todo-line text-amber-600"></i>
                         Leave Approval & Categorization System
                     </span>
@@ -14,7 +14,7 @@
             </div>
 
             <div class="flex items-center gap-3">
-                <div class="bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-right">
+                <div class="bg-slate-50 border border-slate-200 rounded-md px-4 py-2 text-right">
                     <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Pending Action</span>
                     <span class="text-lg font-bold text-amber-600">{{ $totalPending }} Requests</span>
                 </div>
@@ -25,10 +25,10 @@
     <!-- Key Metrics Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Metric 1: Pending Approvals -->
-        <div class="bg-white border {{ $totalPending > 0 ? 'border-amber-300 bg-amber-50/10' : 'border-slate-200' }} rounded-xl p-5 hover:border-amber-400 transition-colors shadow-xs">
+        <div class="bg-white border {{ $totalPending > 0 ? 'border-amber-300 bg-amber-50/10' : 'border-slate-200/80' }} rounded-md p-5 hover:border-amber-400 transition-colors shadow-xs">
             <div class="flex items-center justify-between text-slate-500 mb-3">
                 <span class="text-xs font-semibold uppercase tracking-wider text-amber-800">Pending Review</span>
-                <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
+                <div class="w-8 h-8 rounded-md bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
                     <i class="ri-time-line text-lg"></i>
                 </div>
             </div>
@@ -37,10 +37,10 @@
         </div>
 
         <!-- Metric 2: Approved This Month -->
-        <div class="bg-white border border-slate-200 rounded-xl p-5 hover:border-slate-300 transition-colors shadow-xs">
+        <div class="bg-white border border-slate-200/80 rounded-md p-5 hover:border-slate-300 transition-colors shadow-xs">
             <div class="flex items-center justify-between text-slate-500 mb-3">
                 <span class="text-xs font-semibold uppercase tracking-wider">Approved This Month</span>
-                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                <div class="w-8 h-8 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
                     <i class="ri-checkbox-circle-line text-lg"></i>
                 </div>
             </div>
@@ -49,10 +49,10 @@
         </div>
 
         <!-- Metric 3: Total Paid Leaves -->
-        <div class="bg-white border border-slate-200 rounded-xl p-5 hover:border-slate-300 transition-colors shadow-xs">
+        <div class="bg-white border border-slate-200/80 rounded-md p-5 hover:border-slate-300 transition-colors shadow-xs">
             <div class="flex items-center justify-between text-slate-500 mb-3">
                 <span class="text-xs font-semibold uppercase tracking-wider">Paid Leaves</span>
-                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                <div class="w-8 h-8 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
                     <i class="ri-money-dollar-circle-line text-lg"></i>
                 </div>
             </div>
@@ -61,10 +61,10 @@
         </div>
 
         <!-- Metric 4: Total Unpaid Leaves -->
-        <div class="bg-white border border-slate-200 rounded-xl p-5 hover:border-slate-300 transition-colors shadow-xs">
+        <div class="bg-white border border-slate-200/80 rounded-md p-5 hover:border-slate-300 transition-colors shadow-xs">
             <div class="flex items-center justify-between text-slate-500 mb-3">
                 <span class="text-xs font-semibold uppercase tracking-wider">Unpaid Leaves</span>
-                <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
+                <div class="w-8 h-8 rounded-md bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
                     <i class="ri-calendar-event-line text-lg"></i>
                 </div>
             </div>
@@ -74,9 +74,9 @@
     </div>
 
     <!-- Main Table Container -->
-    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
+    <div class="bg-white border border-slate-200/80 rounded-md p-6 shadow-xs space-y-4">
         <!-- Filter Bar -->
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-md bg-slate-50 border border-slate-200">
             <div class="flex flex-wrap items-center gap-3">
                 <!-- Search Input -->
                 <div class="relative w-full sm:w-64">
@@ -84,7 +84,7 @@
                         type="text" 
                         wire:model.live.debounce.300ms="search" 
                         placeholder="Search employee name or email..." 
-                        class="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-300 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white"
+                        class="w-full pl-9 pr-3 py-1.5 text-xs rounded-md border border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 bg-white"
                     />
                     <i class="ri-search-line text-slate-400 absolute left-3 top-2 text-sm"></i>
                 </div>
@@ -92,7 +92,7 @@
                 <!-- Status Filter -->
                 <select 
                     wire:model.live="statusFilter" 
-                    class="py-1.5 px-3 text-xs rounded-lg border border-slate-300 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white font-medium text-slate-700 shadow-xs"
+                    class="py-1.5 px-3 text-xs rounded-md border border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 bg-white font-medium text-slate-700 shadow-xs"
                 >
                     <option value="">All Statuses</option>
                     <option value="pending">Pending Review</option>
@@ -103,7 +103,7 @@
                 <!-- Department Filter -->
                 <select 
                     wire:model.live="departmentFilter" 
-                    class="py-1.5 px-3 text-xs rounded-lg border border-slate-300 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white font-medium text-slate-700 shadow-xs"
+                    class="py-1.5 px-3 text-xs rounded-md border border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 bg-white font-medium text-slate-700 shadow-xs"
                 >
                     <option value="">All Departments</option>
                     @foreach($departments as $dept)
@@ -115,7 +115,7 @@
             @if($search || $statusFilter || $departmentFilter)
                 <button 
                     wire:click="$set('search', ''); $set('statusFilter', ''); $set('departmentFilter', '');" 
-                    class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 bg-white hover:bg-slate-100 border border-slate-200 transition-colors"
+                    class="px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 bg-white hover:bg-slate-100 border border-slate-200 transition-colors"
                 >
                     <i class="ri-refresh-line"></i> Reset Filters
                 </button>
@@ -123,7 +123,7 @@
         </div>
 
         <!-- Table -->
-        <div class="overflow-x-auto border border-slate-200 rounded-lg">
+        <div class="overflow-x-auto border border-slate-200/80 rounded-md">
             <table class="w-full text-left text-xs text-slate-700">
                 <thead class="uppercase bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
                     <tr>
@@ -194,15 +194,15 @@
                             <!-- Status Badge -->
                             <td class="px-4 py-3.5 align-middle">
                                 @if($req->status === 'pending')
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">
                                         <i class="ri-time-line text-amber-600"></i> Pending Review
                                     </span>
                                 @elseif($req->status === 'approved')
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                         <i class="ri-checkbox-circle-line text-emerald-600"></i> Approved
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold bg-red-50 text-red-700 border border-red-200">
                                         <i class="ri-close-circle-line text-red-600"></i> Rejected
                                     </span>
                                 @endif
@@ -237,15 +237,15 @@
                             <td class="px-4 py-3.5 align-middle text-right space-x-1">
                                 <button 
                                     wire:click="openReviewModal({{ $req->id }})" 
-                                    class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-800 bg-white hover:bg-amber-50 hover:text-amber-800 border border-slate-200 hover:border-amber-300 transition-colors shadow-2xs inline-flex items-center gap-1.5 cursor-pointer"
+                                    class="px-3 py-1.5 rounded-md text-xs font-bold text-slate-800 bg-white hover:bg-slate-100 border border-slate-200 transition-colors shadow-2xs inline-flex items-center gap-1.5 cursor-pointer"
                                 >
-                                    <i class="ri-edit-box-line text-amber-600"></i>
+                                    <i class="ri-edit-box-line text-slate-500"></i>
                                     <span>{{ $req->status === 'pending' ? 'Review & Approve' : 'Edit Decision' }}</span>
                                 </button>
 
                                 <button 
                                     wire:click="openCancelModal({{ $req->id }})" 
-                                    class="px-2.5 py-1.5 rounded-lg text-xs font-bold text-red-700 bg-white hover:bg-red-50 border border-red-200 transition-colors shadow-2xs inline-flex items-center gap-1 cursor-pointer"
+                                    class="px-2.5 py-1.5 rounded-md text-xs font-bold text-red-700 bg-white hover:bg-red-50 border border-red-200 transition-colors shadow-2xs inline-flex items-center gap-1 cursor-pointer"
                                     title="Cancel Leave Request"
                                 >
                                     <i class="ri-delete-bin-line text-red-500"></i>
@@ -280,11 +280,11 @@
             x-data
             @keydown.escape.window="$wire.closeReviewModal()"
         >
-            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xl max-w-lg w-full p-6 space-y-5 text-left relative transform transition-all">
+            <div class="bg-white rounded-md border border-slate-200/80 shadow-2xl max-w-lg w-full p-6 space-y-5 text-left relative transform transition-all">
                 <!-- Modal Header -->
                 <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 border border-amber-200/60 flex items-center justify-center font-bold text-sm shrink-0">
+                        <div class="w-10 h-10 rounded-md bg-amber-50 text-amber-700 border border-amber-200/60 flex items-center justify-center font-bold text-sm shrink-0">
                             {{ strtoupper(substr($selectedLeaveRequest->user->name ?? 'E', 0, 1)) }}
                         </div>
                         <div>
@@ -294,14 +294,14 @@
                     </div>
                     <button 
                         wire:click="closeReviewModal" 
-                        class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+                        class="w-8 h-8 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
                     >
                         <i class="ri-close-line text-lg"></i>
                     </button>
                 </div>
 
                 <!-- Leave Summary Card -->
-                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2 text-xs">
+                <div class="bg-slate-50 border border-slate-200 rounded-md p-3.5 space-y-2 text-xs">
                     <div class="flex items-center justify-between font-bold">
                         <span class="text-slate-800 flex items-center gap-1.5">
                             <i class="{{ $selectedLeaveRequest->request_type === 'single_day' ? 'ri-calendar-event-line' : 'ri-calendar-2-line' }} text-amber-600"></i>
@@ -333,7 +333,7 @@
                     <div>
                         <label class="block font-bold text-slate-700 uppercase tracking-wide mb-2 text-[11px]">Admin Decision</label>
                         <div class="grid grid-cols-2 gap-3">
-                            <label class="flex items-center gap-2.5 p-3 rounded-xl border {{ $decision === 'approved' ? 'border-emerald-500 bg-emerald-50/60 text-emerald-900 font-bold' : 'border-slate-200 bg-white text-slate-700' }} cursor-pointer transition-colors">
+                            <label class="flex items-center gap-2.5 p-3 rounded-md border {{ $decision === 'approved' ? 'border-emerald-500 bg-emerald-50/60 text-emerald-900 font-bold' : 'border-slate-200 bg-white text-slate-700' }} cursor-pointer transition-colors">
                                 <input 
                                     type="radio" 
                                     wire:model.live="decision" 
@@ -346,7 +346,7 @@
                                 </div>
                             </label>
 
-                            <label class="flex items-center gap-2.5 p-3 rounded-xl border {{ $decision === 'rejected' ? 'border-red-500 bg-red-50/60 text-red-900 font-bold' : 'border-slate-200 bg-white text-slate-700' }} cursor-pointer transition-colors">
+                            <label class="flex items-center gap-2.5 p-3 rounded-md border {{ $decision === 'rejected' ? 'border-red-500 bg-red-50/60 text-red-900 font-bold' : 'border-slate-200 bg-white text-slate-700' }} cursor-pointer transition-colors">
                                 <input 
                                     type="radio" 
                                     wire:model.live="decision" 
@@ -367,7 +367,7 @@
                             <label class="block font-bold text-slate-700 mb-1">Select Leave Type</label>
                             <select 
                                 wire:model="leave_category" 
-                                class="w-full px-3 py-2 text-xs font-semibold rounded-lg border border-slate-300 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white shadow-xs"
+                                class="w-full px-3 py-2 text-xs font-semibold rounded-md border border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 bg-white shadow-xs"
                             >
                                 <option value="paid">Paid Leave</option>
                                 <option value="unpaid">Unpaid Leave</option>
@@ -388,7 +388,7 @@
                             wire:model="admin_remarks" 
                             rows="2" 
                             placeholder="Add notes for the employee regarding this decision..." 
-                            class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white"
+                            class="w-full px-3 py-2 text-xs rounded-md border border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 bg-white"
                         ></textarea>
                         @error('admin_remarks') <span class="text-red-500 text-[11px] block mt-1">{{ $message }}</span> @enderror
                     </div>
@@ -398,13 +398,13 @@
                         <button 
                             type="button" 
                             wire:click="closeReviewModal" 
-                            class="px-4 py-2 text-xs font-bold rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
+                            class="px-4 py-2 text-xs font-bold rounded-md border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
                         >
                             Cancel
                         </button>
                         <button 
                             type="submit" 
-                            class="px-4 py-2 text-xs font-bold rounded-lg text-white {{ $decision === 'approved' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700' }} transition-colors cursor-pointer shadow-xs"
+                            class="px-4 py-2 text-xs font-bold rounded-md text-white {{ $decision === 'approved' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700' }} transition-colors cursor-pointer shadow-xs"
                         >
                             Save Decision & Sync Attendance
                         </button>
@@ -421,10 +421,10 @@
             x-data
             @keydown.escape.window="$wire.closeCancelModal()"
         >
-            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xl max-w-md w-full p-6 space-y-5 text-left relative transform transition-all">
+            <div class="bg-white rounded-md border border-slate-200/80 shadow-2xl max-w-md w-full p-6 space-y-5 text-left relative transform transition-all">
                 <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-9 h-9 rounded-xl bg-red-50 text-red-600 border border-red-200/60 flex items-center justify-center font-bold text-lg shrink-0">
+                        <div class="w-9 h-9 rounded-md bg-red-50 text-red-600 border border-red-200/60 flex items-center justify-center font-bold text-lg shrink-0">
                             <i class="ri-delete-bin-line"></i>
                         </div>
                         <div>
@@ -434,7 +434,7 @@
                     </div>
                     <button 
                         wire:click="closeCancelModal" 
-                        class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+                        class="w-8 h-8 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
                     >
                         <i class="ri-close-line text-lg"></i>
                     </button>
@@ -442,7 +442,7 @@
 
                 <div class="space-y-4 text-xs">
                     <!-- Leave Target Summary Card -->
-                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                    <div class="p-3.5 rounded-md bg-slate-50 border border-slate-200 space-y-1.5">
                         <div class="flex items-center justify-between font-bold">
                             <span class="text-slate-800">
                                 {{ $cancelLeaveTarget->request_type === 'single_day' ? 'Single Day Leave' : 'Multiple Days Leave' }}
@@ -462,7 +462,7 @@
                     </div>
 
                     @if($cancelLeaveTarget->status === 'approved')
-                        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2">
+                        <div class="p-3 rounded-md bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2">
                             <i class="ri-information-line text-amber-600 text-base shrink-0 mt-0.5"></i>
                             <div>
                                 <strong>Admin Notice:</strong> Cancelling this leave request will remove the leave status from {{ $cancelLeaveTarget->user->name }}'s attendance records.
@@ -471,7 +471,7 @@
                     @endif
 
                     <!-- Checkbox Confirmation -->
-                    <div class="p-3 rounded-xl border border-slate-200 bg-white">
+                    <div class="p-3 rounded-md border border-slate-200 bg-white">
                         <label class="flex items-start gap-3 cursor-pointer select-none">
                             <input 
                                 type="checkbox" 
@@ -490,7 +490,7 @@
                     <button 
                         type="button" 
                         wire:click="closeCancelModal" 
-                        class="px-4 py-2 text-xs font-bold rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
+                        class="px-4 py-2 text-xs font-bold rounded-md border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
                     >
                         Back
                     </button>
@@ -498,7 +498,7 @@
                         type="button" 
                         wire:click="confirmCancelLeave" 
                         @if(!$confirmCancelCheck) disabled @endif
-                        class="px-4 py-2 text-xs font-bold rounded-lg text-white bg-red-600 hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-xs"
+                        class="px-4 py-2 text-xs font-bold rounded-md text-white bg-red-600 hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-xs"
                     >
                         <i class="ri-checkbox-circle-line text-sm"></i>
                         <span>Confirm & Cancel Leave</span>

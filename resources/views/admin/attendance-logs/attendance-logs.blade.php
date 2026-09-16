@@ -1,10 +1,10 @@
 <div class="space-y-6" wire:poll.10s>
     <!-- Page Header -->
-    <div class="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-xs relative overflow-hidden">
+    <div class="bg-white border border-slate-200/80 rounded-md p-6 sm:p-8 shadow-xs relative overflow-hidden">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <div class="flex items-center gap-2 mb-2">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
                         <i class="ri-time-line text-amber-600"></i>
                         Employee Working Hours & Slot Portal
                     </span>
@@ -15,7 +15,7 @@
             </div>
 
             <div class="flex items-center gap-3">
-                <div class="bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-right">
+                <div class="bg-slate-50 border border-slate-200 rounded-md px-4 py-2 text-right">
                     <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total Staff Tracked</span>
                     <span class="text-lg font-bold text-slate-900">{{ $totalStaff }} Employees</span>
                 </div>
@@ -26,10 +26,10 @@
     <!-- Key Metrics Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Metric 1: Total Staff -->
-        <div class="bg-white border border-slate-200 rounded-xl p-5 hover:border-slate-300 transition-colors shadow-xs">
+        <div class="bg-white border border-slate-200/80 rounded-md p-5 hover:border-slate-300 transition-colors shadow-xs">
             <div class="flex items-center justify-between text-slate-500 mb-3">
                 <span class="text-xs font-semibold uppercase tracking-wider">Staff Count</span>
-                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                <div class="w-8 h-8 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
                     <i class="ri-team-line text-lg"></i>
                 </div>
             </div>
@@ -38,10 +38,10 @@
         </div>
 
         <!-- Metric 2: Clocked In -->
-        <div class="bg-white border border-slate-200 rounded-xl p-5 hover:border-slate-300 transition-colors shadow-xs">
+        <div class="bg-white border border-slate-200/80 rounded-md p-5 hover:border-slate-300 transition-colors shadow-xs">
             <div class="flex items-center justify-between text-slate-500 mb-3">
                 <span class="text-xs font-semibold uppercase tracking-wider">Clocked In</span>
-                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                <div class="w-8 h-8 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
                     <i class="ri-user-check-line text-lg"></i>
                 </div>
             </div>
@@ -50,10 +50,10 @@
         </div>
 
         <!-- Metric 3: Avg Working Hours -->
-        <div class="bg-white border border-slate-200 rounded-xl p-5 hover:border-slate-300 transition-colors shadow-xs">
+        <div class="bg-white border border-slate-200/80 rounded-md p-5 hover:border-slate-300 transition-colors shadow-xs">
             <div class="flex items-center justify-between text-slate-500 mb-3">
                 <span class="text-xs font-semibold uppercase tracking-wider">Avg Work Hours</span>
-                <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+                <div class="w-8 h-8 rounded-md bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
                     <i class="ri-time-line text-lg"></i>
                 </div>
             </div>
@@ -62,10 +62,10 @@
         </div>
 
         <!-- Metric 4: Red Flag Exceptions -->
-        <div class="bg-white border {{ $totalFlaggedCount > 0 ? 'border-red-300 bg-red-50/20' : 'border-slate-200' }} rounded-xl p-5 hover:border-red-400 transition-colors shadow-xs">
+        <div class="bg-white border {{ $totalFlaggedCount > 0 ? 'border-red-300 bg-red-50/20' : 'border-slate-200/80' }} rounded-md p-5 hover:border-red-400 transition-colors shadow-xs">
             <div class="flex items-center justify-between text-slate-500 mb-3">
                 <span class="text-xs font-semibold uppercase tracking-wider text-red-700">Red Flagged</span>
-                <div class="w-8 h-8 rounded-lg bg-red-100 text-red-700 flex items-center justify-center font-bold">
+                <div class="w-8 h-8 rounded-md bg-red-100 text-red-700 flex items-center justify-center font-bold">
                     <i class="ri-alarm-warning-line text-lg"></i>
                 </div>
             </div>
@@ -77,9 +77,9 @@
     </div>
 
     <!-- Main Table Container -->
-    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
+    <div class="bg-white border border-slate-200/80 rounded-md p-6 shadow-xs space-y-4">
         <!-- Date & Filters Bar -->
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-md bg-slate-50 border border-slate-200">
             <!-- Left: Date Selector & Quick Presets -->
             <div class="flex flex-wrap items-center gap-3">
                 <div class="flex items-center gap-2">
@@ -88,20 +88,20 @@
                     <input 
                         type="date" 
                         wire:model.live="selectedDate" 
-                        class="py-1.5 px-3 text-xs font-bold rounded-lg border border-slate-300 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white text-slate-900 shadow-xs"
+                        class="py-1.5 px-3 text-xs font-bold rounded-md border border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 bg-white text-slate-900 shadow-xs"
                     />
                 </div>
 
                 <div class="flex items-center gap-1.5">
                     <button 
                         wire:click="setToday" 
-                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-xs {{ $selectedDate === now()->toDateString() ? 'bg-amber-600 text-white' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100' }}"
+                        class="px-3 py-1.5 rounded-md text-xs font-bold transition-all shadow-xs {{ $selectedDate === now()->toDateString() ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100' }}"
                     >
                         Today
                     </button>
                     <button 
                         wire:click="setYesterday" 
-                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-xs {{ $selectedDate === now()->subDay()->toDateString() ? 'bg-amber-600 text-white' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100' }}"
+                        class="px-3 py-1.5 rounded-md text-xs font-bold transition-all shadow-xs {{ $selectedDate === now()->subDay()->toDateString() ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100' }}"
                     >
                         Yesterday
                     </button>
@@ -115,14 +115,14 @@
                         type="text" 
                         wire:model.live.debounce.300ms="search" 
                         placeholder="Search employee..." 
-                        class="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white"
+                        class="w-full pl-9 pr-3 py-1.5 text-xs rounded-md border border-slate-200 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 bg-white"
                     />
                     <i class="ri-search-line text-slate-400 absolute left-3 top-2 text-sm"></i>
                 </div>
 
                 <select 
                     wire:model.live="departmentFilter" 
-                    class="py-1.5 px-3 text-xs rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white font-medium text-slate-700 shadow-xs"
+                    class="py-1.5 px-3 text-xs rounded-md border border-slate-200 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 bg-white font-medium text-slate-700 shadow-xs"
                 >
                     <option value="">All Departments</option>
                     @foreach($departments as $dept)
@@ -133,7 +133,7 @@
                 @if($search || $departmentFilter || $selectedDate !== now()->toDateString())
                     <button 
                         wire:click="resetFilters" 
-                        class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 bg-white hover:bg-slate-100 border border-slate-200 transition-colors"
+                        class="px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 bg-white hover:bg-slate-100 border border-slate-200 transition-colors"
                         title="Reset Filters"
                     >
                         <i class="ri-refresh-line"></i> Reset
@@ -143,7 +143,7 @@
         </div>
 
         <!-- Attendance & Work Hours Table -->
-        <div class="overflow-x-auto border border-slate-200 rounded-lg">
+        <div class="overflow-x-auto border border-slate-200/80 rounded-md">
             <table class="w-full text-left text-xs text-slate-700">
                 <thead class="uppercase bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
                     <tr>
@@ -204,7 +204,7 @@
                             <!-- Net Working Hours -->
                             <td class="px-4 py-3.5 align-middle">
                                 @if($st && $st['totalWorkedMinutes'] > 0)
-                                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold shadow-2xs {{ $st['hasActiveSession'] ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-slate-100 text-slate-800 border border-slate-300' }}">
+                                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold shadow-2xs {{ $st['hasActiveSession'] ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-slate-100 text-slate-800 border border-slate-300' }}">
                                         <i class="ri-time-fill text-slate-500"></i>
                                         <span>{{ $st['formattedTotalHours'] }}</span>
                                         @if($st['hasActiveSession'])
@@ -219,12 +219,12 @@
                             <!-- Break Duration -->
                             <td class="px-4 py-3.5 align-middle">
                                 @if($st && $st['totalBreaksMinutes'] > 0)
-                                    <span class="px-2.5 py-1 rounded bg-amber-50 text-amber-800 border border-amber-200 font-bold text-xs inline-flex items-center gap-1">
+                                    <span class="px-2.5 py-1 rounded-md bg-amber-50 text-amber-800 border border-amber-200 font-bold text-xs inline-flex items-center gap-1">
                                         <i class="ri-rest-time-line text-amber-600"></i>
                                         <span>{{ $st['formattedBreakHours'] }}</span>
                                     </span>
                                 @elseif($tr && $tr->lunch_duration_minutes)
-                                    <span class="px-2.5 py-1 rounded bg-amber-50 text-amber-800 border border-amber-200 font-bold text-xs inline-flex items-center gap-1">
+                                    <span class="px-2.5 py-1 rounded-md bg-amber-50 text-amber-800 border border-amber-200 font-bold text-xs inline-flex items-center gap-1">
                                         <i class="ri-cup-line text-amber-600"></i>
                                         <span>{{ $tr->lunch_duration_minutes }}m Lunch</span>
                                     </span>
@@ -274,9 +274,9 @@
                             <td class="px-4 py-3.5 align-middle text-right">
                                 <button 
                                     wire:click="openModal({{ $emp->id }})" 
-                                    class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-800 bg-white hover:bg-amber-50 hover:text-amber-800 border border-slate-200 hover:border-amber-300 transition-colors shadow-2xs inline-flex items-center gap-1.5 cursor-pointer"
+                                    class="px-3 py-1.5 rounded-md text-xs font-bold text-slate-800 bg-white hover:bg-slate-100 border border-slate-200 transition-colors shadow-2xs inline-flex items-center gap-1.5 cursor-pointer"
                                 >
-                                    <i class="ri-dashboard-2-line text-amber-600"></i>
+                                    <i class="ri-dashboard-2-line text-slate-500"></i>
                                     <span>Inspect Details</span>
                                 </button>
                             </td>
@@ -316,11 +316,11 @@
             x-data
             @keydown.escape.window="$wire.closeModal()"
         >
-            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xl max-w-2xl w-full p-6 space-y-6 text-left relative max-h-[88vh] overflow-y-auto transform transition-all">
+            <div class="bg-white rounded-md border border-slate-200/80 shadow-2xl max-w-2xl w-full p-6 space-y-6 text-left relative max-h-[88vh] overflow-y-auto transform transition-all">
                 <!-- Clean Minimal Header -->
                 <div class="flex items-center justify-between pb-4 border-b border-slate-100">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 border border-amber-200/60 flex items-center justify-center font-bold text-sm shrink-0">
+                        <div class="w-10 h-10 rounded-md bg-amber-50 text-amber-700 border border-amber-200/60 flex items-center justify-center font-bold text-sm shrink-0">
                             {{ strtoupper(substr($u->name, 0, 1)) }}
                         </div>
                         <div>
@@ -336,7 +336,7 @@
 
                     <button 
                         wire:click="closeModal" 
-                        class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+                        class="w-8 h-8 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
                         title="Close Modal"
                     >
                         <i class="ri-close-line text-lg"></i>
@@ -346,21 +346,21 @@
                 <!-- Minimal Key Stats Grid (Clean Cards) -->
                 <div class="grid grid-cols-3 gap-3">
                     <!-- Stat 1: Total Working Hours -->
-                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70 text-center space-y-1">
+                    <div class="p-4 rounded-md bg-slate-50 border border-slate-200/70 text-center space-y-1">
                         <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total Worked</span>
                         <div class="text-xl font-extrabold text-slate-900">{{ $st['formattedTotalHours'] }}</div>
                         <span class="text-[10px] text-slate-500 font-medium">Net calculated</span>
                     </div>
 
                     <!-- Stat 2: Total Breaks -->
-                    <div class="p-4 rounded-xl bg-amber-50/50 border border-amber-200/60 text-center space-y-1">
+                    <div class="p-4 rounded-md bg-amber-50/50 border border-amber-200/60 text-center space-y-1">
                         <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 block">Break Duration</span>
                         <div class="text-xl font-extrabold text-amber-900">{{ $st['formattedBreakHours'] }}</div>
                         <span class="text-[10px] text-amber-700 font-medium">{{ $st['sessionCount'] > 1 ? ($st['sessionCount'] - 1).' break(s)' : 'No extra break' }}</span>
                     </div>
 
                     <!-- Stat 3: Shift Status -->
-                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70 text-center space-y-1">
+                    <div class="p-4 rounded-md bg-slate-50 border border-slate-200/70 text-center space-y-1">
                         <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Shift Status</span>
                         <div class="text-sm font-bold mt-1">
                             @if($st['hasActiveSession'])
@@ -389,7 +389,7 @@
                     </div>
 
                     @if($tr)
-                        <div class="bg-slate-50 border border-slate-200/70 rounded-xl p-4 space-y-4">
+                        <div class="bg-slate-50 border border-slate-200/70 rounded-md p-4 space-y-4">
                             <!-- Stepper Horizontal Connection -->
                             <div class="grid grid-cols-4 gap-2 text-center relative">
                                 <!-- Step 1 -->
@@ -447,7 +447,7 @@
                             </div>
                         </div>
                     @else
-                        <div class="p-4 text-center text-slate-400 text-xs bg-slate-50 border border-slate-200/60 rounded-xl">
+                        <div class="p-4 text-center text-slate-400 text-xs bg-slate-50 border border-slate-200/60 rounded-md">
                             No slot structure tracking initialized for this date.
                         </div>
                     @endif
@@ -457,7 +457,7 @@
                 <div class="space-y-2.5 pt-1">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Clock-In & Out Sessions</h3>
 
-                    <div class="border border-slate-200/70 rounded-xl overflow-hidden divide-y divide-slate-100">
+                    <div class="border border-slate-200/70 rounded-md overflow-hidden divide-y divide-slate-100">
                         @forelse($logs as $idx => $log)
                             <div class="p-3.5 bg-white flex items-center justify-between gap-3 text-xs">
                                 <div class="flex items-center gap-3">
@@ -475,11 +475,11 @@
 
                                 <div>
                                     @if($log->clock_out_time)
-                                        <span class="px-2.5 py-1 rounded bg-slate-100 text-slate-700 font-bold text-[11px]">
+                                        <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 font-bold text-[11px]">
                                             {{ floor(($log->duration_minutes ?: $log->clock_in_time->diffInMinutes($log->clock_out_time)) / 60) }}h {{ ($log->duration_minutes ?: $log->clock_in_time->diffInMinutes($log->clock_out_time)) % 60 }}m
                                         </span>
                                     @else
-                                        <span class="px-2.5 py-1 rounded bg-emerald-100 text-emerald-800 font-bold text-[11px] animate-pulse">
+                                        <span class="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 font-bold text-[11px] animate-pulse">
                                             In Progress
                                         </span>
                                     @endif
@@ -497,7 +497,7 @@
                 <div class="flex items-center justify-end pt-3 border-t border-slate-100">
                     <button 
                         wire:click="closeModal" 
-                        class="px-4 py-2 text-xs font-bold rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
+                        class="px-4 py-2 text-xs font-bold rounded-md border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
                     >
                         Close
                     </button>

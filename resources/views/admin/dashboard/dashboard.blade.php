@@ -2,10 +2,10 @@
     <!-- Key Metrics Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Metric 1: Total Employees -->
-        <div class="bg-white border border-slate-200 rounded-xl p-5 hover:border-slate-300 transition-colors shadow-xs">
+        <div class="bg-white border border-slate-200/80 rounded-md p-5 hover:border-slate-300 transition-colors shadow-xs">
             <div class="flex items-center justify-between text-slate-500 mb-3">
-                <span class="text-xs font-semibold uppercase tracking-wider">Total Staff</span>
-                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Staff</span>
+                <div class="w-8 h-8 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
                     <i class="ri-team-line text-lg"></i>
                 </div>
             </div>
@@ -14,10 +14,10 @@
         </div>
 
         <!-- Metric 2: Shift Started -->
-        <div class="bg-white border border-slate-200 rounded-xl p-5 hover:border-slate-300 transition-colors shadow-xs">
+        <div class="bg-white border border-slate-200/80 rounded-md p-5 hover:border-slate-300 transition-colors shadow-xs">
             <div class="flex items-center justify-between text-slate-500 mb-3">
-                <span class="text-xs font-semibold uppercase tracking-wider">Shifts Clocked In</span>
-                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Shifts Clocked In</span>
+                <div class="w-8 h-8 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
                     <i class="ri-user-follow-line text-lg"></i>
                 </div>
             </div>
@@ -26,10 +26,10 @@
         </div>
 
         <!-- Metric 3: Lunch Exceeded (RED) -->
-        <div class="bg-white border {{ $lunchExceededCount > 0 ? 'border-red-300 bg-red-50/20' : 'border-slate-200' }} rounded-xl p-5 hover:border-red-400 transition-colors shadow-xs">
+        <div class="bg-white border {{ $lunchExceededCount > 0 ? 'border-red-300 bg-red-50/20' : 'border-slate-200/80' }} rounded-md p-5 hover:border-red-400 transition-colors shadow-xs">
             <div class="flex items-center justify-between text-slate-500 mb-3">
                 <span class="text-xs font-semibold uppercase tracking-wider text-red-700">Exceeded Lunch (&gt;1h)</span>
-                <div class="w-8 h-8 rounded-lg bg-red-100 text-red-700 flex items-center justify-center font-bold">
+                <div class="w-8 h-8 rounded-md bg-red-100 text-red-700 flex items-center justify-center font-bold">
                     <i class="ri-cup-line text-lg"></i>
                 </div>
             </div>
@@ -40,10 +40,10 @@
         </div>
 
         <!-- Metric 4: Total Red Flags (RED) -->
-        <div class="bg-white border {{ $totalRedFlagsCount > 0 ? 'border-red-300 bg-red-50/20' : 'border-slate-200' }} rounded-xl p-5 hover:border-red-400 transition-colors shadow-xs">
+        <div class="bg-white border {{ $totalRedFlagsCount > 0 ? 'border-red-300 bg-red-50/20' : 'border-slate-200/80' }} rounded-md p-5 hover:border-red-400 transition-colors shadow-xs">
             <div class="flex items-center justify-between text-slate-500 mb-3">
                 <span class="text-xs font-semibold uppercase tracking-wider text-red-700">Total Red Flags</span>
-                <div class="w-8 h-8 rounded-lg bg-red-100 text-red-700 flex items-center justify-center font-bold">
+                <div class="w-8 h-8 rounded-md bg-red-100 text-red-700 flex items-center justify-center font-bold">
                     <i class="ri-alarm-warning-line text-lg"></i>
                 </div>
             </div>
@@ -55,9 +55,9 @@
     </div>
 
     <!-- Employee Daily Activity Tracking Table -->
-    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
+    <div class="bg-white border border-slate-200/80 rounded-md p-6 shadow-xs space-y-4">
         <!-- Date & Search Filter Bar -->
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-md bg-slate-50/80 border border-slate-200/90">
             <!-- Left: Date Picker & Quick Presets -->
             <div class="flex flex-wrap items-center gap-3">
                 <div class="flex items-center gap-2">
@@ -66,20 +66,20 @@
                     <input 
                         type="date" 
                         wire:model.live="selectedDate" 
-                        class="py-1.5 px-3 text-xs font-bold rounded-lg border border-slate-300 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white text-slate-900 shadow-xs"
+                        class="py-1.5 px-3 text-xs font-bold rounded-md border border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 bg-white text-slate-900 shadow-2xs"
                     />
                 </div>
 
                 <div class="flex items-center gap-1.5">
                     <button 
                         wire:click="setToday" 
-                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-xs {{ $selectedDate === now()->toDateString() ? 'bg-amber-600 text-white' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100' }}"
+                        class="px-3 py-1.5 rounded-md text-xs font-bold transition-all shadow-2xs cursor-pointer {{ $selectedDate === now()->toDateString() ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100' }}"
                     >
                         Today
                     </button>
                     <button 
                         wire:click="setYesterday" 
-                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-xs {{ $selectedDate === now()->subDay()->toDateString() ? 'bg-amber-600 text-white' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100' }}"
+                        class="px-3 py-1.5 rounded-md text-xs font-bold transition-all shadow-2xs cursor-pointer {{ $selectedDate === now()->subDay()->toDateString() ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100' }}"
                     >
                         Yesterday
                     </button>
@@ -93,14 +93,14 @@
                         type="text" 
                         wire:model.live.debounce.300ms="search" 
                         placeholder="Search employee..." 
-                        class="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white"
+                        class="w-full pl-9 pr-3 py-1.5 text-xs rounded-md border border-slate-200 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 bg-white"
                     />
                     <i class="ri-search-line text-slate-400 absolute left-3 top-2 text-sm"></i>
                 </div>
 
                 <select 
                     wire:model.live="statusFilter" 
-                    class="py-1.5 px-3 text-xs rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white font-medium text-slate-700 shadow-xs"
+                    class="py-1.5 px-3 text-xs rounded-md border border-slate-200 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 bg-white font-medium text-slate-700 shadow-2xs"
                 >
                     <option value="all">All Records</option>
                     <option value="flagged">All Red Flagged Exceptions</option>
@@ -112,9 +112,9 @@
         </div>
 
         <!-- Attendance & Timing Table -->
-        <div class="overflow-x-auto border border-slate-200 rounded-lg">
+        <div class="overflow-x-auto border border-slate-200 rounded-md">
             <table class="w-full text-left text-xs text-slate-700">
-                <thead class="uppercase bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+                <thead class="uppercase bg-slate-50/80 text-slate-600 font-bold border-b border-slate-200">
                     <tr>
                         <th class="px-4 py-3">Employee</th>
                         <th class="px-4 py-3">Slot 1 (Clock-In)</th>
@@ -130,14 +130,14 @@
                             <!-- Employee Info -->
                             <td class="px-4 py-3.5 align-top">
                                 <div class="flex items-center gap-2.5">
-                                    <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-700 border border-slate-200 flex items-center justify-center font-bold text-xs shrink-0">
+                                    <div class="w-8 h-8 rounded-md bg-slate-100 text-slate-700 border border-slate-200 flex items-center justify-center font-bold text-xs shrink-0">
                                         {{ strtoupper(substr($tr->user->name ?? 'U', 0, 1)) }}
                                     </div>
                                     <div>
                                         <div class="font-bold text-slate-900 text-xs sm:text-sm">{{ $tr->user->name ?? 'Unknown' }}</div>
                                         <div class="text-[11px] text-slate-500">{{ $tr->user->email ?? '' }}</div>
                                         <div class="mt-0.5">
-                                            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                            <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
                                                 {{ $tr->user->department->name ?? 'General' }}
                                             </span>
                                         </div>
@@ -167,7 +167,7 @@
                                     </div>
                                     <div class="text-[11px] text-slate-500">Check-in: {{ $tr->slot2_checkin_time?->format('g:i A') }}</div>
                                 @elseif($tr->slot2_checkin_time)
-                                    <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                         <i class="ri-checkbox-circle-line"></i>
                                         <span>Check-in {{ $tr->slot2_checkin_time?->format('g:i A') }}</span>
                                     </div>
@@ -192,12 +192,12 @@
                                             <span>{{ $tr->lunch_duration_minutes }}m (Exceeded by +{{ $tr->lunch_exceeded_minutes }}m)</span>
                                         </div>
                                     @elseif($tr->lunch_end_time)
-                                        <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                             <i class="ri-checkbox-circle-line"></i>
                                             <span>{{ $tr->lunch_duration_minutes }} mins (On Time)</span>
                                         </div>
                                     @else
-                                        <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">
+                                        <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">
                                             <i class="ri-rest-time-line"></i>
                                             <span>Lunch Active...</span>
                                         </div>
@@ -223,7 +223,7 @@
                                             <span>Exceeded Slot 3 (+{{ $tr->slot3_deviation_minutes }}m)</span>
                                         </div>
                                     @elseif($tr->slot3_end_time)
-                                        <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                             <i class="ri-checkbox-circle-line"></i>
                                             <span>Shift Completed</span>
                                         </div>

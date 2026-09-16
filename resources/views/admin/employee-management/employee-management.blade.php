@@ -1,10 +1,10 @@
 <div class="space-y-6" @keydown.escape.window="$wire.closeModals()">
     <!-- Header Section -->
-    <div class="bg-white border border-slate-200 rounded-lg p-6 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="bg-white border border-slate-200/80 rounded-md p-6 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <div class="flex items-center gap-2 mb-1">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary-light text-primary-dark border border-yellow-200">
-                    <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                     Admin Control
                 </span>
             </div>
@@ -67,7 +67,7 @@
     @endif
 
     <!-- Toolbar Filters & Search -->
-    <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="bg-white border border-slate-200/80 rounded-md p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div class="relative flex-1 max-w-md">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -119,7 +119,7 @@
     </div>
 
     <!-- Employee Table Container -->
-    <div class="bg-white border border-slate-200 rounded-lg shadow-xs overflow-hidden relative">
+    <div class="bg-white border border-slate-200/80 rounded-md shadow-xs overflow-hidden relative">
         <div wire:loading.flex class="absolute inset-0 bg-white/70 backdrop-blur-xs z-10 items-center justify-center transition-all">
             <div class="flex items-center gap-2 text-slate-700 font-semibold text-sm">
                 <svg class="animate-spin w-5 h-5 text-slate-900" fill="none" viewBox="0 0 24 24">
@@ -182,11 +182,11 @@
 
                             <td class="px-6 py-4">
                                 @if($employee->is_active)
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
                                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
                                         <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Inactive
                                     </span>
                                 @endif
@@ -322,7 +322,7 @@
                 x-transition:leave="transition ease-in duration-200"
                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                 x-transition:leave-end="opacity-0 scale-95 translate-y-4 sm:translate-y-0"
-                class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl sm:my-8 sm:w-full sm:max-w-lg border border-slate-200"
+                class="relative transform overflow-hidden rounded-md bg-white text-left shadow-xl sm:my-8 sm:w-full sm:max-w-lg border border-slate-200"
             >
                 <!-- Modal Header -->
                 <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
@@ -503,7 +503,7 @@
                 x-transition:leave="transition ease-in duration-200"
                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                 x-transition:leave-end="opacity-0 scale-95 translate-y-4 sm:translate-y-0"
-                class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl sm:my-8 sm:w-full sm:max-w-lg border border-slate-200"
+                class="relative transform overflow-hidden rounded-md bg-white text-left shadow-xl sm:my-8 sm:w-full sm:max-w-lg border border-slate-200"
             >
                 <!-- Modal Header -->
                 <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
@@ -682,7 +682,7 @@
                 x-transition:leave="transition ease-in duration-200"
                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                 x-transition:leave-end="opacity-0 scale-95 translate-y-4 sm:translate-y-0"
-                class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl sm:my-8 sm:w-full sm:max-w-md border border-slate-200"
+                class="relative transform overflow-hidden rounded-md bg-white text-left shadow-xl sm:my-8 sm:w-full sm:max-w-md border border-slate-200"
             >
                 <!-- Header -->
                 <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
@@ -708,7 +708,7 @@
                                     <span class="px-2.5 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wider {{ $selectedEmployee->isAdmin() ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'bg-blue-50 text-blue-700 border border-blue-200' }}">
                                         {{ $selectedEmployee->role }}
                                     </span>
-                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-medium {{ $selectedEmployee->is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200' }}">
+                                    <span class="px-2.5 py-0.5 rounded-md text-xs font-medium {{ $selectedEmployee->is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200' }}">
                                         {{ $selectedEmployee->is_active ? '● Active' : '○ Inactive' }}
                                     </span>
                                 </div>
@@ -805,7 +805,7 @@
                 x-transition:leave="transition ease-in duration-200"
                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                 x-transition:leave-end="opacity-0 scale-95 translate-y-4 sm:translate-y-0"
-                class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl sm:my-8 sm:w-full sm:max-w-md border border-slate-200"
+                class="relative transform overflow-hidden rounded-md bg-white text-left shadow-xl sm:my-8 sm:w-full sm:max-w-md border border-slate-200"
             >
                 @if ($selectedEmployee)
                     <div class="p-6">

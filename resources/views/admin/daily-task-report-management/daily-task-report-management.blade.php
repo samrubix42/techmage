@@ -1,11 +1,11 @@
 <div>
     <div class="space-y-6">
     <!-- Header Section -->
-    <div class="bg-white border border-slate-200 rounded-lg p-6 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="bg-white border border-slate-200/80 rounded-md p-6 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <div class="flex items-center gap-2 mb-1">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary-light text-primary-dark border border-yellow-200">
-                    <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                     Admin Control
                 </span>
             </div>
@@ -15,7 +15,7 @@
     </div>
 
     <!-- Filter & Search Toolbar -->
-    <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="bg-white border border-slate-200/80 rounded-md p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <!-- Search Input -->
         <div class="relative flex-1 max-w-md">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
@@ -100,7 +100,7 @@
     </div>
 
     <!-- Reports Table Container -->
-    <div class="bg-white border border-slate-200 rounded-lg shadow-xs overflow-hidden relative">
+    <div class="bg-white border border-slate-200/80 rounded-md shadow-xs overflow-hidden relative">
         <div wire:loading.flex class="absolute inset-0 bg-white/70 backdrop-blur-xs z-10 items-center justify-center transition-all">
             <div class="flex items-center gap-2 text-slate-700 font-semibold text-sm">
                 <i class="ri-loader-4-line animate-spin text-slate-900 text-lg"></i>
@@ -181,7 +181,7 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($report->is_checked)
                                     <div class="space-y-0.5">
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                             <i class="ri-checkbox-circle-fill text-emerald-600"></i>
                                             <span>Reviewed & Done</span>
                                         </span>
@@ -190,7 +190,7 @@
                                         </span>
                                     </div>
                                 @else
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
                                         <i class="ri-time-line text-amber-500"></i>
                                         <span>Pending Review</span>
                                     </span>
@@ -251,7 +251,7 @@
             x-data
             @keydown.escape.window="$wire.closeDetailModal()"
         >
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-150">
+            <div class="bg-white rounded-md border border-slate-200 shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-150">
                 <!-- Modal Header -->
                 <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
                     <div>
@@ -272,7 +272,7 @@
 
                     <button 
                         wire:click="closeDetailModal"
-                        class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 flex items-center justify-center transition-colors"
+                        class="w-8 h-8 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200 flex items-center justify-center transition-colors"
                     >
                         <i class="ri-close-line text-xl"></i>
                     </button>
@@ -281,7 +281,7 @@
                 <!-- Modal Body -->
                 <div class="p-6 overflow-y-auto space-y-6 flex-1">
                     <!-- Status Banner -->
-                    <div class="p-4 rounded-xl border {{ $modalReport->is_checked ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-amber-50 border-amber-200 text-amber-900' }} flex items-center justify-between">
+                    <div class="p-4 rounded-md border {{ $modalReport->is_checked ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-amber-50 border-amber-200 text-amber-900' }} flex items-center justify-between">
                         <div class="flex items-center gap-2.5">
                             <i class="{{ $modalReport->is_checked ? 'ri-checkbox-circle-fill text-emerald-600' : 'ri-time-line text-amber-600' }} text-xl"></i>
                             <div>
@@ -312,7 +312,7 @@
                     @endphp
 
                     @foreach($modalItems as $index => $item)
-                        <div class="border border-slate-200 rounded-xl p-5 bg-slate-50/50 space-y-3">
+                        <div class="border border-slate-200 rounded-md p-5 bg-slate-50/50 space-y-3">
                             <div class="flex items-center gap-2 border-b border-slate-200 pb-2.5">
                                 <span class="w-5 h-5 rounded-full bg-slate-800 text-white text-[11px] font-bold flex items-center justify-center shrink-0">
                                     {{ $index + 1 }}
@@ -322,7 +322,7 @@
                                 </h4>
                             </div>
 
-                            <div class="prose prose-slate prose-sm max-w-none text-xs leading-relaxed text-slate-700 bg-white p-4 rounded-lg border border-slate-200 shadow-2xs">
+                            <div class="prose prose-slate prose-sm max-w-none text-xs leading-relaxed text-slate-700 bg-white p-4 rounded-md border border-slate-200 shadow-2xs">
                                 {!! $item['description'] ?? '<p class="text-slate-400 italic">No description provided.</p>' !!}
                             </div>
                         </div>
@@ -335,7 +335,7 @@
                     <div class="flex items-center gap-3">
                         <button 
                             wire:click="closeDetailModal"
-                            class="px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200 rounded-lg border border-slate-300 transition-colors cursor-pointer"
+                            class="px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200 rounded-md border border-slate-300 transition-colors cursor-pointer"
                         >
                             Close
                         </button>
@@ -343,7 +343,7 @@
                         @if(!$modalReport->is_checked)
                             <button 
                                 wire:click="markAsChecked({{ $modalReport->id }})"
-                                class="inline-flex items-center gap-2 px-5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-xs transition-colors cursor-pointer"
+                                class="inline-flex items-center gap-2 px-5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-md shadow-xs transition-colors cursor-pointer"
                             >
                                 <i class="ri-check-double-line text-sm"></i>
                                 <span>Mark as Reviewed & Done</span>
