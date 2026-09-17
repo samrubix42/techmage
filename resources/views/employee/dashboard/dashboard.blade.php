@@ -358,11 +358,11 @@
 
                     <button 
                         type="button"
-                        @if(!$is4thSlotEligible) disabled class="px-4 py-2.5 rounded-md text-xs font-semibold text-slate-400 bg-slate-200 cursor-not-allowed" @else @click="showConfirmModal = true" class="px-4 py-2.5 rounded-md text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 transition-all shadow-xs flex items-center gap-2 cursor-pointer" @endif
+                        @if(!$is4thSlotEligible) disabled class="px-4 py-2.5 rounded-md text-xs font-semibold text-slate-400 bg-slate-200 cursor-not-allowed" @else wire:click="openTaskReportModal" class="px-4 py-2.5 rounded-md text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 transition-all shadow-xs flex items-center gap-2 cursor-pointer" @endif
                         wire:loading.attr="disabled"
                     >
-                        <i wire:loading.remove wire:target="saveSlot4AndClockOut" class="ri-logout-box-r-line text-sm"></i>
-                        <i wire:loading wire:target="saveSlot4AndClockOut" class="ri-loader-4-line animate-spin text-sm"></i>
+                        <i wire:loading.remove wire:target="openTaskReportModal" class="ri-logout-box-r-line text-sm"></i>
+                        <i wire:loading wire:target="openTaskReportModal" class="ri-loader-4-line animate-spin text-sm"></i>
                         <span>Confirm 4th Slot & Clock Out</span>
                     </button>
                 </div>
@@ -440,50 +440,115 @@
         </div>
     @endif
 
-    <!-- Clock-Out Confirmation Modal -->
-    <div 
-        x-show="showConfirmModal" 
-        x-cloak 
-        x-transition:enter="transition ease-out duration-200"
-        x-transition:enter-start="opacity-0 scale-95"
-        x-transition:enter-end="opacity-100 scale-100"
-        x-transition:leave="transition ease-in duration-150"
-        x-transition:leave-start="opacity-100 scale-100"
-        x-transition:leave-end="opacity-0 scale-95"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
-        @keydown.escape.window="showConfirmModal = false"
-    >
-        <div class="bg-white rounded-md border border-slate-200 shadow-xl max-w-md w-full p-6 space-y-4 text-left relative" @click.away="showConfirmModal = false">
-            <div class="flex items-start gap-4">
-                <div class="w-10 h-10 rounded-md bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center font-bold text-xl shrink-0">
-                    <i class="ri-logout-box-r-line"></i>
+    <!-- Daily Task Report & Clock-Out Modal -->
+    @if($showTaskReportModal)
+        <div 
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto"
+            x-data
+            @keydown.escape.window="$wire.closeTaskReportModal()"
+        >
+            <div class="bg-white rounded-lg border border-slate-200 shadow-2xl max-w-2xl w-full p-6 space-y-5 text-left relative my-8">
+                <!-- Header -->
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center font-bold text-xl shrink-0">
+                            <i class="ri-task-line"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-slate-900">Daily Task Report & Clock Out</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">Please add your daily task entries before completing your 4th slot and clocking out.</p>
+                        </div>
+                    </div>
+                    <button type="button" wire:click="closeTaskReportModal" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-md hover:bg-slate-100 transition-colors">
+                        <i class="ri-close-line text-lg"></i>
+                    </button>
                 </div>
-                <div>
-                    <h3 class="text-base font-bold text-slate-900">Confirm Shift Clock-Out</h3>
-                    <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                        Are you sure you want to complete your 4th working slot and clock out for today?
-                    </p>
-                </div>
-            </div>
 
-            <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
-                <button 
-                    type="button" 
-                    @click="showConfirmModal = false" 
-                    class="px-4 py-2 text-xs font-medium rounded-md border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
-                >
-                    Cancel
-                </button>
-                <button 
-                    type="button" 
-                    wire:click="saveSlot4AndClockOut" 
-                    @click="showConfirmModal = false" 
-                    class="px-4 py-2 text-xs font-semibold rounded-md text-white bg-slate-900 hover:bg-slate-800 transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
-                >
-                    <i class="ri-check-line text-sm"></i>
-                    <span>Confirm & Clock Out</span>
-                </button>
+                <!-- Task Projects Form -->
+                <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
+                    @foreach($taskProjects as $index => $project)
+                        <div class="p-4 rounded-lg border border-slate-200 bg-slate-50/60 space-y-3 relative group" wire:key="task-proj-{{ $project['_key'] ?? $index }}">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                                    <i class="ri-folder-line text-slate-400"></i> Project / Task Entry #{{ $index + 1 }}
+                                </span>
+                                @if(count($taskProjects) > 1)
+                                    <button 
+                                        type="button" 
+                                        wire:click="removeTaskProject({{ $index }})" 
+                                        class="text-red-500 hover:text-red-700 text-xs font-semibold flex items-center gap-1 px-2 py-1 rounded hover:bg-red-50 transition-colors cursor-pointer"
+                                    >
+                                        <i class="ri-delete-bin-line"></i> Remove Entry
+                                    </button>
+                                @endif
+                            </div>
+
+                            <!-- Title -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Project / Task Title <span class="text-red-500">*</span></label>
+                                <input 
+                                    type="text" 
+                                    wire:model="taskProjects.{{ $index }}.title" 
+                                    placeholder="e.g. Website Refactoring & Bug Fixes"
+                                    class="w-full text-xs px-3 py-2 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent bg-white"
+                                />
+                                @error("taskProjects.{$index}.title")
+                                    <span class="text-red-600 text-[11px] mt-1 block font-medium">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- Description -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Task Description / Work Details <span class="text-red-500">*</span></label>
+                                <textarea 
+                                    wire:model="taskProjects.{{ $index }}.description" 
+                                    rows="3" 
+                                    placeholder="Describe what was accomplished in this task..."
+                                    class="w-full text-xs px-3 py-2 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent bg-white resize-y"
+                                ></textarea>
+                                @error("taskProjects.{$index}.description")
+                                    <span class="text-red-600 text-[11px] mt-1 block font-medium">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                    @endforeach
+
+                    @error('taskProjects')
+                        <div class="p-3 rounded-md bg-red-50 border border-red-200 text-red-700 text-xs font-medium">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                    <button 
+                        type="button" 
+                        wire:click="addTaskProject" 
+                        class="w-full py-2.5 px-4 rounded-md border border-dashed border-slate-300 hover:border-slate-400 text-slate-700 hover:text-slate-900 text-xs font-semibold flex items-center justify-center gap-2 bg-slate-50/50 hover:bg-slate-100 transition-colors cursor-pointer"
+                    >
+                        <i class="ri-add-line text-sm"></i> Add Another Project / Task Entry
+                    </button>
+                </div>
+
+                <!-- Footer Actions -->
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                    <button 
+                        type="button" 
+                        wire:click="closeTaskReportModal" 
+                        class="px-4 py-2 text-xs font-medium rounded-md border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        type="button" 
+                        wire:click="submitReportAndClockOut" 
+                        wire:loading.attr="disabled"
+                        class="px-5 py-2 text-xs font-semibold rounded-md text-white bg-slate-900 hover:bg-slate-800 transition-colors cursor-pointer shadow-xs flex items-center gap-2"
+                    >
+                        <i wire:loading.remove wire:target="submitReportAndClockOut" class="ri-logout-box-r-line text-sm"></i>
+                        <i wire:loading wire:target="submitReportAndClockOut" class="ri-loader-4-line animate-spin text-sm"></i>
+                        <span>Submit Report & Clock Out</span>
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
+    @endif
 </div>

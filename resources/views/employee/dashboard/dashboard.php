@@ -3,6 +3,7 @@
 use App\Models\Attendance;
 use App\Models\AttendanceLog;
 use App\Models\DailySlotTracking;
+use App\Models\DailyTaskReport;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
@@ -11,10 +12,124 @@ use Livewire\Component;
 
 new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class extends Component
 {
+    public bool $showTaskReportModal = false;
+
+    /**
+     * Array of project entries for daily task report
+     * Each item: ['_key' => string, 'title' => string, 'description' => string]
+     *
+     * @var array<int, array{_key: string, title: string, description: string}>
+     */
+    public array $taskProjects = [];
+
     #[On('slot-updated')]
     public function refreshDashboard(): void
     {
         // Triggers component re-render when slot-updated event is dispatched
+    }
+
+    public function openTaskReportModal(): void
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return;
+        }
+
+        $existingReport = DailyTaskReport::where('user_id', $user->id)
+            ->whereDate('date', now()->toDateString())
+            ->first();
+
+        if ($existingReport && is_array($existingReport->title_description) && ! empty($existingReport->title_description)) {
+            $this->taskProjects = array_map(function ($item) {
+                return [
+                    '_key' => uniqid('proj_'),
+                    'title' => $item['title'] ?? '',
+                    'description' => $item['description'] ?? '',
+                ];
+            }, $existingReport->title_description);
+        } else {
+            $this->taskProjects = [
+                [
+                    '_key' => uniqid('proj_'),
+                    'title' => '',
+                    'description' => '',
+                ],
+            ];
+        }
+
+        $this->resetValidation();
+        $this->showTaskReportModal = true;
+    }
+
+    public function addTaskProject(): void
+    {
+        $this->taskProjects[] = [
+            '_key' => uniqid('proj_'),
+            'title' => '',
+            'description' => '',
+        ];
+    }
+
+    public function removeTaskProject(int $index): void
+    {
+        if (count($this->taskProjects) > 1) {
+            unset($this->taskProjects[$index]);
+            $this->taskProjects = array_values($this->taskProjects);
+        }
+    }
+
+    public function closeTaskReportModal(): void
+    {
+        $this->showTaskReportModal = false;
+        $this->resetValidation();
+    }
+
+    public function submitReportAndClockOut(): void
+    {
+        $tracking = $this->getTodayTracking();
+        if (! $tracking || ! $tracking->slot3_start_time) {
+            session()->flash('error', '3rd Slot has not been started yet.');
+
+            return;
+        }
+
+        $workedMinutes = (int) $tracking->slot3_start_time->diffInMinutes(now());
+        if ($workedMinutes < 90) {
+            session()->flash('error', '4th Slot check-in is disabled until 90 minutes have elapsed after 3rd slot start. Currently elapsed: '.$workedMinutes.' mins.');
+
+            return;
+        }
+
+        $this->validate([
+            'taskProjects' => 'required|array|min:1',
+            'taskProjects.*.title' => 'required|string|max:255',
+            'taskProjects.*.description' => 'required|string|min:3',
+        ], [
+            'taskProjects.required' => 'At least one task report entry is required.',
+            'taskProjects.*.title.required' => 'Project/Task title is required.',
+            'taskProjects.*.description.required' => 'Task description is required.',
+            'taskProjects.*.description.min' => 'Task description must be at least 3 characters.',
+        ]);
+
+        $titleDescription = array_map(function ($project) {
+            return [
+                'title' => trim($project['title']),
+                'description' => trim($project['description']),
+            ];
+        }, $this->taskProjects);
+
+        DailyTaskReport::updateOrCreate(
+            [
+                'user_id' => Auth::id(),
+                'date' => now()->toDateString(),
+            ],
+            [
+                'title_description' => $titleDescription,
+            ]
+        );
+
+        $this->saveSlot4AndClockOut();
+        $this->showTaskReportModal = false;
     }
 
     public function getTodayTracking(): ?DailySlotTracking

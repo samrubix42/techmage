@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\DailySlotTracking;
+use App\Models\DailyTaskReport;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -129,4 +130,42 @@ test('it syncs 1st slot time on clock in from sidebar', function () {
     expect($tracking->slot1_checkin_time)->not->toBeNull();
     expect($tracking->attendance_id)->not->toBeNull();
     expect($tracking->attendance)->not->toBeNull();
+});
+
+test('employee can submit daily task report and clock out for 4th slot via modal', function () {
+    $employee = User::factory()->create(['role' => 'employee']);
+    $today = now()->toDateString();
+
+    $tracking = DailySlotTracking::create([
+        'user_id' => $employee->id,
+        'tracking_date' => $today,
+        'slot1_checkin_time' => now()->subHours(6),
+        'slot2_checkin_time' => now()->subHours(4),
+        'lunch_start_time' => now()->subHours(3),
+        'lunch_end_time' => now()->subHours(2),
+        'lunch_duration_minutes' => 60,
+        'slot3_start_time' => now()->subMinutes(100), // Worked 100 mins (>90m)
+    ]);
+
+    Livewire::actingAs($employee)
+        ->test('employee::dashboard')
+        ->call('openTaskReportModal')
+        ->assertSet('showTaskReportModal', true)
+        ->set('taskProjects', [
+            ['_key' => 'p1', 'title' => 'Feature Development', 'description' => 'Implemented 4th slot daily task report modal'],
+        ])
+        ->call('submitReportAndClockOut')
+        ->assertSet('showTaskReportModal', false);
+
+    $tracking->refresh();
+    expect($tracking->slot4_checkin_time)->not->toBeNull();
+
+    $this->assertDatabaseHas('daily_task_reports', [
+        'user_id' => $employee->id,
+    ]);
+
+    $report = DailyTaskReport::where('user_id', $employee->id)->first();
+    expect($report->date->format('Y-m-d'))->toBe($today);
+    expect($report->title_description)->toHaveCount(1);
+    expect($report->title_description[0]['title'])->toBe('Feature Development');
 });
