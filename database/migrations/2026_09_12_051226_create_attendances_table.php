@@ -31,6 +31,13 @@ return new class extends Migration
             $table->dateTime('clock_in_time')->nullable();
             $table->dateTime('clock_out_time')->nullable();
 
+            $table->foreignId('leave_request_id')
+                ->nullable()
+                ->constrained('leave_requests')
+                ->nullOnDelete();
+            $table->string('leave_category')->nullable();
+            $table->string('leave_payment_type')->nullable();
+
             $table->timestamps();
 
             $table->unique(['user_id', 'attendance_date']);

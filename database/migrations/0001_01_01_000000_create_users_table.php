@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->foreignId('department_id')->nullable();
+            $table->string('saturday_off_policy')->default('sunday_only');
             $table->timestamp('email_verified_at')->nullable();
             $table->boolean('is_active')->default(true);
             $table->enum('role', ['employee', 'admin'])->default('employee');

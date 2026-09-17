@@ -16,6 +16,10 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->date('date');
             $table->json('title_description')->nullable();
+            $table->boolean('is_checked')->default(false);
+            $table->timestamp('checked_at')->nullable();
+            $table->foreignId('checked_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->text('admin_notes')->nullable();
             $table->timestamps();
         });
     }
