@@ -22,9 +22,11 @@ class DailySlotTracking extends Model
             'lunch_end_time' => 'datetime',
             'slot3_start_time' => 'datetime',
             'slot3_end_time' => 'datetime',
+            'slot4_checkin_time' => 'datetime',
             'slot2_is_flagged' => 'boolean',
             'lunch_exceeded' => 'boolean',
             'slot3_is_flagged' => 'boolean',
+            'slot4_is_flagged' => 'boolean',
         ];
     }
 

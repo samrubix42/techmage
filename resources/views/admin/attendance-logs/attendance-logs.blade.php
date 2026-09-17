@@ -160,7 +160,7 @@
                         @php
                             $st = $employeeStats[$emp->id] ?? null;
                             $tr = $st['tracking'] ?? null;
-                            $isFlagged = $tr && ($tr->slot2_is_flagged || $tr->lunch_exceeded || $tr->slot3_is_flagged);
+                            $isFlagged = $tr && ($tr->slot2_is_flagged || $tr->lunch_exceeded || $tr->slot3_is_flagged || $tr->slot4_is_flagged);
                         @endphp
                         <tr class="hover:bg-slate-50/80 transition-colors {{ $isFlagged ? 'bg-red-50/30' : '' }}">
                             <!-- Employee Info -->
@@ -238,26 +238,32 @@
                                 @if($tr)
                                     <div class="flex items-center gap-1">
                                         <!-- Step 1 Pill -->
-                                        <span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white bg-emerald-600" title="Step 1: Clock In at {{ $tr->slot1_checkin_time?->format('g:i A') }}">
+                                        <span class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white bg-emerald-600" title="Step 1: Clock In at {{ $tr->slot1_checkin_time?->format('g:i A') }}">
                                             1
                                         </span>
-                                        <span class="w-3 h-0.5 bg-slate-300"></span>
+                                        <span class="w-2 h-0.5 bg-slate-300"></span>
 
                                         <!-- Step 2 Pill -->
-                                        <span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold {{ $tr->slot2_is_flagged ? 'bg-red-600 text-white' : ($tr->slot2_checkin_time ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-500') }}" title="Step 2: Slot 2 Check-in">
+                                        <span class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold {{ $tr->slot2_is_flagged ? 'bg-red-600 text-white' : ($tr->slot2_checkin_time ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-500') }}" title="Step 2: Slot 2 Check-in">
                                             2
                                         </span>
-                                        <span class="w-3 h-0.5 bg-slate-300"></span>
+                                        <span class="w-2 h-0.5 bg-slate-300"></span>
 
                                         <!-- Step 3 Pill (Lunch) -->
-                                        <span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold {{ $tr->lunch_exceeded ? 'bg-red-600 text-white' : ($tr->lunch_end_time ? 'bg-emerald-600 text-white' : ($tr->lunch_start_time ? 'bg-amber-500 text-white animate-pulse' : 'bg-slate-200 text-slate-500')) }}" title="Step 3: Lunch Break">
+                                        <span class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold {{ $tr->lunch_exceeded ? 'bg-red-600 text-white' : ($tr->lunch_end_time ? 'bg-emerald-600 text-white' : ($tr->lunch_start_time ? 'bg-amber-500 text-white animate-pulse' : 'bg-slate-200 text-slate-500')) }}" title="Step 3: Lunch Break">
                                             3
                                         </span>
-                                        <span class="w-3 h-0.5 bg-slate-300"></span>
+                                        <span class="w-2 h-0.5 bg-slate-300"></span>
 
                                         <!-- Step 4 Pill (3rd Slot) -->
-                                        <span class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold {{ $tr->slot3_is_flagged ? 'bg-red-600 text-white' : ($tr->slot3_end_time ? 'bg-emerald-600 text-white' : ($tr->slot3_start_time ? 'bg-indigo-600 text-white animate-pulse' : 'bg-slate-200 text-slate-500')) }}" title="Step 4: 3rd Slot & Shift End">
+                                        <span class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold {{ $tr->slot3_start_time ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-500' }}" title="Step 4: 3rd Slot Start">
                                             4
+                                        </span>
+                                        <span class="w-2 h-0.5 bg-slate-300"></span>
+
+                                        <!-- Step 5 Pill (4th Slot) -->
+                                        <span class="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold {{ $tr->slot4_is_flagged ? 'bg-red-600 text-white' : ($tr->slot4_checkin_time ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-500') }}" title="Step 5: 4th Slot & Clock Out">
+                                            5
                                         </span>
                                     </div>
                                     @if($isFlagged)
@@ -381,7 +387,7 @@
                 <div class="space-y-3 pt-1">
                     <div class="flex items-center justify-between">
                         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Daily Slot Progress Chain</h3>
-                        @if($tr && ($tr->slot2_is_flagged || $tr->lunch_exceeded || $tr->slot3_is_flagged))
+                        @if($tr && ($tr->slot2_is_flagged || $tr->lunch_exceeded || $tr->slot3_is_flagged || $tr->slot4_is_flagged))
                             <span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 border border-red-200 flex items-center gap-1">
                                 <i class="ri-error-warning-fill text-xs"></i> Flagged Exceptions
                             </span>
@@ -391,7 +397,7 @@
                     @if($tr)
                         <div class="bg-slate-50 border border-slate-200/70 rounded-md p-4 space-y-4">
                             <!-- Stepper Horizontal Connection -->
-                            <div class="grid grid-cols-4 gap-2 text-center relative">
+                            <div class="grid grid-cols-5 gap-2 text-center relative">
                                 <!-- Step 1 -->
                                 <div class="space-y-1.5">
                                     <div class="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center mx-auto shadow-2xs">
@@ -424,7 +430,18 @@
                                     </div>
                                     <div class="text-[11px] font-bold text-slate-800">Lunch Break (1h)</div>
                                     <div class="text-[10px] {{ $tr->lunch_exceeded ? 'text-red-600 font-bold' : 'text-slate-500' }}">
-                                        {{ $tr->lunch_duration_minutes ? $tr->lunch_duration_minutes.' mins' : ($tr->lunch_start_time ? 'Active' : 'Pending') }}
+                                        @if($tr->lunch_start_time)
+                                            <div>{{ $tr->lunch_start_time?->format('g:i A') }} - {{ $tr->lunch_end_time ? $tr->lunch_end_time?->format('g:i A') : 'Active' }}</div>
+                                            <div class="text-[9px] opacity-80">
+                                                @if($tr->lunch_end_time)
+                                                    ({{ !is_null($tr->lunch_duration_minutes) ? $tr->lunch_duration_minutes.' mins' : 'Completed' }})
+                                                @else
+                                                    (In Progress)
+                                                @endif
+                                            </div>
+                                        @else
+                                            Pending
+                                        @endif
                                     </div>
                                     @if($tr->lunch_exceeded)
                                         <div class="text-[9px] font-bold text-red-600 uppercase">+{{ $tr->lunch_exceeded_minutes }}m Exceeded</div>
@@ -433,15 +450,26 @@
 
                                 <!-- Step 4 -->
                                 <div class="space-y-1.5">
-                                    <div class="w-8 h-8 rounded-full font-bold text-xs flex items-center justify-center mx-auto shadow-2xs {{ $tr->slot3_is_flagged ? 'bg-red-600 text-white' : ($tr->slot3_end_time ? 'bg-emerald-600 text-white' : ($tr->slot3_start_time ? 'bg-indigo-600 text-white animate-pulse' : 'bg-slate-200 text-slate-500')) }}">
+                                    <div class="w-8 h-8 rounded-full font-bold text-xs flex items-center justify-center mx-auto shadow-2xs {{ $tr->slot3_start_time ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-500' }}">
                                         4
                                     </div>
-                                    <div class="text-[11px] font-bold text-slate-800">3rd Slot & End</div>
-                                    <div class="text-[10px] {{ $tr->slot3_is_flagged ? 'text-red-600 font-bold' : 'text-slate-500' }}">
-                                        {{ $tr->slot3_end_time ? $tr->slot3_end_time?->format('g:i A') : 'Pending' }}
+                                    <div class="text-[11px] font-bold text-slate-800">3rd Slot Start</div>
+                                    <div class="text-[10px] text-slate-500">
+                                        {{ $tr->slot3_start_time ? $tr->slot3_start_time?->format('g:i A') : 'Pending' }}
                                     </div>
-                                    @if($tr->slot3_is_flagged)
-                                        <div class="text-[9px] font-bold text-red-600 uppercase">+{{ $tr->slot3_deviation_minutes }}m Exceeded</div>
+                                </div>
+
+                                <!-- Step 5 -->
+                                <div class="space-y-1.5">
+                                    <div class="w-8 h-8 rounded-full font-bold text-xs flex items-center justify-center mx-auto shadow-2xs {{ $tr->slot4_is_flagged ? 'bg-red-600 text-white' : ($tr->slot4_checkin_time ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-500') }}">
+                                        5
+                                    </div>
+                                    <div class="text-[11px] font-bold text-slate-800">4th Slot & Clock Out</div>
+                                    <div class="text-[10px] {{ $tr->slot4_is_flagged ? 'text-red-600 font-bold' : 'text-slate-500' }}">
+                                        {{ $tr->slot4_checkin_time ? $tr->slot4_checkin_time?->format('g:i A') : 'Pending' }}
+                                    </div>
+                                    @if($tr->slot4_is_flagged)
+                                        <div class="text-[9px] font-bold text-red-600 uppercase">+{{ $tr->slot4_deviation_minutes }}m Exceeded</div>
                                     @endif
                                 </div>
                             </div>

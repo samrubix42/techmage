@@ -107,6 +107,7 @@
                     <option value="slot2_flagged">Slot 2 Check-In Exceeded (&gt;30m)</option>
                     <option value="lunch_exceeded">Exceeded Lunch (&gt;1h)</option>
                     <option value="slot3_flagged">3rd Slot Exceeded (&gt;30m)</option>
+                    <option value="slot4_flagged">4th Slot Exceeded (&gt;30m)</option>
                 </select>
             </div>
         </div>
@@ -120,13 +121,17 @@
                         <th class="px-4 py-3">Slot 1 (Clock-In)</th>
                         <th class="px-4 py-3">Slot 2 Check-In</th>
                         <th class="px-4 py-3">Lunch Break (1h Max)</th>
-                        <th class="px-4 py-3">3rd Slot & Shift End</th>
+                        <th class="px-4 py-3">3rd Slot Start</th>
+                        <th class="px-4 py-3">4th Slot & Clock Out</th>
                         <th class="px-4 py-3">Compliance Status</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     @forelse($trackings as $tr)
-                        <tr class="hover:bg-slate-50/80 transition-colors {{ ($tr->slot2_is_flagged || $tr->lunch_exceeded || $tr->slot3_is_flagged) ? 'bg-red-50/30' : '' }}">
+                        @php
+                            $isFlagged = $tr->slot2_is_flagged || $tr->lunch_exceeded || $tr->slot3_is_flagged || $tr->slot4_is_flagged;
+                        @endphp
+                        <tr class="hover:bg-slate-50/80 transition-colors {{ $isFlagged ? 'bg-red-50/30' : '' }}">
                             <!-- Employee Info -->
                             <td class="px-4 py-3.5 align-top">
                                 <div class="flex items-center gap-2.5">
@@ -207,40 +212,47 @@
                                 @endif
                             </td>
 
-                            <!-- 3rd Slot Start & End Details (Highlight RED if exceeded > 30m) -->
+                            <!-- 3rd Slot Start Details -->
                             <td class="px-4 py-3.5 align-top space-y-1">
                                 @if($tr->slot3_start_time)
-                                    <div class="text-slate-900 font-medium text-xs flex items-center gap-1">
-                                        <span>{{ $tr->slot3_start_time?->format('g:i A') }}</span>
-                                        <i class="ri-arrow-right-line text-slate-400"></i>
-                                        <span>{{ $tr->slot3_end_time ? $tr->slot3_end_time?->format('g:i A') : 'In Progress' }}</span>
+                                    <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                        <i class="ri-play-circle-line"></i>
+                                        <span>Started {{ $tr->slot3_start_time?->format('g:i A') }}</span>
                                     </div>
-
-                                    @if($tr->slot3_is_flagged)
-                                        <!-- RED BADGE for 3rd Slot Exceeded > 30m -->
-                                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-red-600 text-white shadow-xs">
-                                            <i class="ri-error-warning-fill"></i>
-                                            <span>Exceeded Slot 3 (+{{ $tr->slot3_deviation_minutes }}m)</span>
-                                        </div>
-                                    @elseif($tr->slot3_end_time)
-                                        <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                            <i class="ri-checkbox-circle-line"></i>
-                                            <span>Shift Completed</span>
-                                        </div>
-                                    @endif
                                 @else
                                     <span class="text-slate-400 font-medium">Not Started</span>
                                 @endif
                             </td>
 
+                            <!-- 4th Slot & Shift Clock Out Details (Highlight RED if exceeded > 30m) -->
+                            <td class="px-4 py-3.5 align-top space-y-1">
+                                @if($tr->slot4_is_flagged)
+                                    <!-- RED BADGE for 4th Slot Exceeded > 30m -->
+                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-red-600 text-white shadow-xs">
+                                        <i class="ri-error-warning-fill"></i>
+                                        <span>Exceeded Slot 4 (+{{ $tr->slot4_deviation_minutes }}m)</span>
+                                    </div>
+                                    <div class="text-[11px] text-slate-500">Clocked Out: {{ $tr->slot4_checkin_time?->format('g:i A') }}</div>
+                                @elseif($tr->slot4_checkin_time)
+                                    <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        <i class="ri-checkbox-circle-line"></i>
+                                        <span>Clocked Out {{ $tr->slot4_checkin_time?->format('g:i A') }}</span>
+                                    </div>
+                                @elseif($tr->slot3_start_time)
+                                    <span class="text-slate-400 font-medium">In 3rd Slot</span>
+                                @else
+                                    <span class="text-slate-400 font-medium">Pending 4th Slot</span>
+                                @endif
+                            </td>
+
                             <!-- Overall Compliance Status -->
                             <td class="px-4 py-3.5 align-top">
-                                @if($tr->slot2_is_flagged || $tr->lunch_exceeded || $tr->slot3_is_flagged)
+                                @if($tr->slot2_is_flagged || $tr->lunch_exceeded || $tr->slot3_is_flagged || $tr->slot4_is_flagged)
                                     <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-red-100 text-red-800 border border-red-300 flex items-center justify-center gap-1 uppercase tracking-wide shadow-xs">
                                         <i class="ri-alarm-warning-fill"></i>
                                         <span>Red Flagged</span>
                                     </span>
-                                @elseif($tr->slot3_end_time)
+                                @elseif($tr->slot4_checkin_time)
                                     <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center justify-center gap-1 uppercase tracking-wide">
                                         <i class="ri-checkbox-circle-fill"></i>
                                         <span>Shift Compliant</span>

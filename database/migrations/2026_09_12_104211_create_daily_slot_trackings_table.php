@@ -33,12 +33,18 @@ return new class extends Migration
             $table->boolean('lunch_exceeded')->default(false);
             $table->integer('lunch_exceeded_minutes')->default(0);
 
-            // 3rd Slot Tracking & Shift End (Timing only)
+            // 3rd Slot Tracking & Shift Start
             $table->timestamp('slot3_start_time')->nullable();
             $table->timestamp('slot3_end_time')->nullable();
             $table->string('slot3_timing_status')->default('normal'); // 'normal', 'early', 'exceeded'
             $table->integer('slot3_deviation_minutes')->default(0);
             $table->boolean('slot3_is_flagged')->default(false);
+
+            // 4th Slot Tracking & Shift Clock-Out (Available after 90m from Slot 3)
+            $table->timestamp('slot4_checkin_time')->nullable();
+            $table->string('slot4_timing_status')->default('normal'); // 'normal', 'exceeded'
+            $table->integer('slot4_deviation_minutes')->default(0);
+            $table->boolean('slot4_is_flagged')->default(false);
 
             $table->timestamps();
 

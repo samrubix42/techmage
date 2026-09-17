@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Attendance;
+use App\Models\AttendanceLog;
 use App\Models\DailySlotTracking;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -60,7 +61,7 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
             ]);
         }
 
-        $msg = 'Clocked in at '.$now->format('g:i A').'. Slot 2 check-in will be available after 1.5 hours.';
+        $msg = 'Clocked in at '.$now->format('g:i A').'. Slot 2 check-in will be available after 2 hours.';
         session()->flash('attendance_status', $msg);
         $this->dispatch('toast-show', [
             'message' => $msg,
@@ -69,7 +70,6 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
         ]);
         $this->dispatch('slot-updated');
     }
-
 
     public function save2HrCheckin(): void
     {
@@ -84,14 +84,14 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
         $checkinTime = $tracking->slot1_checkin_time;
         $elapsedMinutes = (int) $checkinTime->diffInMinutes($now);
 
-        // Cannot perform checkin before 1.5 hrs (90 mins)
-        if ($elapsedMinutes < 90) {
-            session()->flash('error', 'Slot 2 check-in is disabled until 1.5 hours have elapsed. Currently elapsed: '.$elapsedMinutes.' mins.');
+        // Cannot perform checkin before 2 hrs (120 mins)
+        if ($elapsedMinutes < 120) {
+            session()->flash('error', 'Slot 2 check-in is disabled until 2 hours have elapsed. Currently elapsed: '.$elapsedMinutes.' mins.');
 
             return;
         }
 
-        // Check if early (<90m - handled above) or exceeded (>150m = 2.5 hrs)
+        // Check if exceeded (>150m = 2.5 hrs, i.e., 30 mins after 120m)
         $status = 'normal';
         $deviation = 0;
         $isFlagged = false;
@@ -114,6 +114,8 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
         } else {
             session()->flash('attendance_status', 'Slot 2 check-in completed on time at '.$now->format('g:i A'));
         }
+
+        $this->dispatch('slot-updated');
     }
 
     public function startLunch(): void
@@ -129,6 +131,7 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
         $tracking->update(['lunch_start_time' => $now]);
 
         session()->flash('attendance_status', 'Lunch break started at '.$now->format('g:i A').'. Maximum duration is 1 hour.');
+        $this->dispatch('slot-updated');
     }
 
     public function endLunchAndStartSlot3(): void
@@ -160,6 +163,8 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
         } else {
             session()->flash('attendance_status', 'Lunch ended on time. 3rd Slot started at '.$now->format('g:i A'));
         }
+
+        $this->dispatch('slot-updated');
     }
 
     public function startSlot3(): void
@@ -175,9 +180,10 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
         $tracking->update(['slot3_start_time' => $now]);
 
         session()->flash('attendance_status', '3rd Working Slot started at '.$now->format('g:i A'));
+        $this->dispatch('slot-updated');
     }
 
-    public function saveSlot3AndClockOut(): void
+    public function saveSlot4AndClockOut(): void
     {
         $tracking = $this->getTodayTracking();
         if (! $tracking || ! $tracking->slot3_start_time) {
@@ -190,55 +196,100 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
         $slot3Start = $tracking->slot3_start_time;
         $workedMinutes = (int) $slot3Start->diffInMinutes($now);
 
-        // 3rd slot expected duration is 2 hours (120 mins)
-        // Exceeded by >30 mins = worked > 150 mins
+        // Cannot perform 4th slot checkin before 90 mins after 3rd slot start
+        if ($workedMinutes < 90) {
+            session()->flash('error', '4th Slot check-in is disabled until 90 minutes have elapsed after 3rd slot start. Currently elapsed: '.$workedMinutes.' mins.');
+
+            return;
+        }
+
+        // Exceeded by >30 mins after 90m = worked > 120 mins
         $status = 'normal';
         $deviation = 0;
         $isFlagged = false;
 
-        if ($workedMinutes > 150) {
+        if ($workedMinutes > 120) {
             $status = 'exceeded';
-            $deviation = $workedMinutes - 120;
+            $deviation = $workedMinutes - 90;
             $isFlagged = true;
         }
 
         $tracking->update([
             'slot3_end_time' => $now,
-            'slot3_timing_status' => $status,
-            'slot3_deviation_minutes' => $deviation,
-            'slot3_is_flagged' => $isFlagged,
+            'slot4_checkin_time' => $now,
+            'slot4_timing_status' => $status,
+            'slot4_deviation_minutes' => $deviation,
+            'slot4_is_flagged' => $isFlagged,
         ]);
 
-        // Sync main attendance clock out
+        // Sync main attendance clock out and active attendance log
         $user = Auth::user();
         if ($user) {
-            Attendance::where('user_id', $user->id)
+            $attendance = Attendance::where('user_id', $user->id)
                 ->where('attendance_date', now()->toDateString())
-                ->update(['clock_out_time' => $now]);
+                ->first();
+
+            if ($attendance) {
+                $attendance->update(['clock_out_time' => $now]);
+
+                $activeLog = AttendanceLog::where('attendance_id', $attendance->id)
+                    ->whereNull('clock_out_time')
+                    ->first();
+
+                if ($activeLog) {
+                    $clockIn = $activeLog->clock_in_time;
+                    $duration = $clockIn ? (int) $clockIn->diffInMinutes($now) : 0;
+                    $activeLog->update([
+                        'clock_out_time' => $now,
+                        'duration_minutes' => $duration,
+                    ]);
+                }
+            }
         }
 
         if ($isFlagged) {
-            session()->flash('attendance_status', "3rd Slot completed & Clocked out! Exceeded 3rd slot by {$deviation} mins (>30m threshold). (Flagged in RED to Admin)");
+            session()->flash('attendance_status', "4th Slot completed & Clocked out! Exceeded 90-min slot by {$deviation} mins (>30m threshold). (Flagged in RED to Admin)");
         } else {
-            session()->flash('attendance_status', '3rd Slot completed & Clocked out successfully at '.$now->format('g:i A'));
+            session()->flash('attendance_status', '4th Slot completed & Clocked out successfully at '.$now->format('g:i A'));
         }
+
+        $this->dispatch('slot-updated');
+    }
+
+    public function saveSlot3AndClockOut(): void
+    {
+        $this->saveSlot4AndClockOut();
     }
 
     public function render()
     {
         $tracking = $this->getTodayTracking();
 
-        // Calculate timing and eligibility
+        // Calculate timing and eligibility for Slot 2 (available after 120m)
         $elapsedMinutesSinceCheckin = 0;
         $is2HrCheckinEligible = false;
         $minutesRemainingFor2HrCheckin = 0;
 
         if ($tracking && $tracking->slot1_checkin_time && ! $tracking->slot2_checkin_time) {
             $elapsedMinutesSinceCheckin = (int) $tracking->slot1_checkin_time->diffInMinutes(now());
-            if ($elapsedMinutesSinceCheckin >= 90) {
+            if ($elapsedMinutesSinceCheckin >= 120) {
                 $is2HrCheckinEligible = true;
             } else {
-                $minutesRemainingFor2HrCheckin = 90 - $elapsedMinutesSinceCheckin;
+                $minutesRemainingFor2HrCheckin = 120 - $elapsedMinutesSinceCheckin;
+            }
+        }
+
+        // Calculate timing and eligibility for Slot 4 (available after 90m from 3rd slot start)
+        $elapsedMinutesSlot3 = 0;
+        $is4thSlotEligible = false;
+        $minutesRemainingFor4thSlot = 0;
+
+        if ($tracking && $tracking->slot3_start_time && ! $tracking->slot4_checkin_time) {
+            $elapsedMinutesSlot3 = (int) $tracking->slot3_start_time->diffInMinutes(now());
+            if ($elapsedMinutesSlot3 >= 90) {
+                $is4thSlotEligible = true;
+            } else {
+                $minutesRemainingFor4thSlot = 90 - $elapsedMinutesSlot3;
             }
         }
 
@@ -247,6 +298,9 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
             'elapsedMinutesSinceCheckin' => $elapsedMinutesSinceCheckin,
             'is2HrCheckinEligible' => $is2HrCheckinEligible,
             'minutesRemainingFor2HrCheckin' => $minutesRemainingFor2HrCheckin,
+            'elapsedMinutesSlot3' => $elapsedMinutesSlot3,
+            'is4thSlotEligible' => $is4thSlotEligible,
+            'minutesRemainingFor4thSlot' => $minutesRemainingFor4thSlot,
         ]);
     }
 };

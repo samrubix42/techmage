@@ -221,7 +221,7 @@ new #[Layout('layouts.admin')] #[Title('Employee Working Hours & Slots - TechMag
                 $totalClockedInCount++;
             }
 
-            if ($stats['tracking'] && ($stats['tracking']->slot2_is_flagged || $stats['tracking']->lunch_exceeded || $stats['tracking']->slot3_is_flagged)) {
+            if ($stats['tracking'] && ($stats['tracking']->slot2_is_flagged || $stats['tracking']->lunch_exceeded || $stats['tracking']->slot3_is_flagged || $stats['tracking']->slot4_is_flagged)) {
                 $totalFlaggedCount++;
             }
 

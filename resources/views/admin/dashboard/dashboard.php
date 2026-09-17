@@ -54,7 +54,8 @@ new #[Layout('layouts.admin')] #[Title('Admin Dashboard - TechMage')] class exte
             $query->where(function ($q) {
                 $q->where('slot2_is_flagged', true)
                     ->orWhere('lunch_exceeded', true)
-                    ->orWhere('slot3_is_flagged', true);
+                    ->orWhere('slot3_is_flagged', true)
+                    ->orWhere('slot4_is_flagged', true);
             });
         } elseif ($this->statusFilter === 'slot2_flagged') {
             $query->where('slot2_is_flagged', true);
@@ -62,6 +63,8 @@ new #[Layout('layouts.admin')] #[Title('Admin Dashboard - TechMage')] class exte
             $query->where('lunch_exceeded', true);
         } elseif ($this->statusFilter === 'slot3_flagged') {
             $query->where('slot3_is_flagged', true);
+        } elseif ($this->statusFilter === 'slot4_flagged') {
+            $query->where('slot4_is_flagged', true);
         }
 
         $trackings = $query->latest()->get();
@@ -73,7 +76,8 @@ new #[Layout('layouts.admin')] #[Title('Admin Dashboard - TechMage')] class exte
             ->where(function ($q) {
                 $q->where('slot2_is_flagged', true)
                     ->orWhere('lunch_exceeded', true)
-                    ->orWhere('slot3_is_flagged', true);
+                    ->orWhere('slot3_is_flagged', true)
+                    ->orWhere('slot4_is_flagged', true);
             })->count();
 
         return view('admin.dashboard.dashboard', [
