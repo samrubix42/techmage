@@ -1,7 +1,7 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home4/mobiyqdc/s2s.brandcreatr.com/
+    - export DEPLOYPATH=/home4/growtfce/hr.techonika.in
     - /bin/cp -R * $DEPLOYPATH 
 
 
