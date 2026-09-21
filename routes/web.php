@@ -59,5 +59,4 @@ Route::middleware(['auth', 'role:employee'])->prefix('employee')->as('employee.'
     Route::livewire('/daily-task-reports/{report}/edit', 'employee::daily-task-report-create')->name('daily-task-report-edit');
     Route::livewire('/attendance-logs', 'employee::attendance-logs')->name('attendance-logs');
     Route::livewire('/leave-requests', 'employee::leave-requests')->name('leave-requests');
-    Route::livewire('/settings', 'employee::setting')->name('settings');
 });
