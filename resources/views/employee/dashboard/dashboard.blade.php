@@ -345,7 +345,7 @@
                     <h3 class="text-base font-bold text-slate-900 mt-1.5">4th Slot Check-In & Shift Clock-Out</h3>
                     <p class="text-xs text-slate-500 mt-0.5">
                         3rd slot started at <strong class="text-slate-900">{{ $tracking->slot3_start_time?->format('g:i A') }}</strong>. 
-                        Note: 4th slot check-in opens after 120 minutes (2h). Exceeding by 30 mins (&gt;150m total) will flag entry in RED.
+                        Note: 4th slot check-in opens after 120 minutes (2h) to complete your shift and clock out.
                     </p>
                 </div>
 

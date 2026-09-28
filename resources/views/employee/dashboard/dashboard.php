@@ -337,16 +337,10 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
             return;
         }
 
-        // Exceeded by >30 mins after 120m = worked > 150 mins
+        // 4th Slot is the final slot & shift completion: completed normally without red flags
         $status = 'normal';
         $deviation = 0;
         $isFlagged = false;
-
-        if ($workedMinutes > 150) {
-            $status = 'exceeded';
-            $deviation = $workedMinutes - 120;
-            $isFlagged = true;
-        }
 
         $tracking->update([
             'slot3_end_time' => $now,
@@ -381,11 +375,7 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
             }
         }
 
-        if ($isFlagged) {
-            session()->flash('attendance_status', "4th Slot completed & Clocked out! Exceeded 120-min slot by {$deviation} mins (>30m threshold). (Flagged in RED to Admin)");
-        } else {
-            session()->flash('attendance_status', '4th Slot completed & Clocked out successfully at '.$now->format('g:i A'));
-        }
+        session()->flash('attendance_status', '4th Slot completed & Clocked out successfully at '.$now->format('g:i A'));
 
         $this->dispatch('slot-updated');
     }

@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Attendance;
+use App\Models\AttendanceLog;
+use App\Models\DailySlotTracking;
 use App\Models\DailyTaskReport;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -106,6 +109,47 @@ new #[Layout('layouts.employee')] #[Title('Daily Task Report - TechMage')] class
             ]);
 
             $message = 'Daily Task Report submitted successfully!';
+        }
+
+        // If report is for today, sync 4th slot check-in & clock out shift
+        if ($this->date === now()->toDateString()) {
+            $user = Auth::user();
+            if ($user) {
+                $now = now();
+                $tracking = DailySlotTracking::where('user_id', $user->id)
+                    ->whereDate('tracking_date', $now->toDateString())
+                    ->first();
+
+                if ($tracking && $tracking->slot3_start_time && ! $tracking->slot4_checkin_time) {
+                    $tracking->update([
+                        'slot3_end_time' => $tracking->slot3_end_time ?? $now,
+                        'slot4_checkin_time' => $now,
+                        'slot4_timing_status' => 'normal',
+                        'slot4_is_flagged' => false,
+                    ]);
+
+                    $attendance = Attendance::where('user_id', $user->id)
+                        ->whereDate('attendance_date', $now->toDateString())
+                        ->first();
+
+                    if ($attendance) {
+                        $attendance->update(['clock_out_time' => $now]);
+
+                        $activeLog = AttendanceLog::where('attendance_id', $attendance->id)
+                            ->whereNull('clock_out_time')
+                            ->first();
+
+                        if ($activeLog) {
+                            $clockIn = $activeLog->clock_in_time;
+                            $duration = $clockIn ? (int) $clockIn->diffInMinutes($now) : 0;
+                            $activeLog->update([
+                                'clock_out_time' => $now,
+                                'duration_minutes' => $duration,
+                            ]);
+                        }
+                    }
+                }
+            }
         }
 
         $this->dispatch('toast-show', [

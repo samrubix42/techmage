@@ -102,6 +102,20 @@ new class extends Component
                 'clock_out_time' => $now,
             ]);
 
+            // Sync 4th slot & slot3_end_time in DailySlotTracking
+            $tracking = DailySlotTracking::where('user_id', $user->id)
+                ->where('tracking_date', $today)
+                ->first();
+
+            if ($tracking) {
+                $tracking->update([
+                    'slot3_end_time' => $tracking->slot3_end_time ?? $now,
+                    'slot4_checkin_time' => $tracking->slot4_checkin_time ?? $now,
+                    'slot4_timing_status' => $tracking->slot4_timing_status ?: 'normal',
+                    'slot4_is_flagged' => false,
+                ]);
+            }
+
             session()->flash('attendance_status', 'Clocked out at '.$now->format('g:i A'));
             $this->dispatch('slot-updated');
         }

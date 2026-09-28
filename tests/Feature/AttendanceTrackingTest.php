@@ -82,7 +82,7 @@ test('detects exceeded lunch over 60 mins and shows red flag in admin', function
         ->assertSee('Red Flagged');
 });
 
-test('flags 4th slot timing deviation if exceeded past 30 minutes after 120m target', function () {
+test('completes 4th slot normally without red flag after 120m target', function () {
     $employee = User::factory()->create(['role' => 'employee']);
     $today = now()->toDateString();
 
@@ -94,25 +94,18 @@ test('flags 4th slot timing deviation if exceeded past 30 minutes after 120m tar
         'lunch_start_time' => now()->subHours(4),
         'lunch_end_time' => now()->subHours(3),
         'lunch_duration_minutes' => 60,
-        'slot3_start_time' => now()->subMinutes(160), // Worked 160 mins (target 120m, exceeded 30m target by 40m)
+        'slot3_start_time' => now()->subMinutes(160), // Worked 160 mins (last slot completed normally)
     ]);
 
     Livewire::actingAs($employee)
         ->test('employee::dashboard')
         ->call('saveSlot4AndClockOut')
-        ->assertSee('Exceeded 120-min slot');
+        ->assertSee('4th Slot completed & Clocked out successfully');
 
     $tracking->refresh();
-    expect($tracking->slot4_is_flagged)->toBeTrue();
-    expect($tracking->slot4_timing_status)->toBe('exceeded');
-    expect($tracking->slot4_deviation_minutes)->toBe(40);
+    expect($tracking->slot4_is_flagged)->toBeFalse();
+    expect($tracking->slot4_timing_status)->toBe('normal');
     expect($tracking->slot4_checkin_time)->not->toBeNull();
-
-    $admin = User::factory()->create(['role' => 'admin']);
-    Livewire::actingAs($admin)
-        ->test('admin::dashboard')
-        ->assertSee('Exceeded Slot 4 (+40m)')
-        ->assertSee('Red Flagged');
 });
 
 test('it syncs 1st slot time on clock in from sidebar', function () {
