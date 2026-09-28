@@ -11,7 +11,7 @@
                     <span class="text-xs text-slate-500 font-medium">{{ now()->format('l, F j, Y') }}</span>
                 </div>
                 <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Welcome, {{ auth()->user()->name }} 👋</h1>
-                <p class="text-slate-500 mt-1 text-xs sm:text-sm">Follow your daily shift timeline: Slot 1 Clock-In → 2-Hr Check-In (after 2h) → Lunch Break (1h) → 3rd Slot → 4th Slot & Clock Out (after 90m).</p>
+                <p class="text-slate-500 mt-1 text-xs sm:text-sm">Follow your daily shift timeline: Slot 1 Clock-In → 2-Hr Check-In (after 2h) → Lunch Break (1h) → 3rd Slot → 4th Slot & Clock Out (after 120m).</p>
             </div>
 
             <div>
@@ -205,7 +205,7 @@
                         <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-400 border border-slate-200 flex items-center justify-center font-medium text-sm cursor-not-allowed">
                             5
                         </div>
-                        <span class="text-xs font-medium text-slate-500 mt-2">5. 4th Slot (90m)</span>
+                        <span class="text-xs font-medium text-slate-500 mt-2">5. 4th Slot (120m)</span>
                         <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-medium mt-0.5">
                             Available in ~{{ $minutesRemainingFor4thSlot }}m
                         </span>
@@ -345,7 +345,7 @@
                     <h3 class="text-base font-bold text-slate-900 mt-1.5">4th Slot Check-In & Shift Clock-Out</h3>
                     <p class="text-xs text-slate-500 mt-0.5">
                         3rd slot started at <strong class="text-slate-900">{{ $tracking->slot3_start_time?->format('g:i A') }}</strong>. 
-                        Note: 4th slot check-in opens after 90 minutes. Exceeding by 30 mins (&gt;120m total) will flag entry in RED.
+                        Note: 4th slot check-in opens after 120 minutes (2h). Exceeding by 30 mins (&gt;150m total) will flag entry in RED.
                     </p>
                 </div>
 

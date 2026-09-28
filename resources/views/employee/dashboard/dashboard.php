@@ -94,8 +94,8 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
         }
 
         $workedMinutes = (int) $tracking->slot3_start_time->diffInMinutes(now());
-        if ($workedMinutes < 90) {
-            session()->flash('error', '4th Slot check-in is disabled until 90 minutes have elapsed after 3rd slot start. Currently elapsed: '.$workedMinutes.' mins.');
+        if ($workedMinutes < 120) {
+            session()->flash('error', '4th Slot check-in is disabled until 120 minutes have elapsed after 3rd slot start. Currently elapsed: '.$workedMinutes.' mins.');
 
             return;
         }
@@ -330,21 +330,21 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
         $slot3Start = $tracking->slot3_start_time;
         $workedMinutes = (int) $slot3Start->diffInMinutes($now);
 
-        // Cannot perform 4th slot checkin before 90 mins after 3rd slot start
-        if ($workedMinutes < 90) {
-            session()->flash('error', '4th Slot check-in is disabled until 90 minutes have elapsed after 3rd slot start. Currently elapsed: '.$workedMinutes.' mins.');
+        // Cannot perform 4th slot checkin before 120 mins after 3rd slot start
+        if ($workedMinutes < 120) {
+            session()->flash('error', '4th Slot check-in is disabled until 120 minutes have elapsed after 3rd slot start. Currently elapsed: '.$workedMinutes.' mins.');
 
             return;
         }
 
-        // Exceeded by >30 mins after 90m = worked > 120 mins
+        // Exceeded by >30 mins after 120m = worked > 150 mins
         $status = 'normal';
         $deviation = 0;
         $isFlagged = false;
 
-        if ($workedMinutes > 120) {
+        if ($workedMinutes > 150) {
             $status = 'exceeded';
-            $deviation = $workedMinutes - 90;
+            $deviation = $workedMinutes - 120;
             $isFlagged = true;
         }
 
@@ -382,7 +382,7 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
         }
 
         if ($isFlagged) {
-            session()->flash('attendance_status', "4th Slot completed & Clocked out! Exceeded 90-min slot by {$deviation} mins (>30m threshold). (Flagged in RED to Admin)");
+            session()->flash('attendance_status', "4th Slot completed & Clocked out! Exceeded 120-min slot by {$deviation} mins (>30m threshold). (Flagged in RED to Admin)");
         } else {
             session()->flash('attendance_status', '4th Slot completed & Clocked out successfully at '.$now->format('g:i A'));
         }
@@ -413,17 +413,17 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
             }
         }
 
-        // Calculate timing and eligibility for Slot 4 (available after 90m from 3rd slot start)
+        // Calculate timing and eligibility for Slot 4 (available after 120m from 3rd slot start)
         $elapsedMinutesSlot3 = 0;
         $is4thSlotEligible = false;
         $minutesRemainingFor4thSlot = 0;
 
         if ($tracking && $tracking->slot3_start_time && ! $tracking->slot4_checkin_time) {
             $elapsedMinutesSlot3 = (int) $tracking->slot3_start_time->diffInMinutes(now());
-            if ($elapsedMinutesSlot3 >= 90) {
+            if ($elapsedMinutesSlot3 >= 120) {
                 $is4thSlotEligible = true;
             } else {
-                $minutesRemainingFor4thSlot = 90 - $elapsedMinutesSlot3;
+                $minutesRemainingFor4thSlot = 120 - $elapsedMinutesSlot3;
             }
         }
 
