@@ -6,6 +6,7 @@ use App\Models\LeaveRequest;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -22,6 +23,12 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
     public ?string $selectedDateForModal = null;
 
     public bool $showDetailModal = false;
+
+    #[On('slot-updated')]
+    public function refreshCalendar(): void
+    {
+        // Re-render component on live slot/attendance updates
+    }
 
     public function mount(User $user): void
     {

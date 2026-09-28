@@ -4,10 +4,17 @@ use App\Models\Attendance;
 use App\Models\AttendanceLog;
 use App\Models\DailySlotTracking;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 new class extends Component
 {
+    #[On('slot-updated')]
+    public function refreshSidebar(): void
+    {
+        // Re-render sidebar component when slot or clock-out updates occur
+    }
+
     public function clockIn(): void
     {
         $user = Auth::user();

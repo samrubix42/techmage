@@ -152,6 +152,8 @@ new #[Layout('layouts.employee')] #[Title('Daily Task Report - TechMage')] class
             }
         }
 
+        $this->dispatch('slot-updated');
+
         $this->dispatch('toast-show', [
             'message' => $message,
             'type' => 'success',
