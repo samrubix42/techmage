@@ -55,3 +55,53 @@ test('employee can navigate calendar months and switch view modes', function () 
         ->assertSet('viewMode', 'list')
         ->assertSee('Daily Slot Progress Chain');
 });
+
+test('clocking in on Sunday or Saturday off day marks status as present in employee calendar and admin calendar and tracking', function () {
+    $employee = User::factory()->create([
+        'role' => 'employee',
+        'name' => 'Weekend Worker',
+        'saturday_off_policy' => 'sunday_2nd_4th_saturday',
+    ]);
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    // Set time to Sunday Sept 13, 2026 09:00 AM
+    Carbon::setTestNow('2026-09-13 09:00:00');
+
+    // Employee clocks in on Sunday
+    Livewire::actingAs($employee)
+        ->test('employee::dashboard')
+        ->call('clockIn');
+
+    // Check Attendance model status
+    $sundayAttendance = Attendance::where('user_id', $employee->id)
+        ->whereDate('attendance_date', '2026-09-13')
+        ->first();
+
+    expect($sundayAttendance)->not->toBeNull();
+    expect($sundayAttendance->status)->toBe('present');
+
+    // Check Employee Calendar view for Sunday
+    Livewire::actingAs($employee)
+        ->test('employee::attendance-logs')
+        ->assertViewHas('calendarDays', function ($days) {
+            $sunday = collect($days)->firstWhere('date', '2026-09-13');
+
+            return $sunday && $sunday['status'] === 'present';
+        });
+
+    // Check Admin Employee Calendar view for Sunday
+    Livewire::actingAs($admin)
+        ->test('admin::employee-calendar', ['user' => $employee])
+        ->assertViewHas('calendarDays', function ($days) {
+            $sunday = collect($days)->firstWhere('date', '2026-09-13');
+
+            return $sunday && $sunday['status'] === 'present';
+        });
+
+    // Check Admin Attendance Logs for Sunday
+    Livewire::actingAs($admin)
+        ->test('admin::attendance-logs')
+        ->set('selectedDate', '2026-09-13')
+        ->assertSee('Weekend Worker')
+        ->assertSee('9:00 AM');
+});

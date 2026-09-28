@@ -197,11 +197,13 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
 
             $formattedHours = $workedMins > 0 ? (floor($workedMins / 60).'h '.($workedMins % 60).'m') : null;
 
+            $hasClockIn = ($att && ($att->clock_in_time || $att->logs->isNotEmpty())) || ($tr && $tr->slot1_checkin_time);
+
             $status = 'none';
-            if ($att) {
-                $status = $att->status ?: 'present';
-            } elseif ($tr && $tr->slot1_checkin_time) {
-                $status = 'present';
+            if ($hasClockIn) {
+                $status = ($att && in_array($att->status, ['on_leave', 'leave', 'half_day', 'holiday'])) ? $att->status : 'present';
+            } elseif ($att && $att->status) {
+                $status = $att->status;
             } elseif ($isCurrentMonth && $cursor->isPast() && ! $isOffDay && ! $isToday) {
                 $status = 'absent';
             } elseif ($isOffDay) {

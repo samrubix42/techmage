@@ -29,10 +29,10 @@ new class extends Component
             ]
         );
 
-        if (! $attendance->clock_in_time) {
+        if ($attendance->status !== 'present' || ! $attendance->clock_in_time) {
             $attendance->update([
-                'clock_in_time' => $now,
                 'status' => 'present',
+                'clock_in_time' => $attendance->clock_in_time ?? $now,
             ]);
         }
 

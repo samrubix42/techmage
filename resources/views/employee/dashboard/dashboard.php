@@ -160,6 +160,13 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
             ['status' => 'present', 'clock_in_time' => $now]
         );
 
+        if ($attendance->status !== 'present' || ! $attendance->clock_in_time) {
+            $attendance->update([
+                'status' => 'present',
+                'clock_in_time' => $attendance->clock_in_time ?? $now,
+            ]);
+        }
+
         // Ensure DailySlotTracking record exists
         $tracking = DailySlotTracking::firstOrCreate(
             ['user_id' => $user->id, 'tracking_date' => $today],
@@ -173,6 +180,18 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
             $tracking->update([
                 'attendance_id' => $attendance->id,
                 'slot1_checkin_time' => $now,
+            ]);
+        }
+
+        $activeLog = AttendanceLog::where('attendance_id', $attendance->id)
+            ->whereNull('clock_out_time')
+            ->first();
+
+        if (! $activeLog) {
+            AttendanceLog::create([
+                'attendance_id' => $attendance->id,
+                'user_id' => $user->id,
+                'clock_in_time' => $now,
             ]);
         }
 

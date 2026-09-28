@@ -157,7 +157,7 @@ new #[Layout('layouts.admin')] #[Title('Employee Working Hours & Slots - TechMag
             'totalBreaksMinutes' => $totalBreaksMinutes,
             'formattedBreakHours' => $formattedBreakHours,
             'hasActiveSession' => ! is_null($activeSession),
-            'firstClockIn' => $attendance?->clock_in_time ?: $logs->first()?->clock_in_time,
+            'firstClockIn' => $attendance?->clock_in_time ?: ($logs->first()?->clock_in_time ?: $tracking?->slot1_checkin_time),
             'lastClockOut' => $attendance?->clock_out_time ?: $logs->whereNotNull('clock_out_time')->last()?->clock_out_time,
         ];
     }
