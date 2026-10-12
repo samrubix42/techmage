@@ -47,6 +47,11 @@
                 <i class="ri-calendar-todo-line text-base {{ request()->routeIs('admin.leave-requests') ? 'text-white' : 'text-slate-400' }}"></i>
                 <span>Leave Requests</span>
             </a>
+
+            <a href="{{ route('admin.change-password') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-xs font-medium transition-all {{ request()->routeIs('admin.change-password') ? 'bg-slate-900 text-white font-semibold shadow-xs' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900' }}">
+                <i class="ri-lock-password-line text-base {{ request()->routeIs('admin.change-password') ? 'text-white' : 'text-slate-400' }}"></i>
+                <span>Change Password</span>
+            </a>
         </nav>
     </div>
 

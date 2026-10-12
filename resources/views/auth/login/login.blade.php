@@ -88,34 +88,4 @@
             </span>
         </button>
     </form>
-
-    <!-- Demo Credentials Section -->
-    <div class="mt-8 pt-6 border-t border-slate-100">
-        <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider text-center mb-3">Quick Demo Accounts</p>
-        <div class="grid grid-cols-2 gap-2 text-xs">
-            <button 
-                type="button"
-                @click="$wire.set('email', 'admin@admin.com'); $wire.set('password', 'password');"
-                class="p-2.5 rounded-md bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left transition-colors cursor-pointer group"
-            >
-                <div class="font-semibold text-slate-800 flex items-center justify-between">
-                    <span>Admin</span>
-                    <i class="ri-shield-user-line text-slate-500"></i>
-                </div>
-                <div class="text-[11px] text-slate-500 mt-0.5 truncate">admin@admin.com</div>
-            </button>
-
-            <button 
-                type="button"
-                @click="$wire.set('email', 'employee@employee.com'); $wire.set('password', 'password');"
-                class="p-2.5 rounded-md bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left transition-colors cursor-pointer group"
-            >
-                <div class="font-semibold text-slate-800 flex items-center justify-between">
-                    <span>Employee</span>
-                    <i class="ri-user-line text-slate-500"></i>
-                </div>
-                <div class="text-[11px] text-slate-500 mt-0.5 truncate">employee@...</div>
-            </button>
-        </div>
-    </div>
 </div>
