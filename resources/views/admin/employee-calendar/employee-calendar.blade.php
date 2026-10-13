@@ -228,24 +228,6 @@
                     </div>
                 @endforeach
             </div>
-
-            <!-- Working Hours Legend Footer -->
-            <div class="px-6 py-3 border-t border-slate-200 bg-slate-50/70 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
-                <div class="flex items-center gap-2">
-                    <span class="font-semibold text-slate-700">Working Hours:</span>
-                    <span>Calculated from Slot Tracking minus Lunch Break (1h)</span>
-                </div>
-                <div class="flex items-center gap-4">
-                    <span class="inline-flex items-center gap-1.5 font-medium text-emerald-700">
-                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                        <span>&ge; 8 Hours (Full Day Target)</span>
-                    </span>
-                    <span class="inline-flex items-center gap-1.5 font-medium text-red-700">
-                        <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
-                        <span>&lt; 8 Hours (Under 8 Hours)</span>
-                    </span>
-                </div>
-            </div>
         </div>
     @else
         <!-- Log Table View -->
