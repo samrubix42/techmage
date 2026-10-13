@@ -41,6 +41,19 @@ new #[Layout('layouts.admin')] #[Title('Holiday Management - TechMage')] class e
 
     public string $holiday_date = '';
 
+    public string $date_mode = 'single'; // 'single', 'range', 'multiple'
+
+    public string $start_date = '';
+
+    public string $end_date = '';
+
+    public bool $range_skip_weekends = false;
+
+    /** @var array<int, string> */
+    public array $multiple_dates = [];
+
+    public string $new_multiple_date = '';
+
     public string $type = 'public';
 
     public string $description = '';
@@ -87,6 +100,9 @@ new #[Layout('layouts.admin')] #[Title('Holiday Management - TechMage')] class e
     {
         $this->resetForm();
         $this->holiday_date = $date;
+        $this->start_date = $date;
+        $this->end_date = $date;
+        $this->date_mode = 'single';
         $this->showCreateModal = true;
     }
 
@@ -115,9 +131,36 @@ new #[Layout('layouts.admin')] #[Title('Holiday Management - TechMage')] class e
         $this->holidayId = null;
         $this->name = '';
         $this->holiday_date = '';
+        $this->date_mode = 'single';
+        $this->start_date = '';
+        $this->end_date = '';
+        $this->range_skip_weekends = false;
+        $this->multiple_dates = [];
+        $this->new_multiple_date = '';
         $this->type = 'public';
         $this->description = '';
         $this->resetErrorBag();
+    }
+
+    public function addMultipleDate(): void
+    {
+        if (empty($this->new_multiple_date)) {
+            return;
+        }
+
+        $dateStr = Carbon::parse($this->new_multiple_date)->toDateString();
+        if (! in_array($dateStr, $this->multiple_dates)) {
+            $this->multiple_dates[] = $dateStr;
+            sort($this->multiple_dates);
+        }
+
+        $this->new_multiple_date = '';
+        $this->resetErrorBag('multiple_dates');
+    }
+
+    public function removeMultipleDate(string $date): void
+    {
+        $this->multiple_dates = array_values(array_filter($this->multiple_dates, fn ($d) => $d !== $date));
     }
 
     public function closeModals(): void
@@ -135,17 +178,137 @@ new #[Layout('layouts.admin')] #[Title('Holiday Management - TechMage')] class e
     {
         $this->resetForm();
         $this->holiday_date = now()->toDateString();
+        $this->start_date = now()->toDateString();
+        $this->end_date = now()->addDays(1)->toDateString();
         $this->showCreateModal = true;
     }
 
     public function createHoliday(): void
     {
-        $validated = $this->validate([
+        $baseRules = [
             'name' => ['required', 'string', 'max:255'],
-            'holiday_date' => ['required', 'date'],
             'type' => ['required', 'in:public,company,optional'],
             'description' => ['nullable', 'string', 'max:1000'],
-        ]);
+        ];
+
+        if ($this->date_mode === 'range') {
+            $validated = $this->validate(array_merge($baseRules, [
+                'start_date' => ['required', 'date'],
+                'end_date' => ['required', 'date', 'after_or_equal:start_date'],
+            ]));
+
+            $start = Carbon::parse($validated['start_date']);
+            $end = Carbon::parse($validated['end_date']);
+            $targetDates = [];
+            $cursor = $start->copy();
+
+            while ($cursor->lte($end)) {
+                if (! ($this->range_skip_weekends && $cursor->isWeekend())) {
+                    $targetDates[] = $cursor->toDateString();
+                }
+                $cursor->addDay();
+            }
+
+            if (empty($targetDates)) {
+                $this->addError('end_date', 'No valid dates selected in the date range.');
+
+                return;
+            }
+
+            $existingDates = Holiday::whereIn('holiday_date', $targetDates)
+                ->pluck('holiday_date')
+                ->map(fn ($d) => $d->toDateString())
+                ->toArray();
+
+            if (count($existingDates) === count($targetDates)) {
+                $this->addError('start_date', 'All dates in the selected range already have holidays.');
+
+                return;
+            }
+
+            $createdCount = 0;
+            foreach ($targetDates as $dateStr) {
+                if (! in_array($dateStr, $existingDates)) {
+                    Holiday::create([
+                        'name' => trim($validated['name']),
+                        'holiday_date' => $dateStr,
+                        'type' => $validated['type'],
+                        'description' => ! empty($validated['description']) ? trim($validated['description']) : null,
+                    ]);
+                    $createdCount++;
+                }
+            }
+
+            $skippedCount = count($existingDates);
+            $msg = "Created {$createdCount} holidays for \"{$validated['name']}\" successfully.";
+            if ($skippedCount > 0) {
+                $msg .= " ({$skippedCount} duplicate dates were skipped).";
+            }
+
+            session()->flash('message', $msg);
+            $this->closeModals();
+
+            return;
+        }
+
+        if ($this->date_mode === 'multiple') {
+            if (! empty($this->new_multiple_date)) {
+                $dateStr = Carbon::parse($this->new_multiple_date)->toDateString();
+                if (! in_array($dateStr, $this->multiple_dates)) {
+                    $this->multiple_dates[] = $dateStr;
+                    sort($this->multiple_dates);
+                }
+                $this->new_multiple_date = '';
+            }
+
+            $validated = $this->validate($baseRules);
+
+            if (empty($this->multiple_dates)) {
+                $this->addError('multiple_dates', 'Please add at least one holiday date.');
+
+                return;
+            }
+
+            $existingDates = Holiday::whereIn('holiday_date', $this->multiple_dates)
+                ->pluck('holiday_date')
+                ->map(fn ($d) => $d->toDateString())
+                ->toArray();
+
+            if (count($existingDates) === count($this->multiple_dates)) {
+                $this->addError('multiple_dates', 'All selected dates already have holidays.');
+
+                return;
+            }
+
+            $createdCount = 0;
+            foreach ($this->multiple_dates as $dateStr) {
+                if (! in_array($dateStr, $existingDates)) {
+                    Holiday::create([
+                        'name' => trim($validated['name']),
+                        'holiday_date' => $dateStr,
+                        'type' => $validated['type'],
+                        'description' => ! empty($validated['description']) ? trim($validated['description']) : null,
+                    ]);
+                    $createdCount++;
+                }
+            }
+
+            $skippedCount = count($existingDates);
+            $msg = "Created {$createdCount} holidays for \"{$validated['name']}\" successfully.";
+            if ($skippedCount > 0) {
+                $msg .= " ({$skippedCount} duplicate dates were skipped).";
+            }
+
+            session()->flash('message', $msg);
+            $this->closeModals();
+
+            return;
+        }
+
+        // Single date mode (default)
+        $validated = $this->validate(array_merge($baseRules, [
+            'holiday_date' => ['required', 'date'],
+        ]));
 
         $existing = Holiday::whereDate('holiday_date', $validated['holiday_date'])->exists();
         if ($existing) {

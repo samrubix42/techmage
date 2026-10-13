@@ -184,3 +184,48 @@ test('admin can open create modal with prefilled date by clicking calendar day',
     expect($created->holiday_date->toDateString())->toBe('2026-10-25')
         ->and($created->type)->toBe('company');
 });
+
+test('admin can create multiple holidays using date range', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    Livewire::actingAs($admin)
+        ->test('admin::holiday-management')
+        ->call('openCreateModal')
+        ->set('date_mode', 'range')
+        ->set('name', 'Diwali Vacation')
+        ->set('start_date', '2026-11-01')
+        ->set('end_date', '2026-11-04')
+        ->set('type', 'public')
+        ->call('createHoliday')
+        ->assertHasNoErrors()
+        ->assertSet('showCreateModal', false);
+
+    expect(Holiday::where('name', 'Diwali Vacation')->count())->toBe(4);
+    expect(Holiday::whereDate('holiday_date', '2026-11-01')->exists())->toBeTrue();
+    expect(Holiday::whereDate('holiday_date', '2026-11-02')->exists())->toBeTrue();
+    expect(Holiday::whereDate('holiday_date', '2026-11-03')->exists())->toBeTrue();
+    expect(Holiday::whereDate('holiday_date', '2026-11-04')->exists())->toBeTrue();
+});
+
+test('admin can create multiple holidays using specific multiple dates list', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    Livewire::actingAs($admin)
+        ->test('admin::holiday-management')
+        ->call('openCreateModal')
+        ->set('date_mode', 'multiple')
+        ->set('name', 'National Observances')
+        ->set('new_multiple_date', '2026-08-15')
+        ->call('addMultipleDate')
+        ->assertSet('multiple_dates', ['2026-08-15'])
+        ->set('new_multiple_date', '2026-10-02')
+        ->call('addMultipleDate')
+        ->assertSet('multiple_dates', ['2026-08-15', '2026-10-02'])
+        ->call('createHoliday')
+        ->assertHasNoErrors()
+        ->assertSet('showCreateModal', false);
+
+    expect(Holiday::where('name', 'National Observances')->count())->toBe(2);
+    expect(Holiday::whereDate('holiday_date', '2026-08-15')->exists())->toBeTrue();
+    expect(Holiday::whereDate('holiday_date', '2026-10-02')->exists())->toBeTrue();
+});

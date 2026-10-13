@@ -673,7 +673,7 @@
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
             <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" wire:click="closeModals"></div>
 
-            <div class="relative inline-block w-full max-w-md p-0 my-8 overflow-hidden text-left align-middle transition-all transform bg-white rounded-lg shadow-xl border border-slate-200">
+            <div class="relative inline-block w-full max-w-lg p-0 my-8 overflow-hidden text-left align-middle transition-all transform bg-white rounded-lg shadow-xl border border-slate-200">
                 <!-- Modal Header -->
                 <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50/50">
                     <div class="flex items-center gap-2">
@@ -696,21 +696,175 @@
                             <input 
                                 type="text" 
                                 wire:model="name" 
-                                placeholder="e.g. Republic Day, Diwali, Christmas Day..." 
+                                placeholder="e.g. Republic Day, Diwali Vacation, Christmas Holidays..." 
                                 class="w-full px-3.5 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 {{ $errors->has('name') ? 'border-rose-400 bg-rose-50/30' : 'border-slate-300' }}"
                             />
                             @error('name') <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p> @enderror
                         </div>
 
-                        <!-- Date -->
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Holiday Date <span class="text-rose-500">*</span></label>
-                            <input 
-                                type="date" 
-                                wire:model="holiday_date" 
-                                class="w-full px-3.5 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 {{ $errors->has('holiday_date') ? 'border-rose-400 bg-rose-50/30' : 'border-slate-300' }}"
-                            />
-                            @error('holiday_date') <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p> @enderror
+                        <!-- Date Mode Switcher & Inputs -->
+                        <div class="space-y-2">
+                            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Holiday Date Selection <span class="text-rose-500">*</span></label>
+                            
+                            <!-- Mode Switcher Tabs -->
+                            <div class="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-md border border-slate-200">
+                                <button 
+                                    type="button" 
+                                    wire:click="$set('date_mode', 'single')" 
+                                    class="px-2.5 py-1.5 rounded text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer {{ $date_mode === 'single' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900' }}"
+                                >
+                                    <i class="ri-calendar-event-line text-sm"></i>
+                                    <span>Single Day</span>
+                                </button>
+
+                                <button 
+                                    type="button" 
+                                    wire:click="$set('date_mode', 'range')" 
+                                    class="px-2.5 py-1.5 rounded text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer {{ $date_mode === 'range' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900' }}"
+                                >
+                                    <i class="ri-calendar-2-line text-sm"></i>
+                                    <span>Date Range</span>
+                                </button>
+
+                                <button 
+                                    type="button" 
+                                    wire:click="$set('date_mode', 'multiple')" 
+                                    class="px-2.5 py-1.5 rounded text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer {{ $date_mode === 'multiple' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900' }}"
+                                >
+                                    <i class="ri-calendar-check-line text-sm"></i>
+                                    <span>Multiple Dates</span>
+                                </button>
+                            </div>
+
+                            <!-- Option 1: Single Date -->
+                            @if ($date_mode === 'single')
+                                <div class="pt-1">
+                                    <input 
+                                        type="date" 
+                                        wire:model="holiday_date" 
+                                        class="w-full px-3.5 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white {{ $errors->has('holiday_date') ? 'border-rose-400 bg-rose-50/30' : 'border-slate-300' }}"
+                                    />
+                                    @error('holiday_date') <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p> @enderror
+                                </div>
+                            @endif
+
+                            <!-- Option 2: Date Range -->
+                            @if ($date_mode === 'range')
+                                <div class="pt-1 space-y-3 p-3 bg-slate-50 border border-slate-200 rounded-md">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1">Start Date <span class="text-rose-500">*</span></label>
+                                            <input 
+                                                type="date" 
+                                                wire:model.live="start_date" 
+                                                class="w-full px-3 py-1.5 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white {{ $errors->has('start_date') ? 'border-rose-400 bg-rose-50/30' : 'border-slate-300' }}"
+                                            />
+                                            @error('start_date') <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p> @enderror
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1">End Date <span class="text-rose-500">*</span></label>
+                                            <input 
+                                                type="date" 
+                                                wire:model.live="end_date" 
+                                                class="w-full px-3 py-1.5 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white {{ $errors->has('end_date') ? 'border-rose-400 bg-rose-50/30' : 'border-slate-300' }}"
+                                            />
+                                            @error('end_date') <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p> @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between pt-1 text-xs">
+                                        <label class="inline-flex items-center gap-2 cursor-pointer text-slate-700">
+                                            <input 
+                                                type="checkbox" 
+                                                wire:model.live="range_skip_weekends" 
+                                                class="rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+                                            />
+                                            <span class="text-[11px] font-medium">Skip weekends (Sat & Sun)</span>
+                                        </label>
+
+                                        @if(!empty($start_date) && !empty($end_date) && $start_date <= $end_date)
+                                            @php
+                                                $s = \Illuminate\Support\Carbon::parse($start_date);
+                                                $e = \Illuminate\Support\Carbon::parse($end_date);
+                                                $dayCount = 0;
+                                                $c = $s->copy();
+                                                while($c->lte($e)) {
+                                                    if (!($range_skip_weekends && $c->isWeekend())) {
+                                                        $dayCount++;
+                                                    }
+                                                    $c->addDay();
+                                                }
+                                            @endphp
+                                            <span class="text-[11px] font-semibold text-purple-700 bg-purple-100/70 px-2 py-0.5 rounded border border-purple-200">
+                                                {{ $dayCount }} {{ Str::plural('Holiday', $dayCount) }} will be added
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
+
+                            <!-- Option 3: Multiple Custom Dates -->
+                            @if ($date_mode === 'multiple')
+                                <div class="pt-1 space-y-3 p-3 bg-slate-50 border border-slate-200 rounded-md">
+                                    <div>
+                                        <label class="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1">Pick a Date to Add</label>
+                                        <div class="flex items-center gap-2">
+                                            <input 
+                                                type="date" 
+                                                wire:model="new_multiple_date" 
+                                                wire:keydown.enter.prevent="addMultipleDate"
+                                                class="flex-1 px-3 py-1.5 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white"
+                                            />
+                                            <button 
+                                                type="button" 
+                                                wire:click="addMultipleDate" 
+                                                class="px-3 py-1.5 bg-slate-900 text-white rounded-md text-xs font-semibold hover:bg-slate-800 transition-colors flex items-center gap-1 cursor-pointer shrink-0"
+                                            >
+                                                <i class="ri-add-line"></i>
+                                                <span>Add Date</span>
+                                            </button>
+                                        </div>
+                                        @error('multiple_dates') <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p> @enderror
+                                    </div>
+
+                                    <div>
+                                        <div class="flex items-center justify-between mb-1.5">
+                                            <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Added Dates ({{ count($multiple_dates) }}):</span>
+                                            @if(count($multiple_dates) > 0)
+                                                <button 
+                                                    type="button" 
+                                                    wire:click="$set('multiple_dates', [])" 
+                                                    class="text-[11px] text-rose-600 hover:underline cursor-pointer"
+                                                >
+                                                    Clear All
+                                                </button>
+                                            @endif
+                                        </div>
+
+                                        @if(empty($multiple_dates))
+                                            <p class="text-xs text-slate-400 italic">No dates added yet. Pick a date above and click "Add Date".</p>
+                                        @else
+                                            <div class="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-1.5 bg-white border border-slate-200 rounded-md">
+                                                @foreach ($multiple_dates as $d)
+                                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold bg-purple-50 text-purple-800 border border-purple-200">
+                                                        <i class="ri-calendar-event-line text-purple-600"></i>
+                                                        <span>{{ \Illuminate\Support\Carbon::parse($d)->format('d M Y (D)') }}</span>
+                                                        <button 
+                                                            type="button" 
+                                                            wire:click="removeMultipleDate('{{ $d }}')" 
+                                                            class="text-purple-500 hover:text-purple-900 p-0.5 cursor-pointer"
+                                                            title="Remove"
+                                                        >
+                                                            <i class="ri-close-line text-xs font-bold"></i>
+                                                        </button>
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
                         </div>
 
                         <!-- Type -->
