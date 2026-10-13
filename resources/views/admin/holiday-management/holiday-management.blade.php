@@ -12,7 +12,25 @@
             <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Manage official company holidays, calendar visibility, and track employees working on holiday dates.</p>
         </div>
 
-        <div>
+        <div class="flex flex-wrap items-center gap-3">
+            <!-- View Switcher -->
+            <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-md border border-slate-200">
+                <button 
+                    wire:click="setViewMode('calendar')" 
+                    class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 {{ $viewMode === 'calendar' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900' }}"
+                >
+                    <i class="ri-calendar-line text-sm"></i>
+                    <span>Calendar View</span>
+                </button>
+                <button 
+                    wire:click="setViewMode('list')" 
+                    class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 {{ $viewMode === 'list' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900' }}"
+                >
+                    <i class="ri-list-check-2 text-sm"></i>
+                    <span>List View</span>
+                </button>
+            </div>
+
             <button 
                 wire:click="openCreateModal" 
                 class="inline-flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 active:scale-95 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 transition-all shadow-sm cursor-pointer"
@@ -91,8 +109,331 @@
         </div>
     </div>
 
-    <!-- Toolbar Filters & Search -->
-    <div class="bg-white border border-slate-200/80 rounded-md p-4 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    @if ($viewMode === 'calendar')
+        <!-- Calendar Navigation & Controls Bar -->
+        <div class="bg-white rounded-md border border-slate-200/80 shadow-xs p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <!-- Month Navigator -->
+            <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+                <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-md">
+                    <button 
+                        wire:click="previousMonth" 
+                        class="p-2 rounded-md hover:bg-white text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
+                        title="Previous Month"
+                    >
+                        <i class="ri-arrow-left-s-line text-lg"></i>
+                    </button>
+                    <button 
+                        wire:click="goToToday" 
+                        class="px-3 py-1.5 rounded-md text-xs font-semibold text-slate-700 hover:bg-white transition-all cursor-pointer"
+                    >
+                        Today
+                    </button>
+                    <button 
+                        wire:click="nextMonth" 
+                        class="p-2 rounded-md hover:bg-white text-slate-600 hover:text-slate-900 transition-all cursor-pointer"
+                        title="Next Month"
+                    >
+                        <i class="ri-arrow-right-s-line text-lg"></i>
+                    </button>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <i class="ri-calendar-event-line text-purple-600"></i>
+                    <span>{{ $currentMonthLabel }}</span>
+                </h3>
+            </div>
+
+            <!-- Month & Year Jump Selectors + Badge -->
+            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+                <div class="flex items-center gap-1.5">
+                    <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Month:</label>
+                    <select 
+                        wire:model.live="calendarMonth" 
+                        class="border border-slate-300 rounded-md text-xs font-medium px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white"
+                    >
+                        @foreach (range(1, 12) as $m)
+                            <option value="{{ $m }}">{{ date('F', mktime(0, 0, 0, $m, 1)) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-1.5">
+                    <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Year:</label>
+                    <select 
+                        wire:model.live="calendarYear" 
+                        class="border border-slate-300 rounded-md text-xs font-medium px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white"
+                    >
+                        @foreach (range((int) now()->format('Y') - 2, (int) now()->format('Y') + 3) as $y)
+                            <option value="{{ $y }}">{{ $y }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold bg-purple-50 text-purple-800 border border-purple-200">
+                    <i class="ri-calendar-event-fill text-purple-600"></i>
+                    <span>{{ $monthHolidaysCount }} {{ Str::plural('Holiday', $monthHolidaysCount) }} this month</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Holiday Legend & Quick Tip -->
+        <div class="bg-white rounded-md border border-slate-200/80 shadow-xs px-4 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div class="flex flex-wrap items-center gap-3">
+                <span class="text-slate-500 font-semibold uppercase tracking-wider text-[11px]">Holiday Legend:</span>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-purple-50 text-purple-700 border border-purple-200">
+                    <i class="ri-calendar-event-fill text-purple-600"></i> Public Holiday
+                </span>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                    <i class="ri-calendar-event-fill text-blue-600"></i> Company Holiday
+                </span>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                    <i class="ri-calendar-event-fill text-amber-600"></i> Optional Holiday
+                </span>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-100 text-amber-800 border border-amber-300">
+                    <i class="ri-user-star-line text-amber-600"></i> Staff Worked
+                </span>
+            </div>
+            <div class="text-[11px] text-slate-500 flex items-center gap-1">
+                <i class="ri-information-line text-slate-400"></i>
+                <span>Click any empty day to add a holiday, or click a holiday card to view worked staff.</span>
+            </div>
+        </div>
+
+        <!-- Calendar Grid Card -->
+        <div class="bg-white rounded-md border border-slate-200/80 shadow-xs overflow-hidden">
+            <!-- Day Names Header -->
+            <div class="grid grid-cols-7 border-b border-slate-200 bg-slate-50/80 text-center text-xs font-bold text-slate-600 uppercase tracking-wider py-3">
+                <div>Mon</div>
+                <div>Tue</div>
+                <div>Wed</div>
+                <div>Thu</div>
+                <div>Fri</div>
+                <div class="text-amber-700">Sat</div>
+                <div class="text-rose-700">Sun</div>
+            </div>
+
+            <!-- Calendar Days Grid -->
+            <div class="grid grid-cols-7 auto-rows-fr divide-x divide-y divide-slate-100 bg-slate-50/30">
+                @foreach ($calendarDays as $day)
+                    <div 
+                        class="min-h-[110px] sm:min-h-[125px] p-2 transition-all relative group flex flex-col justify-between 
+                        {{ ! $day['isCurrentMonth'] ? 'bg-slate-50/50 opacity-40' : 'bg-white hover:bg-slate-50/60' }}
+                        {{ $day['isToday'] ? 'ring-2 ring-amber-400 ring-inset bg-amber-50/20' : '' }}"
+                    >
+                        <!-- Cell Header: Date Number & Add Button -->
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-bold {{ $day['isToday'] ? 'w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center font-black' : ($day['isWeekend'] ? 'text-amber-800' : 'text-slate-700') }}">
+                                {{ $day['dayNumber'] }}
+                            </span>
+
+                            @if($day['isToday'])
+                                <span class="text-[10px] font-bold text-amber-700 uppercase tracking-wider hidden sm:inline">Today</span>
+                            @endif
+
+                            @if(!$day['holiday'])
+                                <button 
+                                    wire:click="openCreateModalForDate('{{ $day['date'] }}')" 
+                                    title="Add holiday on {{ $day['date'] }}"
+                                    class="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-400 hover:text-purple-700 hover:bg-purple-50 rounded cursor-pointer"
+                                >
+                                    <i class="ri-add-line text-xs font-bold"></i>
+                                </button>
+                            @endif
+                        </div>
+
+                        <!-- Cell Body: Holiday Display -->
+                        <div class="flex-1">
+                            @if ($day['holiday'])
+                                @php
+                                    $h = $day['holiday'];
+                                    $themeClass = match($h->type) {
+                                        'company' => 'bg-blue-50/90 border-blue-200 text-blue-950 hover:border-blue-300',
+                                        'optional' => 'bg-amber-50/90 border-amber-200 text-amber-950 hover:border-amber-300',
+                                        default => 'bg-purple-50/90 border-purple-200 text-purple-950 hover:border-purple-300',
+                                    };
+                                    $badgeClass = match($h->type) {
+                                        'company' => 'bg-blue-100/80 text-blue-800 border-blue-200',
+                                        'optional' => 'bg-amber-100/80 text-amber-800 border-amber-200',
+                                        default => 'bg-purple-100/80 text-purple-800 border-purple-200',
+                                    };
+                                    $iconColor = match($h->type) {
+                                        'company' => 'text-blue-600',
+                                        'optional' => 'text-amber-600',
+                                        default => 'text-purple-600',
+                                    };
+                                @endphp
+                                <div 
+                                    wire:click="openViewModal({{ $h->id }})" 
+                                    class="p-2 rounded-md border {{ $themeClass }} shadow-xs transition-all cursor-pointer space-y-1.5"
+                                >
+                                    <div class="flex items-start justify-between gap-1">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <i class="ri-calendar-event-line text-sm {{ $iconColor }} shrink-0"></i>
+                                            <span class="text-xs font-bold truncate leading-tight">{{ $h->name }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex flex-wrap items-center gap-1">
+                                        <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-semibold border {{ $badgeClass }}">
+                                            {{ ucfirst($h->type) }}
+                                        </span>
+
+                                        @if ($day['workerCount'] > 0)
+                                            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                                                <i class="ri-user-star-line text-[10px]"></i>
+                                                {{ $day['workerCount'] }} Worked
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    <!-- Quick Actions on Card Hover -->
+                                    <div class="flex items-center justify-end gap-1 pt-0.5 border-t border-slate-200/40" @click.stop>
+                                        <button 
+                                            wire:click.stop="openViewModal({{ $h->id }})" 
+                                            class="p-1 text-slate-500 hover:text-purple-700 hover:bg-purple-100/60 rounded transition-colors cursor-pointer"
+                                            title="View Details & Worked Staff"
+                                        >
+                                            <i class="ri-eye-line text-xs"></i>
+                                        </button>
+                                        <button 
+                                            wire:click.stop="openEditModal({{ $h->id }})" 
+                                            class="p-1 text-slate-500 hover:text-blue-700 hover:bg-blue-100/60 rounded transition-colors cursor-pointer"
+                                            title="Edit Holiday"
+                                        >
+                                            <i class="ri-edit-line text-xs"></i>
+                                        </button>
+                                        <button 
+                                            wire:click.stop="openDeleteModal({{ $h->id }})" 
+                                            class="p-1 text-slate-500 hover:text-rose-700 hover:bg-rose-100/60 rounded transition-colors cursor-pointer"
+                                            title="Delete Holiday"
+                                        >
+                                            <i class="ri-delete-bin-line text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            @else
+                                <div 
+                                    wire:click="openCreateModalForDate('{{ $day['date'] }}')" 
+                                    class="h-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-slate-300 hover:text-slate-500 py-4"
+                                >
+                                    <span class="text-[11px] font-medium">+ Add Holiday</span>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Yearly Holidays Quick Overview Section -->
+        <div class="bg-white border border-slate-200/80 rounded-md shadow-xs p-6 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                <div>
+                    <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                        <i class="ri-calendar-event-line text-purple-600 text-lg"></i>
+                        <span>All Holidays Scheduled for {{ $calendarYear }}</span>
+                    </h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Quick overview of every company holiday scheduled in {{ $calendarYear }}.</p>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 border border-purple-200">
+                        {{ $yearlyHolidays->count() }} Total in {{ $calendarYear }}
+                    </span>
+                </div>
+            </div>
+
+            @if($yearlyHolidays->isEmpty())
+                <div class="text-center py-8 text-slate-400">
+                    <i class="ri-calendar-event-line text-3xl mb-1 text-slate-300"></i>
+                    <p class="text-xs font-medium">No holidays scheduled for year {{ $calendarYear }}. Click "Add New Holiday" to create one.</p>
+                </div>
+            @else
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    @foreach ($yearlyHolidays as $yHoliday)
+                        @php
+                            $yDateStr = $yHoliday->holiday_date->toDateString();
+                            $yWorkerCount = $yearlyWorkedCounts[$yDateStr] ?? 0;
+                            $yIsPast = $yHoliday->holiday_date->isPast() && $yDateStr !== now()->toDateString();
+                            $yIsToday = $yDateStr === now()->toDateString();
+                        @endphp
+                        <div class="p-3.5 rounded-md border border-slate-200/80 hover:border-purple-300 bg-white hover:bg-purple-50/20 transition-all flex flex-col justify-between gap-3 shadow-2xs">
+                            <div class="space-y-1.5">
+                                <div class="flex items-start justify-between gap-2">
+                                    <h4 class="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                                        <i class="ri-calendar-event-line text-purple-600"></i>
+                                        <span>{{ $yHoliday->name }}</span>
+                                    </h4>
+                                    @if ($yIsToday)
+                                        <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 shrink-0">Today</span>
+                                    @elseif ($yIsPast)
+                                        <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200 shrink-0">Past</span>
+                                    @else
+                                        <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">Upcoming</span>
+                                    @endif
+                                </div>
+
+                                <div class="text-[11px] text-slate-600 flex items-center gap-2">
+                                    <span class="font-semibold text-slate-900">
+                                        <i class="ri-calendar-line text-slate-400 mr-0.5"></i>
+                                        {{ $yHoliday->holiday_date->format('d M Y') }}
+                                    </span>
+                                    <span class="text-slate-400">•</span>
+                                    <span>{{ $yHoliday->holiday_date->format('l') }}</span>
+                                </div>
+
+                                @if($yHoliday->description)
+                                    <p class="text-[11px] text-slate-500 line-clamp-1">{{ $yHoliday->description }}</p>
+                                @endif
+                            </div>
+
+                            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200">
+                                    {{ ucfirst($yHoliday->type) }} Holiday
+                                </span>
+
+                                <div class="flex items-center gap-1">
+                                    @if($yWorkerCount > 0)
+                                        <button 
+                                            wire:click="openViewModal({{ $yHoliday->id }})" 
+                                            class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200 cursor-pointer"
+                                            title="View worked employees"
+                                        >
+                                            <i class="ri-user-star-line text-[10px]"></i>
+                                            {{ $yWorkerCount }} Worked
+                                        </button>
+                                    @endif
+
+                                    <button 
+                                        wire:click="openViewModal({{ $yHoliday->id }})" 
+                                        class="p-1 text-slate-500 hover:text-purple-700 hover:bg-purple-100/60 rounded transition-colors cursor-pointer"
+                                        title="View Details"
+                                    >
+                                        <i class="ri-eye-line text-xs"></i>
+                                    </button>
+                                    <button 
+                                        wire:click="openEditModal({{ $yHoliday->id }})" 
+                                        class="p-1 text-slate-500 hover:text-blue-700 hover:bg-blue-100/60 rounded transition-colors cursor-pointer"
+                                        title="Edit Holiday"
+                                    >
+                                        <i class="ri-edit-line text-xs"></i>
+                                    </button>
+                                    <button 
+                                        wire:click="openDeleteModal({{ $yHoliday->id }})" 
+                                        class="p-1 text-slate-500 hover:text-rose-700 hover:bg-rose-100/60 rounded transition-colors cursor-pointer"
+                                        title="Delete Holiday"
+                                    >
+                                        <i class="ri-delete-bin-line text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+    @else
+        <!-- Toolbar Filters & Search -->
+        <div class="bg-white border border-slate-200/80 rounded-md p-4 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <!-- Search Input -->
         <div class="relative flex-1 max-w-md">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -310,6 +651,7 @@
             </div>
         @endif
     </div>
+    @endif
 
     <!-- ========================================== -->
     <!-- MODAL 1: ADD NEW HOLIDAY MODAL             -->

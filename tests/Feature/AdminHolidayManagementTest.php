@@ -123,3 +123,64 @@ test('admin can delete a holiday', function () {
 
     expect(Holiday::find($holiday->id))->toBeNull();
 });
+
+test('admin can view calendar grid and navigate months in holiday management', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    Holiday::create([
+        'name' => 'Diwali Day',
+        'holiday_date' => '2026-11-08',
+        'type' => 'public',
+    ]);
+
+    Livewire::actingAs($admin)
+        ->test('admin::holiday-management')
+        ->assertSet('viewMode', 'calendar')
+        ->assertSet('calendarMonth', 10)
+        ->assertSet('calendarYear', 2026)
+        ->assertSee('October 2026')
+        ->call('nextMonth')
+        ->assertSet('calendarMonth', 11)
+        ->assertSee('November 2026')
+        ->assertSee('Diwali Day')
+        ->call('previousMonth')
+        ->assertSet('calendarMonth', 10)
+        ->assertSee('October 2026')
+        ->call('goToToday')
+        ->assertSet('calendarMonth', 10)
+        ->assertSet('calendarYear', 2026);
+});
+
+test('admin can switch view mode between calendar and list', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    Livewire::actingAs($admin)
+        ->test('admin::holiday-management')
+        ->assertSet('viewMode', 'calendar')
+        ->call('setViewMode', 'list')
+        ->assertSet('viewMode', 'list')
+        ->assertSee('Search holiday by title or description')
+        ->call('setViewMode', 'calendar')
+        ->assertSet('viewMode', 'calendar')
+        ->assertSee('Holiday Legend:');
+});
+
+test('admin can open create modal with prefilled date by clicking calendar day', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    Livewire::actingAs($admin)
+        ->test('admin::holiday-management')
+        ->call('openCreateModalForDate', '2026-10-25')
+        ->assertSet('showCreateModal', true)
+        ->assertSet('holiday_date', '2026-10-25')
+        ->set('name', 'Custom Off Day')
+        ->set('type', 'company')
+        ->call('createHoliday')
+        ->assertHasNoErrors()
+        ->assertSet('showCreateModal', false);
+
+    expect(Holiday::where('name', 'Custom Off Day')->exists())->toBeTrue();
+    $created = Holiday::where('name', 'Custom Off Day')->first();
+    expect($created->holiday_date->toDateString())->toBe('2026-10-25')
+        ->and($created->type)->toBe('company');
+});

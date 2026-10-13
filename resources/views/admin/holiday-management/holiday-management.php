@@ -2,6 +2,7 @@
 
 use App\Models\Attendance;
 use App\Models\Holiday;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -11,6 +12,12 @@ use Livewire\WithPagination;
 new #[Layout('layouts.admin')] #[Title('Holiday Management - TechMage')] class extends Component
 {
     use WithPagination;
+
+    public string $viewMode = 'calendar'; // 'calendar' or 'list'
+
+    public int $calendarYear;
+
+    public int $calendarMonth;
 
     public string $search = '';
 
@@ -46,7 +53,41 @@ new #[Layout('layouts.admin')] #[Title('Holiday Management - TechMage')] class e
     public function mount(): void
     {
         $this->yearFilter = (string) now()->format('Y');
+        $this->calendarYear = (int) now()->format('Y');
+        $this->calendarMonth = (int) now()->format('m');
         $this->workedEmployees = collect();
+    }
+
+    public function setViewMode(string $mode): void
+    {
+        $this->viewMode = in_array($mode, ['calendar', 'list']) ? $mode : 'calendar';
+    }
+
+    public function previousMonth(): void
+    {
+        $date = Carbon::create($this->calendarYear, $this->calendarMonth, 1)->subMonth();
+        $this->calendarYear = (int) $date->format('Y');
+        $this->calendarMonth = (int) $date->format('m');
+    }
+
+    public function nextMonth(): void
+    {
+        $date = Carbon::create($this->calendarYear, $this->calendarMonth, 1)->addMonth();
+        $this->calendarYear = (int) $date->format('Y');
+        $this->calendarMonth = (int) $date->format('m');
+    }
+
+    public function goToToday(): void
+    {
+        $this->calendarYear = (int) now()->format('Y');
+        $this->calendarMonth = (int) now()->format('m');
+    }
+
+    public function openCreateModalForDate(string $date): void
+    {
+        $this->resetForm();
+        $this->holiday_date = $date;
+        $this->showCreateModal = true;
     }
 
     public function updatingSearch(): void
@@ -294,9 +335,85 @@ new #[Layout('layouts.admin')] #[Title('Holiday Management - TechMage')] class e
             ->distinct('user_id')
             ->count('user_id');
 
+        // Calendar grid calculations
+        $currentMonthCarbon = Carbon::create($this->calendarYear, $this->calendarMonth, 1);
+        $gridStart = $currentMonthCarbon->copy()->startOfWeek(Carbon::MONDAY);
+        $gridEnd = $currentMonthCarbon->copy()->endOfMonth()->endOfWeek(Carbon::SUNDAY);
+
+        $holidaysInGrid = Holiday::whereBetween('holiday_date', [$gridStart->toDateString(), $gridEnd->toDateString()])
+            ->get()
+            ->keyBy(fn ($item) => $item->holiday_date->toDateString());
+
+        $gridHolidayDates = $holidaysInGrid->pluck('holiday_date')->map(fn ($d) => $d->toDateString())->toArray();
+        $gridWorkedCounts = [];
+        if (! empty($gridHolidayDates)) {
+            $gridWorkedCounts = Attendance::whereIn('attendance_date', $gridHolidayDates)
+                ->where(function ($q) {
+                    $q->whereNotNull('clock_in_time')
+                        ->orWhereHas('logs');
+                })
+                ->selectRaw('attendance_date, count(distinct user_id) as worker_count')
+                ->groupBy('attendance_date')
+                ->pluck('worker_count', 'attendance_date')
+                ->toArray();
+        }
+
+        $calendarDays = [];
+        $cursor = $gridStart->copy();
+        $monthHolidaysCount = 0;
+
+        while ($cursor->lte($gridEnd)) {
+            $dateStr = $cursor->toDateString();
+            $holiday = $holidaysInGrid->get($dateStr);
+            $isCurrentMonth = ($cursor->month === $this->calendarMonth);
+            $isToday = ($dateStr === now()->toDateString());
+            $workerCount = $holiday ? ($gridWorkedCounts[$dateStr] ?? 0) : 0;
+
+            if ($isCurrentMonth && $holiday) {
+                $monthHolidaysCount++;
+            }
+
+            $calendarDays[] = [
+                'date' => $dateStr,
+                'dayNumber' => $cursor->day,
+                'isCurrentMonth' => $isCurrentMonth,
+                'isToday' => $isToday,
+                'isWeekend' => $cursor->isWeekend(),
+                'holiday' => $holiday,
+                'workerCount' => $workerCount,
+            ];
+
+            $cursor->addDay();
+        }
+
+        // Yearly holidays for the selected calendar year
+        $yearlyHolidays = Holiday::whereYear('holiday_date', $this->calendarYear)
+            ->orderBy('holiday_date', 'asc')
+            ->get();
+
+        $yearlyHolidayDates = $yearlyHolidays->pluck('holiday_date')->map(fn ($d) => $d->toDateString())->toArray();
+        $yearlyWorkedCounts = [];
+        if (! empty($yearlyHolidayDates)) {
+            $yearlyWorkedCounts = Attendance::whereIn('attendance_date', $yearlyHolidayDates)
+                ->where(function ($q) {
+                    $q->whereNotNull('clock_in_time')
+                        ->orWhereHas('logs');
+                })
+                ->selectRaw('attendance_date, count(distinct user_id) as worker_count')
+                ->groupBy('attendance_date')
+                ->pluck('worker_count', 'attendance_date')
+                ->toArray();
+        }
+
         return view('admin.holiday-management.holiday-management', [
             'holidays' => $holidays,
             'workedCountsByDate' => $workedCountsByDate,
+            'calendarDays' => $calendarDays,
+            'currentMonthLabel' => $currentMonthCarbon->format('F Y'),
+            'currentMonthCarbon' => $currentMonthCarbon,
+            'monthHolidaysCount' => $monthHolidaysCount,
+            'yearlyHolidays' => $yearlyHolidays,
+            'yearlyWorkedCounts' => $yearlyWorkedCounts,
             'totalHolidaysCount' => $totalHolidaysCount,
             'upcomingHolidaysCount' => $upcomingHolidaysCount,
             'pastHolidaysCount' => $pastHolidaysCount,
