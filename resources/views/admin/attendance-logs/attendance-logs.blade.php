@@ -221,9 +221,12 @@
                             <!-- Net Working Hours -->
                             <td class="px-4 py-3.5 align-middle">
                                 @if($st && $st['totalWorkedMinutes'] > 0)
-                                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold shadow-2xs {{ $st['hasActiveSession'] ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-slate-100 text-slate-800 border border-slate-300' }}">
-                                        <i class="ri-time-fill text-slate-500"></i>
+                                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold shadow-2xs {{ ($st['isUnderEightHours'] ?? false) ? 'bg-red-50 text-red-700 border border-red-200' : ($st['hasActiveSession'] ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-slate-100 text-slate-800 border border-slate-300') }}">
+                                        <i class="ri-time-fill {{ ($st['isUnderEightHours'] ?? false) ? 'text-red-500' : 'text-slate-500' }}"></i>
                                         <span>{{ $st['formattedTotalHours'] }}</span>
+                                        @if($st['isUnderEightHours'] ?? false)
+                                            <span class="text-[9px] font-bold bg-red-100 text-red-800 px-1 rounded">&lt; 8h</span>
+                                        @endif
                                         @if($st['hasActiveSession'])
                                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Active Working Session"></span>
                                         @endif
@@ -371,7 +374,12 @@
                     <!-- Stat 1: Total Working Hours -->
                     <div class="p-4 rounded-md bg-slate-50 border border-slate-200/70 text-center space-y-1">
                         <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total Worked</span>
-                        <div class="text-xl font-extrabold text-slate-900">{{ $st['formattedTotalHours'] }}</div>
+                        <div class="text-xl font-extrabold {{ ($st['isUnderEightHours'] ?? false) ? 'text-red-600' : 'text-slate-900' }} flex items-center justify-center gap-1.5">
+                            <span>{{ $st['formattedTotalHours'] }}</span>
+                            @if($st['isUnderEightHours'] ?? false)
+                                <span class="text-[9px] font-bold bg-red-100 text-red-800 px-1 py-0.5 rounded">&lt; 8h</span>
+                            @endif
+                        </div>
                         <span class="text-[10px] text-slate-500 font-medium">Net calculated</span>
                     </div>
 

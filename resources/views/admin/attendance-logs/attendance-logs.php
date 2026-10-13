@@ -140,9 +140,11 @@ new #[Layout('layouts.admin')] #[Title('Employee Working Hours & Slots - TechMag
             }
         }
 
+        $totalWorkedMinutes = DailySlotTracking::calculateWorkedMinutesForDay($tracking, $attendance);
         $hours = floor($totalWorkedMinutes / 60);
         $minutes = $totalWorkedMinutes % 60;
         $formattedTotalHours = "{$hours}h {$minutes}m";
+        $isUnderEightHours = DailySlotTracking::isUnderEightHours($totalWorkedMinutes);
 
         $breakHours = floor($totalBreaksMinutes / 60);
         $breakMins = $totalBreaksMinutes % 60;
@@ -155,6 +157,7 @@ new #[Layout('layouts.admin')] #[Title('Employee Working Hours & Slots - TechMag
             'sessionCount' => $logs->count(),
             'totalWorkedMinutes' => $totalWorkedMinutes,
             'formattedTotalHours' => $formattedTotalHours,
+            'isUnderEightHours' => $isUnderEightHours,
             'totalBreaksMinutes' => $totalBreaksMinutes,
             'formattedBreakHours' => $formattedBreakHours,
             'hasActiveSession' => ! is_null($activeSession),

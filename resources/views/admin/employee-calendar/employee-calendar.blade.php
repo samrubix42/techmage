@@ -156,7 +156,7 @@
                             </span>
 
                             @if ($day['formattedHours'])
-                                <span class="text-[10px] font-medium text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded {{ $day['isUnderEightHours'] ? 'text-red-700 bg-red-50 border border-red-200' : 'text-emerald-700 bg-emerald-50 border border-emerald-200' }}" title="{{ $day['isUnderEightHours'] ? 'Working hours less than 8 hours' : '8+ hours completed' }}">
                                     <i class="ri-time-line"></i> {{ $day['formattedHours'] }}
                                 </span>
                             @endif
@@ -174,8 +174,8 @@
                                         <span class="text-[9px] font-bold bg-purple-200 text-purple-800 px-1 rounded shrink-0">Worked</span>
                                     </span>
                                     @if ($day['formattedHours'])
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 w-full justify-center">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> {{ $day['formattedHours'] }}
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold {{ $day['isUnderEightHours'] ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200' }} w-full justify-center">
+                                            <span class="w-1.5 h-1.5 rounded-full {{ $day['isUnderEightHours'] ? 'bg-red-500' : 'bg-emerald-500' }}"></span> {{ $day['formattedHours'] }}
                                         </span>
                                     @endif
                                 </div>
@@ -185,8 +185,16 @@
                                     <span class="truncate">{{ $day['holiday']?->name ?? 'Holiday' }}</span>
                                 </span>
                             @elseif ($day['status'] === 'present')
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 w-full justify-center">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Present
+                                <span class="inline-flex items-center justify-between gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 w-full">
+                                    <span class="flex items-center gap-1 truncate">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        <span>Present</span>
+                                    </span>
+                                    @if ($day['formattedHours'])
+                                        <span class="text-[9px] font-bold {{ $day['isUnderEightHours'] ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-emerald-100 text-emerald-800' }} px-1.5 py-0.5 rounded shrink-0">
+                                            {{ $day['formattedHours'] }}
+                                        </span>
+                                    @endif
                                 </span>
                             @elseif ($day['status'] === 'on_leave' || $day['status'] === 'leave')
                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 w-full justify-center">
@@ -219,6 +227,24 @@
                         </div>
                     </div>
                 @endforeach
+            </div>
+
+            <!-- Working Hours Legend Footer -->
+            <div class="px-6 py-3 border-t border-slate-200 bg-slate-50/70 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
+                <div class="flex items-center gap-2">
+                    <span class="font-semibold text-slate-700">Working Hours:</span>
+                    <span>Calculated from Slot Tracking minus Lunch Break (1h)</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="inline-flex items-center gap-1.5 font-medium text-emerald-700">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                        <span>&ge; 8 Hours (Full Day Target)</span>
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 font-medium text-red-700">
+                        <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                        <span>&lt; 8 Hours (Under 8 Hours)</span>
+                    </span>
+                </div>
             </div>
         </div>
     @else
@@ -277,8 +303,24 @@
                                 <td class="px-6 py-4 text-slate-600">
                                     {{ $log->clock_out_time ? $log->clock_out_time->format('h:i A') : '--:--' }}
                                 </td>
-                                <td class="px-6 py-4 font-medium text-slate-900">
-                                    {{ $log->total_work_minutes > 0 ? floor($log->total_work_minutes / 60).'h '.($log->total_work_minutes % 60).'m' : '-' }}
+                                <td class="px-6 py-4">
+                                    @php
+                                        $logTr = $trackingsInMonth->get($log->attendance_date->toDateString());
+                                        $logWorkedMins = \App\Models\DailySlotTracking::calculateWorkedMinutesForDay($logTr, $log);
+                                        $logUnder8 = $logWorkedMins > 0 && \App\Models\DailySlotTracking::isUnderEightHours($logWorkedMins);
+                                        $logFormatted = $logWorkedMins > 0 ? \App\Models\DailySlotTracking::formatMinutesToHours($logWorkedMins) : ($log->total_work_minutes > 0 ? floor($log->total_work_minutes / 60).'h '.($log->total_work_minutes % 60).'m' : '-');
+                                    @endphp
+                                    @if($logWorkedMins > 0 || $log->total_work_minutes > 0)
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold {{ $logUnder8 ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200' }}">
+                                            <i class="ri-time-line"></i>
+                                            <span>{{ $logFormatted }}</span>
+                                            @if($logUnder8)
+                                                <span class="text-[9px] font-bold bg-red-100 text-red-800 px-1 rounded">&lt; 8h</span>
+                                            @endif
+                                        </span>
+                                    @else
+                                        <span class="text-slate-400">-</span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 text-slate-500 max-w-xs truncate">
                                     {{ $log->leave_category ? ucfirst(str_replace('_', ' ', $log->leave_category)) : ($log->notes ?: '-') }}
@@ -335,8 +377,11 @@
                         </div>
                         <div>
                             <div class="text-[10px] font-semibold text-slate-500 uppercase">Worked Hours</div>
-                            <div class="text-xs font-bold text-slate-900 mt-0.5">
-                                {{ $selectedDateDetail['formattedTotalHours'] }}
+                            <div class="text-xs font-bold {{ $selectedDateDetail['isUnderEightHours'] ? 'text-red-600' : 'text-slate-900' }} mt-0.5 flex items-center justify-center gap-1">
+                                <span>{{ $selectedDateDetail['formattedTotalHours'] }}</span>
+                                @if ($selectedDateDetail['isUnderEightHours'] && $selectedDateDetail['workedMinutes'] > 0)
+                                    <span class="text-[9px] font-bold text-red-700 bg-red-50 border border-red-200 px-1 rounded">&lt; 8 hrs</span>
+                                @endif
                             </div>
                         </div>
                         <div>

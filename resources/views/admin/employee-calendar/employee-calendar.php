@@ -102,33 +102,10 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
 
         $logs = $attendance ? $attendance->logs : collect();
 
-        $totalWorkedMinutes = 0;
-        $totalBreaksMinutes = 0;
-        $lastClockOut = null;
-
-        foreach ($logs as $log) {
-            $clockIn = $log->clock_in_time;
-            $clockOut = $log->clock_out_time;
-
-            if ($lastClockOut && $clockIn) {
-                $breakDuration = (int) $lastClockOut->diffInMinutes($clockIn);
-                if ($breakDuration > 0) {
-                    $totalBreaksMinutes += $breakDuration;
-                }
-            }
-
-            if ($clockOut) {
-                $duration = $log->duration_minutes ?: (int) $clockIn->diffInMinutes($clockOut);
-                $totalWorkedMinutes += $duration;
-                $lastClockOut = $clockOut;
-            } elseif ($clockIn) {
-                $refTime = ($targetDate === now()->toDateString()) ? now() : $clockIn;
-                $totalWorkedMinutes += (int) $clockIn->diffInMinutes($refTime);
-            }
-        }
-
+        $totalWorkedMinutes = DailySlotTracking::calculateWorkedMinutesForDay($tracking, $attendance);
         $hours = floor($totalWorkedMinutes / 60);
         $minutes = $totalWorkedMinutes % 60;
+        $isUnderEightHours = DailySlotTracking::isUnderEightHours($totalWorkedMinutes);
 
         $holiday = Holiday::whereDate('holiday_date', $targetDate)->first();
 
@@ -139,8 +116,10 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
             'leaveRequest' => $leaveRequest,
             'holiday' => $holiday,
             'logs' => $logs,
+            'workedMinutes' => $totalWorkedMinutes,
             'formattedTotalHours' => "{$hours}h {$minutes}m",
-            'totalBreaksMinutes' => $totalBreaksMinutes,
+            'isUnderEightHours' => $isUnderEightHours,
+            'totalBreaksMinutes' => DailySlotTracking::calculateBreaksMinutesForDay($tracking, $attendance),
             'sessionCount' => $logs->count(),
         ];
     }
@@ -200,19 +179,9 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
             $isToday = ($dateStr === now()->toDateString());
             $isOffDay = $this->user->isOffDay($cursor);
 
-            $workedMins = 0;
-            if ($att && $att->logs->isNotEmpty()) {
-                foreach ($att->logs as $log) {
-                    if ($log->clock_out_time) {
-                        $workedMins += $log->duration_minutes ?: (int) $log->clock_in_time->diffInMinutes($log->clock_out_time);
-                    } elseif ($log->clock_in_time) {
-                        $ref = $isToday ? now() : $log->clock_in_time;
-                        $workedMins += (int) $log->clock_in_time->diffInMinutes($ref);
-                    }
-                }
-            }
-
+            $workedMins = DailySlotTracking::calculateWorkedMinutesForDay($tr, $att);
             $formattedHours = $workedMins > 0 ? (floor($workedMins / 60).'h '.($workedMins % 60).'m') : null;
+            $isUnderEightHours = DailySlotTracking::isUnderEightHours($workedMins);
 
             $hasClockIn = ($att && ($att->clock_in_time || $att->logs->isNotEmpty())) || ($tr && $tr->slot1_checkin_time);
 
@@ -261,7 +230,9 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
                 'tracking' => $tr,
                 'leaveRequest' => $matchingLeave,
                 'status' => $status,
+                'workedMinutes' => $workedMins,
                 'formattedHours' => $formattedHours,
+                'isUnderEightHours' => $isUnderEightHours,
             ];
 
             $cursor->addDay();
@@ -286,6 +257,7 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
             'absentDaysCount' => $absentDaysCount,
             'holidayDaysCount' => $holidayDaysCount,
             'monthlyLogs' => $monthlyLogs,
+            'trackingsInMonth' => $trackingsInMonth,
             'selectedDateDetail' => $this->selectedDateDetail,
         ]);
     }

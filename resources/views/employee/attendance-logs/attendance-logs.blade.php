@@ -134,15 +134,22 @@
                             {{ $day['isCurrentMonth'] && !$day['isToday'] ? 'bg-white border-slate-200 hover:border-slate-400 hover:shadow-xs' : '' }}
                             "
                         >
-                            <!-- Day Number -->
+                            <!-- Day Number & Working Hours -->
                             <div class="flex items-start justify-between">
                                 <span class="text-xs font-bold {{ $day['isToday'] ? 'text-slate-900 bg-slate-200 px-1.5 py-0.5 rounded-md' : ($day['isCurrentMonth'] ? 'text-slate-900' : 'text-slate-400') }}">
                                     {{ $day['dayNumber'] }}
                                 </span>
 
-                                @if($day['isToday'])
-                                    <span class="text-[9px] font-bold uppercase text-slate-700 bg-slate-100 px-1 py-0.5 rounded-md">Today</span>
-                                @endif
+                                <div class="flex items-center gap-1">
+                                    @if($day['isToday'])
+                                        <span class="text-[9px] font-bold uppercase text-slate-700 bg-slate-100 px-1 py-0.5 rounded-md">Today</span>
+                                    @endif
+                                    @if($day['formattedHours'])
+                                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded {{ $day['isUnderEightHours'] ? 'text-red-700 bg-red-50 border border-red-200' : 'text-emerald-700 bg-emerald-50 border border-emerald-200' }}" title="{{ $day['isUnderEightHours'] ? 'Working hours less than 8 hours' : '8+ hours completed' }}">
+                                            <i class="ri-time-line"></i> {{ $day['formattedHours'] }}
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
 
                             <!-- Attendance Badge -->
@@ -154,7 +161,7 @@
                                             <span class="truncate">{{ $day['holiday']?->name ?? 'Holiday' }} (Worked)</span>
                                         </span>
                                         @if($day['formattedHours'])
-                                            <span class="text-[9px] font-bold bg-purple-200 text-purple-800 px-1 rounded shrink-0">{{ $day['formattedHours'] }}</span>
+                                            <span class="text-[9px] font-bold {{ $day['isUnderEightHours'] ? 'bg-red-100 text-red-800 border border-red-200' : 'bg-purple-200 text-purple-800' }} px-1 rounded shrink-0">{{ $day['formattedHours'] }}</span>
                                         @endif
                                     </div>
                                 @elseif($st === 'holiday')
@@ -164,9 +171,14 @@
                                     </div>
                                 @elseif($st === 'present')
                                     <div class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-between gap-1">
-                                        <span class="truncate">✓ Present</span>
+                                        <span class="truncate flex items-center gap-1">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                            <span>✓ Present</span>
+                                        </span>
                                         @if($day['formattedHours'])
-                                            <span class="text-[9px] font-bold opacity-90 shrink-0">{{ $day['formattedHours'] }}</span>
+                                            <span class="text-[9px] font-bold {{ $day['isUnderEightHours'] ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-emerald-100 text-emerald-800' }} px-1.5 py-0.5 rounded shrink-0">
+                                                {{ $day['formattedHours'] }}
+                                            </span>
                                         @endif
                                     </div>
                                 @elseif($st === 'on_leave' || $st === 'leave')
@@ -204,6 +216,24 @@
                             </div>
                         </div>
                     @endforeach
+                </div>
+
+                <!-- Working Hours Legend Footer -->
+                <div class="mt-4 pt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
+                    <div class="flex items-center gap-2">
+                        <span class="font-semibold text-slate-700">Working Hours:</span>
+                        <span>Slot Tracking minus Lunch Break (1h)</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="inline-flex items-center gap-1.5 font-medium text-emerald-700">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                            <span>&ge; 8 Hours (Full Target)</span>
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 font-medium text-red-700">
+                            <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                            <span>&lt; 8 Hours (Under 8 Hours)</span>
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -266,9 +296,12 @@
 
                                 <!-- Net Worked Hours -->
                                 <td class="px-4 py-3.5 align-middle">
-                                    <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200 inline-flex items-center gap-1">
-                                        <i class="ri-time-line text-slate-400"></i>
+                                    <span class="px-2.5 py-1 rounded-md text-xs font-bold {{ ($st['isUnderEightHours'] ?? false) ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200' }} inline-flex items-center gap-1.5">
+                                        <i class="ri-time-line"></i>
                                         <span>{{ $st['formattedHours'] ?? '0h 0m' }}</span>
+                                        @if($st['isUnderEightHours'] ?? false)
+                                            <span class="text-[9px] font-bold bg-red-100 text-red-800 px-1 rounded">&lt; 8h</span>
+                                        @endif
                                     </span>
                                 </td>
 
@@ -428,7 +461,12 @@
                 <div class="grid grid-cols-2 gap-3 text-center">
                     <div class="p-3.5 bg-slate-50 border border-slate-200/70 rounded-md">
                         <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total Worked</span>
-                        <span class="text-lg font-bold text-slate-900">{{ $dt['formattedTotalHours'] }}</span>
+                        <div class="flex items-center justify-center gap-1.5 mt-0.5">
+                            <span class="text-lg font-bold {{ $dt['isUnderEightHours'] ? 'text-red-600' : 'text-slate-900' }}">{{ $dt['formattedTotalHours'] }}</span>
+                            @if($dt['isUnderEightHours'] && $dt['workedMinutes'] > 0)
+                                <span class="text-[9px] font-bold bg-red-100 text-red-800 px-1 py-0.5 rounded border border-red-200">&lt; 8h</span>
+                            @endif
+                        </div>
                     </div>
 
                     <div class="p-3.5 bg-slate-50 border border-slate-200/70 rounded-md">

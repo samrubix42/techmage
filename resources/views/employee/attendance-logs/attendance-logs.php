@@ -133,33 +133,10 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
 
         $logs = $attendance ? $attendance->logs : collect();
 
-        $totalWorkedMinutes = 0;
-        $totalBreaksMinutes = 0;
-        $lastClockOut = null;
-
-        foreach ($logs as $log) {
-            $clockIn = $log->clock_in_time;
-            $clockOut = $log->clock_out_time;
-
-            if ($lastClockOut && $clockIn) {
-                $breakDuration = (int) $lastClockOut->diffInMinutes($clockIn);
-                if ($breakDuration > 0) {
-                    $totalBreaksMinutes += $breakDuration;
-                }
-            }
-
-            if ($clockOut) {
-                $duration = $log->duration_minutes ?: (int) $clockIn->diffInMinutes($clockOut);
-                $totalWorkedMinutes += $duration;
-                $lastClockOut = $clockOut;
-            } elseif ($clockIn) {
-                $refTime = ($targetDate === now()->toDateString()) ? now() : $clockIn;
-                $totalWorkedMinutes += (int) $clockIn->diffInMinutes($refTime);
-            }
-        }
-
+        $totalWorkedMinutes = DailySlotTracking::calculateWorkedMinutesForDay($tracking, $attendance);
         $hours = floor($totalWorkedMinutes / 60);
         $minutes = $totalWorkedMinutes % 60;
+        $isUnderEightHours = DailySlotTracking::isUnderEightHours($totalWorkedMinutes);
 
         $holiday = Holiday::whereDate('holiday_date', $targetDate)->first();
 
@@ -169,8 +146,10 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
             'attendance' => $attendance,
             'holiday' => $holiday,
             'logs' => $logs,
+            'workedMinutes' => $totalWorkedMinutes,
             'formattedTotalHours' => "{$hours}h {$minutes}m",
-            'totalBreaksMinutes' => $totalBreaksMinutes,
+            'isUnderEightHours' => $isUnderEightHours,
+            'totalBreaksMinutes' => DailySlotTracking::calculateBreaksMinutesForDay($tracking, $attendance),
             'sessionCount' => $logs->count(),
         ];
     }
@@ -226,20 +205,10 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
             $isToday = ($dateStr === now()->toDateString());
             $isOffDay = $user->isOffDay($cursor);
 
-            // Calculate worked hours for calendar day
-            $workedMins = 0;
-            if ($att && $att->logs->isNotEmpty()) {
-                foreach ($att->logs as $log) {
-                    if ($log->clock_out_time) {
-                        $workedMins += $log->duration_minutes ?: (int) $log->clock_in_time->diffInMinutes($log->clock_out_time);
-                    } elseif ($log->clock_in_time) {
-                        $ref = $isToday ? now() : $log->clock_in_time;
-                        $workedMins += (int) $log->clock_in_time->diffInMinutes($ref);
-                    }
-                }
-            }
-
+            // Calculate worked hours for calendar day based on slot tracking minus lunch hour
+            $workedMins = DailySlotTracking::calculateWorkedMinutesForDay($tr, $att);
             $formattedHours = $workedMins > 0 ? (floor($workedMins / 60).'h '.($workedMins % 60).'m') : null;
+            $isUnderEightHours = DailySlotTracking::isUnderEightHours($workedMins);
 
             // Determine status badge
             $hasClockIn = ($att && ($att->clock_in_time || $att->logs->isNotEmpty())) || ($tr && $tr->slot1_checkin_time);
@@ -288,7 +257,9 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
                 'attendance' => $att,
                 'tracking' => $tr,
                 'status' => $status,
+                'workedMinutes' => $workedMins,
                 'formattedHours' => $formattedHours,
+                'isUnderEightHours' => $isUnderEightHours,
             ];
 
             $cursor->addDay();
@@ -314,21 +285,16 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
                 ->first();
 
             $logs = $attItem ? $attItem->logs : collect();
-            $totalWorked = 0;
-            foreach ($logs as $log) {
-                if ($log->clock_out_time) {
-                    $totalWorked += $log->duration_minutes ?: (int) $log->clock_in_time->diffInMinutes($log->clock_out_time);
-                } elseif ($log->clock_in_time) {
-                    $ref = ($trItem->tracking_date->toDateString() === now()->toDateString()) ? now() : $log->clock_in_time;
-                    $totalWorked += (int) $log->clock_in_time->diffInMinutes($ref);
-                }
-            }
+            $totalWorked = DailySlotTracking::calculateWorkedMinutesForDay($trItem, $attItem);
 
             $h = floor($totalWorked / 60);
             $m = $totalWorked % 60;
+            $isUnderEightHours = DailySlotTracking::isUnderEightHours($totalWorked);
 
             $trackingStats[$trItem->id] = [
+                'workedMinutes' => $totalWorked,
                 'formattedHours' => "{$h}h {$m}m",
+                'isUnderEightHours' => $isUnderEightHours,
                 'attendance' => $attItem,
                 'sessionCount' => $logs->count(),
             ];
