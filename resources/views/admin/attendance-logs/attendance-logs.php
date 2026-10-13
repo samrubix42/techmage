@@ -3,6 +3,7 @@
 use App\Models\Attendance;
 use App\Models\DailySlotTracking;
 use App\Models\Department;
+use App\Models\Holiday;
 use App\Models\User;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
@@ -232,6 +233,8 @@ new #[Layout('layouts.admin')] #[Title('Employee Working Hours & Slots - TechMag
         $totalStaff = User::where('role', 'employee')->count();
         $avgHours = $totalClockedInCount > 0 ? round(($totalWorkMinutesOverall / $totalClockedInCount) / 60, 1) : 0;
 
+        $holiday = Holiday::whereDate('holiday_date', $date)->first();
+
         return view('admin.attendance-logs.attendance-logs', [
             'employees' => $employees,
             'employeeStats' => $employeeStats,
@@ -240,6 +243,7 @@ new #[Layout('layouts.admin')] #[Title('Employee Working Hours & Slots - TechMag
             'totalClockedInCount' => $totalClockedInCount,
             'totalFlaggedCount' => $totalFlaggedCount,
             'avgHours' => $avgHours,
+            'holiday' => $holiday,
             'selectedUserDetail' => $this->selectedUserDetail,
         ]);
     }

@@ -4,6 +4,7 @@ use App\Models\Attendance;
 use App\Models\AttendanceLog;
 use App\Models\DailySlotTracking;
 use App\Models\DailyTaskReport;
+use App\Models\Holiday;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
@@ -417,8 +418,11 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
             }
         }
 
+        $todayHoliday = Holiday::whereDate('holiday_date', now()->toDateString())->first();
+
         return view('employee.dashboard.dashboard', [
             'tracking' => $tracking,
+            'todayHoliday' => $todayHoliday,
             'elapsedMinutesSinceCheckin' => $elapsedMinutesSinceCheckin,
             'is2HrCheckinEligible' => $is2HrCheckinEligible,
             'minutesRemainingFor2HrCheckin' => $minutesRemainingFor2HrCheckin,

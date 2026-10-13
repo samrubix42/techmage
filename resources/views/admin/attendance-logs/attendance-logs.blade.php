@@ -23,6 +23,23 @@
         </div>
     </div>
 
+    @if(isset($holiday) && $holiday)
+        <div class="p-4 bg-purple-50 border border-purple-200 text-purple-900 rounded-md shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-md bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-lg shrink-0">
+                    <i class="ri-calendar-event-line text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-purple-950">Official Holiday: {{ $holiday->name }} ({{ ucfirst($holiday->type) }} Holiday)</h3>
+                    <p class="text-xs text-purple-800 mt-0.5">This date is marked as an organization holiday. Employees who chose to work on this day are tracked below.</p>
+                </div>
+            </div>
+            <a href="{{ route('admin.holidays') }}" class="text-xs font-semibold text-purple-800 hover:text-purple-950 underline px-3 py-1.5 rounded-md hover:bg-purple-100/60 transition-colors shrink-0">
+                Manage Holidays &rarr;
+            </a>
+        </div>
+    @endif
+
     <!-- Key Metrics Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Metric 1: Total Staff -->

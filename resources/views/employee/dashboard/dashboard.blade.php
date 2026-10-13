@@ -3,12 +3,18 @@
     <div class="bg-white border border-slate-200/80 rounded-md p-6 sm:p-8 shadow-xs relative overflow-hidden">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <div class="flex items-center gap-2 mb-2">
+                <div class="flex items-center gap-2 mb-2 flex-wrap">
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
                         <span class="w-2 h-2 rounded-full bg-slate-900 animate-pulse"></span>
                         Daily Slot Roadmap
                     </span>
                     <span class="text-xs text-slate-500 font-medium">{{ now()->format('l, F j, Y') }}</span>
+                    @if(isset($todayHoliday) && $todayHoliday)
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-purple-100 text-purple-800 border border-purple-200">
+                            <i class="ri-calendar-event-line text-purple-600"></i>
+                            <span>Holiday: {{ $todayHoliday->name }}</span>
+                        </span>
+                    @endif
                 </div>
                 <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Welcome, {{ auth()->user()->name }} 👋</h1>
                 <p class="text-slate-500 mt-1 text-xs sm:text-sm">Follow your daily shift timeline: Slot 1 Clock-In → 2-Hr Check-In (after 2h) → Lunch Break (1h) → 3rd Slot → 4th Slot & Clock Out (after 120m).</p>
@@ -18,7 +24,11 @@
                 <div class="bg-slate-50/80 border border-slate-200/90 rounded-md px-4 py-2.5 text-right space-y-1">
                     <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 block">Shift Status</span>
                     @if(!$tracking)
-                        <span class="text-xs font-semibold text-slate-600 block">Not Clocked In</span>
+                        @if(isset($todayHoliday) && $todayHoliday)
+                            <span class="text-xs font-semibold text-purple-700 block">Holiday (Not Clocked In)</span>
+                        @else
+                            <span class="text-xs font-semibold text-slate-600 block">Not Clocked In</span>
+                        @endif
                     @elseif($tracking->slot4_checkin_time)
                         <span class="text-xs font-semibold text-emerald-600 block">Shift Finished</span>
                     @elseif($tracking->slot3_start_time)
@@ -28,7 +38,9 @@
                     @elseif($tracking->slot2_checkin_time)
                         <span class="text-xs font-semibold text-blue-600 block">Completed 2-Hr Slot</span>
                     @else
-                        <span class="text-xs font-semibold text-blue-600 block">Slot 1 Active</span>
+                        <span class="text-xs font-semibold text-blue-600 block">
+                            {{ isset($todayHoliday) && $todayHoliday ? 'Slot 1 Active (Holiday)' : 'Slot 1 Active' }}
+                        </span>
                     @endif
 
                     <a href="{{ route('employee.attendance-logs') }}" class="text-[11px] font-medium text-slate-600 hover:text-slate-900 underline inline-flex items-center gap-1 mt-1 transition-colors">
@@ -38,6 +50,42 @@
             </div>
         </div>
     </div>
+
+    <!-- Holiday Announcement Card -->
+    @if(isset($todayHoliday) && $todayHoliday)
+        <div class="bg-gradient-to-r from-purple-50 via-purple-50/60 to-white border border-purple-200 rounded-md p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-start sm:items-center gap-3.5">
+                <div class="w-10 h-10 rounded-md bg-purple-100 text-purple-700 border border-purple-200 flex items-center justify-center font-bold text-xl shrink-0">
+                    <i class="ri-calendar-event-fill text-2xl text-purple-700"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h2 class="text-base font-bold text-purple-950">Today is an Official Holiday: {{ $todayHoliday->name }}</h2>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-purple-200 text-purple-900 capitalize">
+                            {{ $todayHoliday->type }} Holiday
+                        </span>
+                    </div>
+                    <p class="text-xs text-purple-800 mt-0.5">
+                        {{ $todayHoliday->description ?: 'Today is designated as an official company holiday. You may take the day off, or clock in below if you choose to work.' }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="shrink-0 flex items-center gap-2">
+                @if(!$tracking)
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-white border border-purple-200 text-purple-800 shadow-2xs">
+                        <i class="ri-information-line text-purple-600"></i>
+                        Work is Optional Today
+                    </span>
+                @else
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-emerald-50 border border-emerald-200 text-emerald-800 shadow-2xs">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Working on Holiday
+                    </span>
+                @endif
+            </div>
+        </div>
+    @endif
 
     <!-- Alert Notifications -->
     @if(session()->has('attendance_status'))
@@ -230,11 +278,25 @@
 
         <!-- Step 1 Form -->
         @if(!$tracking || !$tracking->slot1_checkin_time)
-            <div class="p-5 rounded-md border border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="p-5 rounded-md border {{ isset($todayHoliday) && $todayHoliday ? 'border-purple-200 bg-purple-50/30' : 'border-slate-200 bg-slate-50/50' }} flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
-                    <span class="px-2.5 py-0.5 rounded-md text-[10px] font-semibold bg-slate-200 text-slate-700 uppercase tracking-wide">Step 1</span>
+                    <div class="flex items-center gap-2">
+                        <span class="px-2.5 py-0.5 rounded-md text-[10px] font-semibold bg-slate-200 text-slate-700 uppercase tracking-wide">Step 1</span>
+                        @if(isset($todayHoliday) && $todayHoliday)
+                            <span class="px-2.5 py-0.5 rounded-md text-[10px] font-semibold bg-purple-100 text-purple-800 border border-purple-200 inline-flex items-center gap-1">
+                                <i class="ri-calendar-event-line text-purple-600"></i>
+                                <span>Working on Holiday</span>
+                            </span>
+                        @endif
+                    </div>
                     <h3 class="text-base font-bold text-slate-900 mt-1.5">Daily Shift Clock-In</h3>
-                    <p class="text-slate-500 text-xs mt-0.5">Click below to start your shift. Your Slot 2 check-in will unlock after 2 hours (120 min).</p>
+                    <p class="text-slate-500 text-xs mt-0.5">
+                        @if(isset($todayHoliday) && $todayHoliday)
+                            Today is <strong>{{ $todayHoliday->name }}</strong>. If you are working today, clock in below to start tracking your working hours on this holiday.
+                        @else
+                            Click below to start your shift. Your Slot 2 check-in will unlock after 2 hours (120 min).
+                        @endif
+                    </p>
                 </div>
                 <button 
                     wire:click="clockIn" 
@@ -243,7 +305,7 @@
                 >
                     <i wire:loading.remove wire:target="clockIn" class="ri-time-line text-sm"></i>
                     <i wire:loading wire:target="clockIn" class="ri-loader-4-line animate-spin text-sm"></i>
-                    <span>Start Daily Shift Clock-In</span>
+                    <span>{{ isset($todayHoliday) && $todayHoliday ? 'Clock In & Work Today' : 'Start Daily Shift Clock-In' }}</span>
                 </button>
             </div>
 

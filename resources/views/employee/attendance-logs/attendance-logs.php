@@ -2,6 +2,7 @@
 
 use App\Models\Attendance;
 use App\Models\DailySlotTracking;
+use App\Models\Holiday;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -160,10 +161,13 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
         $hours = floor($totalWorkedMinutes / 60);
         $minutes = $totalWorkedMinutes % 60;
 
+        $holiday = Holiday::whereDate('holiday_date', $targetDate)->first();
+
         return [
             'targetDate' => $targetDate,
             'tracking' => $tracking,
             'attendance' => $attendance,
+            'holiday' => $holiday,
             'logs' => $logs,
             'formattedTotalHours' => "{$hours}h {$minutes}m",
             'totalBreaksMinutes' => $totalBreaksMinutes,
@@ -197,6 +201,12 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
                 return $item->tracking_date->toDateString();
             });
 
+        $holidaysInMonth = Holiday::whereBetween('holiday_date', [$gridStart->toDateString(), $gridEnd->toDateString()])
+            ->get()
+            ->keyBy(function ($item) {
+                return $item->holiday_date->toDateString();
+            });
+
         $calendarDays = [];
         $cursor = $gridStart->copy();
 
@@ -204,11 +214,13 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
         $leaveDaysCount = 0;
         $halfDayDaysCount = 0;
         $absentDaysCount = 0;
+        $holidayDaysCount = 0;
 
         while ($cursor->lte($gridEnd)) {
             $dateStr = $cursor->toDateString();
             $att = $attendancesInMonth->get($dateStr);
             $tr = $trackingsInMonth->get($dateStr);
+            $holiday = $holidaysInMonth->get($dateStr);
 
             $isCurrentMonth = ($cursor->month === $this->currentMonth);
             $isToday = ($dateStr === now()->toDateString());
@@ -233,8 +245,14 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
             $hasClockIn = ($att && ($att->clock_in_time || $att->logs->isNotEmpty())) || ($tr && $tr->slot1_checkin_time);
 
             $status = 'none';
-            if ($hasClockIn) {
-                $status = ($att && in_array($att->status, ['on_leave', 'leave', 'half_day', 'holiday'])) ? $att->status : 'present';
+            if ($holiday) {
+                if ($hasClockIn) {
+                    $status = 'holiday_worked';
+                } else {
+                    $status = 'holiday';
+                }
+            } elseif ($hasClockIn) {
+                $status = ($att && in_array($att->status, ['on_leave', 'leave', 'half_day'])) ? $att->status : 'present';
             } elseif ($att && $att->status) {
                 $status = $att->status;
             } elseif ($isCurrentMonth && $cursor->isPast() && ! $isOffDay && ! $isToday) {
@@ -244,7 +262,7 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
             }
 
             if ($isCurrentMonth) {
-                if ($status === 'present') {
+                if ($status === 'present' || $status === 'holiday_worked') {
                     $presentDaysCount++;
                 } elseif ($status === 'on_leave' || $status === 'leave') {
                     $leaveDaysCount++;
@@ -252,6 +270,10 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
                     $halfDayDaysCount++;
                 } elseif ($status === 'absent') {
                     $absentDaysCount++;
+                }
+
+                if ($holiday) {
+                    $holidayDaysCount++;
                 }
             }
 
@@ -261,6 +283,8 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
                 'isCurrentMonth' => $isCurrentMonth,
                 'isToday' => $isToday,
                 'isWeekend' => $isOffDay,
+                'isHoliday' => (bool) $holiday,
+                'holiday' => $holiday,
                 'attendance' => $att,
                 'tracking' => $tr,
                 'status' => $status,
@@ -317,6 +341,7 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
             'leaveDaysCount' => $leaveDaysCount,
             'halfDayDaysCount' => $halfDayDaysCount,
             'absentDaysCount' => $absentDaysCount,
+            'holidayDaysCount' => $holidayDaysCount,
             'trackings' => $trackings,
             'trackingStats' => $trackingStats,
             'selectedTrackingDetail' => $this->selectedTrackingDetail,

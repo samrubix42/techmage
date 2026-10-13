@@ -42,6 +42,16 @@
                     @endif
                 </div>
 
+                @if(isset($todayHoliday) && $todayHoliday)
+                    <div class="px-2.5 py-1.5 rounded-md bg-purple-50 border border-purple-200 text-purple-800 text-[11px] font-semibold flex items-center justify-between gap-1.5">
+                        <span class="flex items-center gap-1.5 truncate">
+                            <i class="ri-calendar-event-line text-purple-600 shrink-0"></i>
+                            <span class="truncate">Holiday: {{ $todayHoliday->name }}</span>
+                        </span>
+                        <span class="text-[9px] uppercase font-bold text-purple-700 bg-purple-100 px-1 py-0.5 rounded shrink-0">Work Optional</span>
+                    </div>
+                @endif
+
                 <!-- Clock In Details -->
                 @if($activeLog && $activeLog->clock_in_time)
                     <div class="bg-white rounded-md p-2.5 border border-slate-200 flex items-center justify-between text-xs">

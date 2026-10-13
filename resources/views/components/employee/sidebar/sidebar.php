@@ -3,6 +3,7 @@
 use App\Models\Attendance;
 use App\Models\AttendanceLog;
 use App\Models\DailySlotTracking;
+use App\Models\Holiday;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -158,10 +159,13 @@ new class extends Component
             }
         }
 
+        $todayHoliday = Holiday::whereDate('holiday_date', now()->toDateString())->first();
+
         return view('components.employee.sidebar.sidebar', [
             'todayAttendance' => $todayAttendance,
             'todayLogs' => $logs,
             'activeLog' => $activeLog,
+            'todayHoliday' => $todayHoliday,
             'todayDateFormatted' => now()->format('D, M d, Y'),
         ]);
     }

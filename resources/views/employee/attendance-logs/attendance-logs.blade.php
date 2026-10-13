@@ -76,6 +76,13 @@
                         Present: <strong>{{ $presentDaysCount }}d</strong>
                     </span>
 
+                    @if(isset($holidayDaysCount) && $holidayDaysCount > 0)
+                        <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-purple-50 text-purple-800 border border-purple-200 flex items-center gap-1.5">
+                            <i class="ri-calendar-event-line text-purple-600"></i>
+                            Holidays: <strong>{{ $holidayDaysCount }}d</strong>
+                        </span>
+                    @endif
+
                     <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1.5">
                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                         Leave: <strong>{{ $leaveDaysCount }}d</strong>
@@ -140,7 +147,22 @@
 
                             <!-- Attendance Badge -->
                             <div class="mt-2 space-y-1">
-                                @if($st === 'present')
+                                @if($st === 'holiday_worked')
+                                    <div class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-purple-100 text-purple-900 border border-purple-300 flex items-center justify-between gap-1">
+                                        <span class="truncate flex items-center gap-1">
+                                            <i class="ri-calendar-event-line text-purple-700 shrink-0"></i>
+                                            <span class="truncate">{{ $day['holiday']?->name ?? 'Holiday' }} (Worked)</span>
+                                        </span>
+                                        @if($day['formattedHours'])
+                                            <span class="text-[9px] font-bold bg-purple-200 text-purple-800 px-1 rounded shrink-0">{{ $day['formattedHours'] }}</span>
+                                        @endif
+                                    </div>
+                                @elseif($st === 'holiday')
+                                    <div class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200 flex items-center gap-1">
+                                        <i class="ri-calendar-event-line text-purple-600 shrink-0"></i>
+                                        <span class="truncate">{{ $day['holiday']?->name ?? 'Holiday' }}</span>
+                                    </div>
+                                @elseif($st === 'present')
                                     <div class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-between gap-1">
                                         <span class="truncate">✓ Present</span>
                                         @if($day['formattedHours'])
@@ -154,10 +176,6 @@
                                 @elseif($st === 'half_day')
                                     <div class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-between gap-1">
                                         <span>½ Half Day</span>
-                                    </div>
-                                @elseif($st === 'holiday')
-                                    <div class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200 flex items-center gap-1">
-                                        <span>🎉 Holiday</span>
                                     </div>
                                 @elseif($st === 'absent')
                                     <div class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-red-50 text-red-700 border border-red-200 flex items-center gap-1">
@@ -358,7 +376,17 @@
                     <div>
                         <div class="flex items-center gap-2">
                             <h2 class="text-base font-bold text-slate-900">Work Logs for {{ \Carbon\Carbon::parse($targetDate)->format('F j, Y') }}</h2>
-                            @if($att && $att->status === 'present')
+                            @if(isset($dt['holiday']) && $dt['holiday'])
+                                @if($dt['sessionCount'] > 0)
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-purple-100 text-purple-900 border border-purple-300 inline-flex items-center gap-1">
+                                        <i class="ri-calendar-event-line"></i> Holiday (Worked)
+                                    </span>
+                                @else
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200 inline-flex items-center gap-1">
+                                        <i class="ri-calendar-event-line"></i> Holiday
+                                    </span>
+                                @endif
+                            @elseif($att && $att->status === 'present')
                                 <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Present</span>
                             @elseif($att && ($att->status === 'on_leave' || $att->status === 'leave'))
                                 <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">On Leave</span>
@@ -376,6 +404,25 @@
                         <i class="ri-close-line text-lg"></i>
                     </button>
                 </div>
+
+                @if(isset($dt['holiday']) && $dt['holiday'])
+                    <div class="p-3.5 bg-purple-50 border border-purple-200 rounded-md space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-purple-900 flex items-center gap-1.5">
+                                <i class="ri-calendar-event-line text-purple-600"></i> Official Holiday: {{ $dt['holiday']->name }}
+                            </span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-purple-200 text-purple-900 capitalize">
+                                {{ $dt['holiday']->type }} Holiday
+                            </span>
+                        </div>
+                        @if($dt['holiday']->description)
+                            <p class="text-xs text-purple-800">{{ $dt['holiday']->description }}</p>
+                        @endif
+                        <p class="text-[11px] font-medium {{ $dt['sessionCount'] > 0 ? 'text-emerald-700' : 'text-slate-600' }}">
+                            {{ $dt['sessionCount'] > 0 ? '✓ You worked on this holiday (Logged '.$dt['formattedTotalHours'].')' : 'Official holiday off.' }}
+                        </p>
+                    </div>
+                @endif
 
                 <!-- Stats Summary Cards -->
                 <div class="grid grid-cols-2 gap-3 text-center">

@@ -54,10 +54,14 @@
             </div>
 
             <!-- Month Quick Stats Cards -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 lg:w-auto w-full">
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 lg:w-auto w-full">
                 <div class="p-3.5 bg-emerald-50/70 rounded-md border border-emerald-200/60 text-center min-w-[100px]">
                     <div class="text-xl font-bold text-emerald-700">{{ $presentDaysCount }}</div>
                     <div class="text-[11px] font-medium text-emerald-600">Present Days</div>
+                </div>
+                <div class="p-3.5 bg-purple-50/70 rounded-md border border-purple-200/60 text-center min-w-[100px]">
+                    <div class="text-xl font-bold text-purple-700">{{ $holidayDaysCount }}</div>
+                    <div class="text-[11px] font-medium text-purple-600">Holidays</div>
                 </div>
                 <div class="p-3.5 bg-amber-50/70 rounded-md border border-amber-200/60 text-center min-w-[100px]">
                     <div class="text-xl font-bold text-amber-700">{{ $leaveDaysCount }}</div>
@@ -160,7 +164,27 @@
 
                         <!-- Status Badges -->
                         <div class="mt-2 space-y-1">
-                            @if ($day['status'] === 'present')
+                            @if ($day['status'] === 'holiday_worked')
+                                <div class="space-y-1">
+                                    <span class="inline-flex items-center justify-between gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-purple-100 text-purple-900 border border-purple-300 w-full">
+                                        <span class="truncate flex items-center gap-1">
+                                            <i class="ri-calendar-event-line text-purple-700 shrink-0"></i>
+                                            <span class="truncate">{{ $day['holiday']?->name ?? 'Holiday' }}</span>
+                                        </span>
+                                        <span class="text-[9px] font-bold bg-purple-200 text-purple-800 px-1 rounded shrink-0">Worked</span>
+                                    </span>
+                                    @if ($day['formattedHours'])
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 w-full justify-center">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> {{ $day['formattedHours'] }}
+                                        </span>
+                                    @endif
+                                </div>
+                            @elseif ($day['status'] === 'holiday')
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200 w-full justify-center">
+                                    <i class="ri-calendar-event-line text-purple-600 shrink-0"></i>
+                                    <span class="truncate">{{ $day['holiday']?->name ?? 'Holiday' }}</span>
+                                </span>
+                            @elseif ($day['status'] === 'present')
                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 w-full justify-center">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Present
                                 </span>
@@ -179,10 +203,6 @@
                             @elseif ($day['status'] === 'weekend')
                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-100 text-slate-500 w-full justify-center">
                                     Off Day
-                                </span>
-                            @elseif ($day['status'] === 'holiday')
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200 w-full justify-center">
-                                    🎉 Holiday
                                 </span>
                             @endif
 
@@ -326,6 +346,30 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Holiday Details (If on holiday) -->
+                    @if ($selectedDateDetail['holiday'])
+                        <div class="p-4 bg-purple-50 border border-purple-200 rounded-md space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-purple-900 flex items-center gap-1.5">
+                                    <i class="ri-calendar-event-line text-purple-600"></i> Official Holiday: {{ $selectedDateDetail['holiday']->name }}
+                                </span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-purple-200 text-purple-900 capitalize">
+                                    {{ $selectedDateDetail['holiday']->type }} Holiday
+                                </span>
+                            </div>
+                            @if ($selectedDateDetail['holiday']->description)
+                                <p class="text-xs text-purple-800">{{ $selectedDateDetail['holiday']->description }}</p>
+                            @endif
+                            <div class="pt-1 text-[11px] font-semibold {{ $selectedDateDetail['sessionCount'] > 0 ? 'text-emerald-700' : 'text-slate-600' }}">
+                                @if ($selectedDateDetail['sessionCount'] > 0)
+                                    ✓ Employee worked on this holiday (Logged {{ $selectedDateDetail['formattedTotalHours'] }})
+                                @else
+                                    Official Company Holiday (No work logged)
+                                @endif
+                            </div>
+                        </div>
+                    @endif
 
                     <!-- Leave Details (If on leave) -->
                     @if ($selectedDateDetail['leaveRequest'])

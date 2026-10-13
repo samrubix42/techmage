@@ -2,6 +2,7 @@
 
 use App\Models\Attendance;
 use App\Models\DailySlotTracking;
+use App\Models\Holiday;
 use App\Models\LeaveRequest;
 use App\Models\User;
 use Illuminate\Support\Carbon;
@@ -129,11 +130,14 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
         $hours = floor($totalWorkedMinutes / 60);
         $minutes = $totalWorkedMinutes % 60;
 
+        $holiday = Holiday::whereDate('holiday_date', $targetDate)->first();
+
         return [
             'targetDate' => $targetDate,
             'tracking' => $tracking,
             'attendance' => $attendance,
             'leaveRequest' => $leaveRequest,
+            'holiday' => $holiday,
             'logs' => $logs,
             'formattedTotalHours' => "{$hours}h {$minutes}m",
             'totalBreaksMinutes' => $totalBreaksMinutes,
@@ -168,6 +172,10 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
             })
             ->get();
 
+        $holidaysInMonth = Holiday::whereBetween('holiday_date', [$gridStart->toDateString(), $gridEnd->toDateString()])
+            ->get()
+            ->keyBy(fn ($item) => $item->holiday_date->toDateString());
+
         $calendarDays = [];
         $cursor = $gridStart->copy();
 
@@ -175,11 +183,13 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
         $leaveDaysCount = 0;
         $halfDayDaysCount = 0;
         $absentDaysCount = 0;
+        $holidayDaysCount = 0;
 
         while ($cursor->lte($gridEnd)) {
             $dateStr = $cursor->toDateString();
             $att = $attendancesInMonth->get($dateStr);
             $tr = $trackingsInMonth->get($dateStr);
+            $holiday = $holidaysInMonth->get($dateStr);
 
             // Find matching approved leave request if any
             $matchingLeave = $leaveRequestsInMonth->first(function ($l) use ($dateStr) {
@@ -207,8 +217,14 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
             $hasClockIn = ($att && ($att->clock_in_time || $att->logs->isNotEmpty())) || ($tr && $tr->slot1_checkin_time);
 
             $status = 'none';
-            if ($hasClockIn) {
-                $status = ($att && in_array($att->status, ['on_leave', 'leave', 'half_day', 'holiday'])) ? $att->status : 'present';
+            if ($holiday) {
+                if ($hasClockIn) {
+                    $status = 'holiday_worked';
+                } else {
+                    $status = 'holiday';
+                }
+            } elseif ($hasClockIn) {
+                $status = ($att && in_array($att->status, ['on_leave', 'leave', 'half_day'])) ? $att->status : 'present';
             } elseif ($att && $att->status) {
                 $status = $att->status;
             } elseif ($isCurrentMonth && $cursor->isPast() && ! $isOffDay && ! $isToday) {
@@ -218,7 +234,7 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
             }
 
             if ($isCurrentMonth) {
-                if ($status === 'present') {
+                if ($status === 'present' || $status === 'holiday_worked') {
                     $presentDaysCount++;
                 } elseif ($status === 'on_leave' || $status === 'leave') {
                     $leaveDaysCount++;
@@ -226,6 +242,10 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
                     $halfDayDaysCount++;
                 } elseif ($status === 'absent') {
                     $absentDaysCount++;
+                }
+
+                if ($holiday) {
+                    $holidayDaysCount++;
                 }
             }
 
@@ -235,6 +255,8 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
                 'isCurrentMonth' => $isCurrentMonth,
                 'isToday' => $isToday,
                 'isWeekend' => $isOffDay,
+                'isHoliday' => (bool) $holiday,
+                'holiday' => $holiday,
                 'attendance' => $att,
                 'tracking' => $tr,
                 'leaveRequest' => $matchingLeave,
@@ -262,6 +284,7 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
             'leaveDaysCount' => $leaveDaysCount,
             'halfDayDaysCount' => $halfDayDaysCount,
             'absentDaysCount' => $absentDaysCount,
+            'holidayDaysCount' => $holidayDaysCount,
             'monthlyLogs' => $monthlyLogs,
             'selectedDateDetail' => $this->selectedDateDetail,
         ]);

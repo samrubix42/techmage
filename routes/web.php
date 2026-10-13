@@ -49,6 +49,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->as('admin.')->group(
     Route::livewire('/daily-task-reports', 'admin::daily-task-report-management')->name('daily-task-reports');
     Route::livewire('/attendance-logs', 'admin::attendance-logs')->name('attendance-logs');
     Route::livewire('/leave-requests', 'admin::leave-requests')->name('leave-requests');
+    Route::livewire('/holidays', 'admin::holiday-management')->name('holidays');
     Route::livewire('/change-password', 'admin::change-password')->name('change-password');
 });
 
