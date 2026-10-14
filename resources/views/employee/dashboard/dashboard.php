@@ -85,20 +85,36 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
         $this->resetValidation();
     }
 
+    public function getTodayDailyTaskReportProperty(): ?DailyTaskReport
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return null;
+        }
+
+        return DailyTaskReport::where('user_id', $user->id)
+            ->whereDate('date', now()->toDateString())
+            ->first();
+    }
+
     public function submitReportAndClockOut(): void
     {
         $tracking = $this->getTodayTracking();
-        if (! $tracking || ! $tracking->slot3_start_time) {
-            session()->flash('error', '3rd Slot has not been started yet.');
+        $isAlreadyClockedOut = (bool) ($tracking && $tracking->slot4_checkin_time);
 
-            return;
-        }
+        if (! $isAlreadyClockedOut) {
+            if (! $tracking || ! $tracking->slot3_start_time) {
+                session()->flash('error', '3rd Slot has not been started yet.');
 
-        $workedMinutes = (int) $tracking->slot3_start_time->diffInMinutes(now());
-        if ($workedMinutes < 120) {
-            session()->flash('error', '4th Slot check-in is disabled until 120 minutes have elapsed after 3rd slot start. Currently elapsed: '.$workedMinutes.' mins.');
+                return;
+            }
 
-            return;
+            $workedMinutes = (int) $tracking->slot3_start_time->diffInMinutes(now());
+            if ($workedMinutes < 120) {
+                session()->flash('error', '4th Slot check-in is disabled until 120 minutes have elapsed after 3rd slot start. Currently elapsed: '.$workedMinutes.' mins.');
+
+                return;
+            }
         }
 
         $this->validate([
@@ -119,17 +135,29 @@ new #[Layout('layouts.employee')] #[Title('Employee Portal - TechMage')] class e
             ];
         }, $this->taskProjects);
 
-        DailyTaskReport::updateOrCreate(
-            [
+        $existingReport = DailyTaskReport::where('user_id', Auth::id())
+            ->whereDate('date', now()->toDateString())
+            ->first();
+
+        if ($existingReport) {
+            $existingReport->update([
+                'title_description' => $titleDescription,
+            ]);
+        } else {
+            DailyTaskReport::create([
                 'user_id' => Auth::id(),
                 'date' => now()->toDateString(),
-            ],
-            [
                 'title_description' => $titleDescription,
-            ]
-        );
+            ]);
+        }
 
-        $this->saveSlot4AndClockOut();
+        if (! $isAlreadyClockedOut) {
+            $this->saveSlot4AndClockOut();
+        } else {
+            session()->flash('attendance_status', 'Daily Task Report updated successfully!');
+            $this->dispatch('slot-updated');
+        }
+
         $this->showTaskReportModal = false;
     }
 

@@ -162,3 +162,80 @@ test('employee can submit daily task report and clock out for 4th slot via modal
     expect($report->title_description)->toHaveCount(1);
     expect($report->title_description[0]['title'])->toBe('Feature Development');
 });
+
+test('employee can add daily task report after clock out via modal on dashboard', function () {
+    $employee = User::factory()->create(['role' => 'employee']);
+    $today = now()->toDateString();
+
+    // Employee already clocked out
+    $tracking = DailySlotTracking::create([
+        'user_id' => $employee->id,
+        'tracking_date' => $today,
+        'slot1_checkin_time' => now()->subHours(8),
+        'slot2_checkin_time' => now()->subHours(6),
+        'lunch_start_time' => now()->subHours(5),
+        'lunch_end_time' => now()->subHours(4),
+        'lunch_duration_minutes' => 60,
+        'slot3_start_time' => now()->subHours(4),
+        'slot4_checkin_time' => now()->subHours(1),
+    ]);
+
+    Livewire::actingAs($employee)
+        ->test('employee::dashboard')
+        ->call('openTaskReportModal')
+        ->assertSet('showTaskReportModal', true)
+        ->set('taskProjects', [
+            ['_key' => 'p1', 'title' => 'Post Clockout Task', 'description' => '<p>Completed daily tasks after clocking out</p>'],
+        ])
+        ->call('submitReportAndClockOut')
+        ->assertSet('showTaskReportModal', false);
+
+    $this->assertDatabaseHas('daily_task_reports', [
+        'user_id' => $employee->id,
+    ]);
+
+    $report = DailyTaskReport::where('user_id', $employee->id)->first();
+    expect($report->date->format('Y-m-d'))->toBe($today);
+    expect($report->title_description[0]['title'])->toBe('Post Clockout Task');
+    expect($report->title_description[0]['description'])->toBe('<p>Completed daily tasks after clocking out</p>');
+});
+
+test('employee can update existing daily task report after clock out via modal on dashboard', function () {
+    $employee = User::factory()->create(['role' => 'employee']);
+    $today = now()->toDateString();
+
+    $tracking = DailySlotTracking::create([
+        'user_id' => $employee->id,
+        'tracking_date' => $today,
+        'slot1_checkin_time' => now()->subHours(8),
+        'slot2_checkin_time' => now()->subHours(6),
+        'lunch_start_time' => now()->subHours(5),
+        'lunch_end_time' => now()->subHours(4),
+        'lunch_duration_minutes' => 60,
+        'slot3_start_time' => now()->subHours(4),
+        'slot4_checkin_time' => now()->subHours(1),
+    ]);
+
+    $existingReport = DailyTaskReport::create([
+        'user_id' => $employee->id,
+        'date' => $today,
+        'title_description' => [
+            ['title' => 'Initial Task', 'description' => '<p>Initial Description</p>'],
+        ],
+    ]);
+
+    Livewire::actingAs($employee)
+        ->test('employee::dashboard')
+        ->call('openTaskReportModal')
+        ->assertSet('showTaskReportModal', true)
+        ->assertCount('taskProjects', 1)
+        ->set('taskProjects', [
+            ['_key' => 'p1', 'title' => 'Updated Task Title', 'description' => '<p>Updated Description via TinyMCE</p>'],
+        ])
+        ->call('submitReportAndClockOut')
+        ->assertSet('showTaskReportModal', false);
+
+    $existingReport->refresh();
+    expect($existingReport->title_description[0]['title'])->toBe('Updated Task Title');
+    expect($existingReport->title_description[0]['description'])->toBe('<p>Updated Description via TinyMCE</p>');
+});

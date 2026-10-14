@@ -104,18 +104,58 @@
                         @enderror
                     </div>
 
-                    <!-- Project Description with TinyMCE -->
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">
-                            Project Description & Accomplishments <span class="text-red-500">*</span>
-                        </label>
-                        
+                    <!-- Project Description with TinyMCE Option -->
+                    <div 
+                        x-data="tinymceEditor(@entangle('projects.' . $index . '.description'), 'tinymce-{{ $project['_key'] }}')"
+                        class="space-y-1.5"
+                    >
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-semibold text-slate-700">
+                                Project Description & Accomplishments <span class="text-red-500">*</span>
+                            </label>
+
+                            <!-- Option to toggle TinyMCE vs Plain Text -->
+                            <div class="inline-flex items-center rounded-md border border-slate-200 bg-slate-100 p-0.5 text-[11px] font-medium">
+                                <button 
+                                    type="button" 
+                                    @click="enableTinyMce()"
+                                    :class="useTinyMce ? 'bg-white text-slate-900 font-semibold shadow-xs' : 'text-slate-500 hover:text-slate-800'"
+                                    class="px-2 py-0.5 rounded transition-all flex items-center gap-1 cursor-pointer"
+                                    title="Use TinyMCE Rich Text Editor"
+                                >
+                                    <i class="ri-edit-2-line text-xs"></i>
+                                    <span>TinyMCE</span>
+                                </button>
+                                <button 
+                                    type="button" 
+                                    @click="disableTinyMce()"
+                                    :class="!useTinyMce ? 'bg-white text-slate-900 font-semibold shadow-xs' : 'text-slate-500 hover:text-slate-800'"
+                                    class="px-2 py-0.5 rounded transition-all flex items-center gap-1 cursor-pointer"
+                                    title="Use Plain Text"
+                                >
+                                    <i class="ri-file-text-line text-xs"></i>
+                                    <span>Plain Text</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- TinyMCE Rich Editor Box -->
                         <div 
-                            x-data="tinymceEditor(@entangle('projects.' . $index . '.description'), 'tinymce-{{ $project['_key'] }}')"
+                            x-show="useTinyMce"
                             wire:ignore
-                            class="border border-slate-200 rounded-md overflow-hidden"
+                            class="border border-slate-200 rounded-md overflow-hidden bg-white"
                         >
                             <textarea id="tinymce-{{ $project['_key'] }}"></textarea>
+                        </div>
+
+                        <!-- Plain Textarea Option -->
+                        <div x-show="!useTinyMce" x-cloak>
+                            <textarea 
+                                x-model="value" 
+                                rows="6" 
+                                placeholder="Describe what was accomplished in this project..."
+                                class="w-full text-xs px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all resize-y"
+                            ></textarea>
                         </div>
 
                         @error("projects.{$index}.description")
@@ -159,49 +199,3 @@
         </div>
     </form>
 </div>
-
-<!-- TinyMCE Script & Alpine Component Script -->
-<script src="{{ asset('tinymce/tinymce.min.js') }}" referrerpolicy="origin"></script>
-
-<script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('tinymceEditor', (wireValue, editorId) => ({
-            value: wireValue,
-            editor: null,
-            init() {
-                this.$nextTick(() => {
-                    if (typeof tinymce === 'undefined') return;
-
-                    if (tinymce.get(editorId)) {
-                        tinymce.get(editorId).remove();
-                    }
-
-                    tinymce.init({
-                        selector: '#' + editorId,
-                        height: 260,
-                        menubar: false,
-                        plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table wordcount',
-                        toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | code',
-                        content_style: 'body { font-family: "Instrument Sans", sans-serif; font-size: 13px; color: #1e293b; line-height: 1.5; }',
-                        setup: (editor) => {
-                            this.editor = editor;
-                            editor.on('init', () => {
-                                if (this.value) {
-                                    editor.setContent(this.value);
-                                }
-                            });
-                            editor.on('change KeyUp Input Blur', () => {
-                                this.value = editor.getContent();
-                            });
-                        }
-                    });
-                });
-            },
-            destroy() {
-                if (typeof tinymce !== 'undefined' && tinymce.get(editorId)) {
-                    tinymce.get(editorId).remove();
-                }
-            }
-        }));
-    });
-</script>

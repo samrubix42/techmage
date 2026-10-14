@@ -431,20 +431,47 @@
             </div>
 
         @else
-            <!-- Day Completed Banner -->
-            <div class="p-5 rounded-md border border-emerald-200 bg-emerald-50/60 text-emerald-900 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-md bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-base">
-                        <i class="ri-checkbox-circle-line"></i>
+            <!-- Day Completed Banner & Post-Clock-Out Daily Task Report -->
+            <div class="p-5 rounded-md border border-emerald-200 bg-emerald-50/60 text-emerald-900 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-md bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-lg shrink-0">
+                            <i class="ri-checkbox-circle-line"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-emerald-950">Shift Activity Tracking Completed!</h3>
+                            <p class="text-xs text-emerald-800">You have completed your shift tracking and clocked out for today.</p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 class="text-sm font-bold text-emerald-950">Shift Activity Tracking Completed!</h3>
-                        <p class="text-xs text-emerald-800">You have completed Slot 1, 2-Hr Check-In, Lunch Break, 3rd Slot, and 4th Slot Clock-Out for today.</p>
+                    <div class="flex items-center gap-2 self-start sm:self-center">
+                        <span class="text-xs font-semibold text-emerald-700 bg-white px-3 py-1.5 rounded-md border border-emerald-200 shadow-2xs">
+                            Shift Ended: {{ $tracking->slot4_checkin_time?->format('g:i A') }}
+                        </span>
                     </div>
                 </div>
-                <span class="text-xs font-semibold text-emerald-700 bg-white px-3 py-1.5 rounded-md border border-emerald-200">
-                    Shift Ended: {{ $tracking->slot4_checkin_time?->format('g:i A') }}
-                </span>
+
+                <!-- Daily Task Report Status & Action Button after Clock Out -->
+                <div class="pt-3 border-t border-emerald-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-2 text-xs">
+                        <i class="ri-task-line text-emerald-700 text-base"></i>
+                        @if($this->todayDailyTaskReport)
+                            <span class="font-semibold text-emerald-950">Daily Task Report Submitted</span>
+                            <span class="text-emerald-700">({{ count($this->todayDailyTaskReport->title_description ?? []) }} {{ count($this->todayDailyTaskReport->title_description ?? []) === 1 ? 'entry' : 'entries' }} logged)</span>
+                        @else
+                            <span class="font-semibold text-amber-800">Daily Task Report Pending</span>
+                            <span class="text-amber-700 text-[11px]">— Add your daily accomplishments and work details</span>
+                        @endif
+                    </div>
+
+                    <button 
+                        type="button" 
+                        wire:click="openTaskReportModal" 
+                        class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all shadow-xs cursor-pointer {{ $this->todayDailyTaskReport ? 'bg-white hover:bg-slate-50 text-slate-800 border border-slate-200' : 'bg-slate-900 hover:bg-slate-800 text-white' }}"
+                    >
+                        <i class="{{ $this->todayDailyTaskReport ? 'ri-edit-line' : 'ri-add-line' }} text-sm"></i>
+                        <span>{{ $this->todayDailyTaskReport ? 'Update Daily Task Report' : 'Add Daily Task Report' }}</span>
+                    </button>
+                </div>
             </div>
         @endif
     </div>
@@ -509,7 +536,7 @@
             x-data
             @keydown.escape.window="$wire.closeTaskReportModal()"
         >
-            <div class="bg-white rounded-lg border border-slate-200 shadow-2xl max-w-2xl w-full p-6 space-y-5 text-left relative my-8">
+            <div class="bg-white rounded-lg border border-slate-200 shadow-2xl max-w-3xl w-full p-6 space-y-5 text-left relative my-8">
                 <!-- Header -->
                 <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                     <div class="flex items-center gap-3">
@@ -517,8 +544,12 @@
                             <i class="ri-task-line"></i>
                         </div>
                         <div>
-                            <h3 class="text-base font-bold text-slate-900">Daily Task Report & Clock Out</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">Please add your daily task entries before completing your 4th slot and clocking out.</p>
+                            <h3 class="text-base font-bold text-slate-900">
+                                {{ $tracking?->slot4_checkin_time ? ($this->todayDailyTaskReport ? 'Update Daily Task Report' : 'Add Daily Task Report') : 'Daily Task Report & Clock Out' }}
+                            </h3>
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                {{ $tracking?->slot4_checkin_time ? ($this->todayDailyTaskReport ? 'Review or update your task entries for today\'s completed shift.' : 'Please add your daily task entries for today\'s completed shift.') : 'Please add your daily task entries before completing your 4th slot and clocking out.' }}
+                            </p>
                         </div>
                     </div>
                     <button type="button" wire:click="closeTaskReportModal" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-md hover:bg-slate-100 transition-colors">
@@ -559,15 +590,56 @@
                                 @enderror
                             </div>
 
-                            <!-- Description -->
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Task Description / Work Details <span class="text-red-500">*</span></label>
-                                <textarea 
-                                    wire:model="taskProjects.{{ $index }}.description" 
-                                    rows="3" 
-                                    placeholder="Describe what was accomplished in this task..."
-                                    class="w-full text-xs px-3 py-2 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent bg-white resize-y"
-                                ></textarea>
+                            <!-- Description with TinyMCE Option -->
+                            <div 
+                                x-data="tinymceEditor(@entangle('taskProjects.' . $index . '.description'), 'tinymce-modal-{{ $project['_key'] ?? $index }}')"
+                                class="space-y-1.5"
+                            >
+                                <div class="flex items-center justify-between mb-1">
+                                    <label class="block text-xs font-semibold text-slate-700">
+                                        Task Description / Work Details <span class="text-red-500">*</span>
+                                    </label>
+
+                                    <!-- Option to toggle TinyMCE vs Plain Text -->
+                                    <div class="inline-flex items-center rounded-md border border-slate-200 bg-slate-100 p-0.5 text-[11px] font-medium">
+                                        <button 
+                                            type="button" 
+                                            @click="enableTinyMce()"
+                                            :class="useTinyMce ? 'bg-white text-slate-900 font-semibold shadow-xs' : 'text-slate-500 hover:text-slate-800'"
+                                            class="px-2 py-0.5 rounded transition-all flex items-center gap-1 cursor-pointer"
+                                            title="Use TinyMCE Rich Text Editor"
+                                        >
+                                            <i class="ri-edit-2-line text-xs"></i>
+                                            <span>TinyMCE</span>
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            @click="disableTinyMce()"
+                                            :class="!useTinyMce ? 'bg-white text-slate-900 font-semibold shadow-xs' : 'text-slate-500 hover:text-slate-800'"
+                                            class="px-2 py-0.5 rounded transition-all flex items-center gap-1 cursor-pointer"
+                                            title="Use Plain Text"
+                                        >
+                                            <i class="ri-file-text-line text-xs"></i>
+                                            <span>Plain Text</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- TinyMCE Rich Editor Box -->
+                                <div x-show="useTinyMce" wire:ignore class="border border-slate-200 rounded-md overflow-hidden bg-white">
+                                    <textarea id="tinymce-modal-{{ $project['_key'] ?? $index }}"></textarea>
+                                </div>
+
+                                <!-- Plain Textarea Option -->
+                                <div x-show="!useTinyMce" x-cloak>
+                                    <textarea 
+                                        x-model="value" 
+                                        rows="3" 
+                                        placeholder="Describe what was accomplished in this task..."
+                                        class="w-full text-xs px-3 py-2 border rounded-md border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent bg-white resize-y"
+                                    ></textarea>
+                                </div>
+
                                 @error("taskProjects.{$index}.description")
                                     <span class="text-red-600 text-[11px] mt-1 block font-medium">{{ $message }}</span>
                                 @enderror
@@ -605,9 +677,15 @@
                         wire:loading.attr="disabled"
                         class="px-5 py-2 text-xs font-semibold rounded-md text-white bg-slate-900 hover:bg-slate-800 transition-colors cursor-pointer shadow-xs flex items-center gap-2"
                     >
-                        <i wire:loading.remove wire:target="submitReportAndClockOut" class="ri-logout-box-r-line text-sm"></i>
-                        <i wire:loading wire:target="submitReportAndClockOut" class="ri-loader-4-line animate-spin text-sm"></i>
-                        <span>Submit Report & Clock Out</span>
+                        @if($tracking?->slot4_checkin_time)
+                            <i wire:loading.remove wire:target="submitReportAndClockOut" class="ri-save-line text-sm"></i>
+                            <i wire:loading wire:target="submitReportAndClockOut" class="ri-loader-4-line animate-spin text-sm"></i>
+                            <span>{{ $this->todayDailyTaskReport ? 'Update Daily Report' : 'Submit Daily Report' }}</span>
+                        @else
+                            <i wire:loading.remove wire:target="submitReportAndClockOut" class="ri-logout-box-r-line text-sm"></i>
+                            <i wire:loading wire:target="submitReportAndClockOut" class="ri-loader-4-line animate-spin text-sm"></i>
+                            <span>Submit Report & Clock Out</span>
+                        @endif
                     </button>
                 </div>
             </div>
