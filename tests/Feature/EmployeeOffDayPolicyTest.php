@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Holiday;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -65,4 +66,47 @@ test('admin can select saturday off policy when creating employee', function () 
     $created = User::where('email', 'special@company.com')->first();
     expect($created)->not->toBeNull();
     expect($created->saturday_off_policy)->toBe('sunday_2nd_4th_saturday');
+});
+
+test('admin employee calendar displays total working days excluding holidays and off days', function () {
+    Carbon::setTestNow('2026-09-15 10:00:00');
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    // Employee 1: Sunday only off (September 2026 has 30 days, 4 Sundays)
+    $employeeSundayOnly = User::factory()->create([
+        'role' => 'employee',
+        'saturday_off_policy' => 'sunday_only',
+    ]);
+
+    // Holiday on a weekday (Monday Sept 21)
+    Holiday::create([
+        'name' => 'Autumn Fest',
+        'holiday_date' => '2026-09-21',
+        'type' => 'public',
+    ]);
+
+    // 30 days - 4 Sundays - 1 Holiday = 25 working days
+    Livewire::actingAs($admin)
+        ->test('admin::employee-calendar', ['user' => $employeeSundayOnly])
+        ->assertSet('currentYear', 2026)
+        ->assertSet('currentMonth', 9)
+        ->assertViewHas('totalWorkingDaysCount', 25)
+        ->assertViewHas('offDaysCount', 4)
+        ->assertViewHas('holidayDaysCount', 1)
+        ->assertSee('Total Working Days:')
+        ->assertSee('25');
+
+    // Employee 2: Sunday & 2nd/4th Saturday off (September 2026 has 4 Sundays + 2 Saturdays = 6 off days)
+    $employeeAltSat = User::factory()->create([
+        'role' => 'employee',
+        'saturday_off_policy' => 'sunday_2nd_4th_saturday',
+    ]);
+
+    // 30 days - 6 Off days - 1 Holiday = 23 working days
+    Livewire::actingAs($admin)
+        ->test('admin::employee-calendar', ['user' => $employeeAltSat])
+        ->assertViewHas('totalWorkingDaysCount', 23)
+        ->assertViewHas('offDaysCount', 6)
+        ->assertViewHas('holidayDaysCount', 1)
+        ->assertSee('23');
 });

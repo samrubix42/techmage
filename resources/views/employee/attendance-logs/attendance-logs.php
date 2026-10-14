@@ -194,6 +194,8 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
         $halfDayDaysCount = 0;
         $absentDaysCount = 0;
         $holidayDaysCount = 0;
+        $offDaysCount = 0;
+        $totalWorkingDaysCount = 0;
 
         while ($cursor->lte($gridEnd)) {
             $dateStr = $cursor->toDateString();
@@ -204,6 +206,8 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
             $isCurrentMonth = ($cursor->month === $this->currentMonth);
             $isToday = ($dateStr === now()->toDateString());
             $isOffDay = $user->isOffDay($cursor);
+            $isHoliday = (bool) $holiday;
+            $isWorkingDay = $isCurrentMonth && ! $isOffDay && ! $isHoliday;
 
             // Calculate worked hours for calendar day based on slot tracking minus lunch hour
             $workedMins = DailySlotTracking::calculateWorkedMinutesForDay($tr, $att);
@@ -243,6 +247,14 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
 
                 if ($holiday) {
                     $holidayDaysCount++;
+                }
+
+                if ($isOffDay) {
+                    $offDaysCount++;
+                }
+
+                if ($isWorkingDay) {
+                    $totalWorkingDaysCount++;
                 }
             }
 
@@ -303,6 +315,8 @@ new #[Layout('layouts.employee')] #[Title('My Working Hours & Calendar - TechMag
         return view('employee.attendance-logs.attendance-logs', [
             'calendarDays' => $calendarDays,
             'currentMonthLabel' => $currentMonthCarbon->format('F Y'),
+            'totalWorkingDaysCount' => $totalWorkingDaysCount,
+            'offDaysCount' => $offDaysCount,
             'presentDaysCount' => $presentDaysCount,
             'leaveDaysCount' => $leaveDaysCount,
             'halfDayDaysCount' => $halfDayDaysCount,

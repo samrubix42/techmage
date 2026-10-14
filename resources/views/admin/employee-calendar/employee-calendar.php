@@ -108,6 +108,8 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
         $isUnderEightHours = DailySlotTracking::isUnderEightHours($totalWorkedMinutes);
 
         $holiday = Holiday::whereDate('holiday_date', $targetDate)->first();
+        $isOffDay = $this->user->isOffDay($targetDate);
+        $isWorkingDay = ! $isOffDay && ! $holiday;
 
         return [
             'targetDate' => $targetDate,
@@ -115,6 +117,8 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
             'attendance' => $attendance,
             'leaveRequest' => $leaveRequest,
             'holiday' => $holiday,
+            'isOffDay' => $isOffDay,
+            'isWorkingDay' => $isWorkingDay,
             'logs' => $logs,
             'workedMinutes' => $totalWorkedMinutes,
             'formattedTotalHours' => "{$hours}h {$minutes}m",
@@ -163,6 +167,8 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
         $halfDayDaysCount = 0;
         $absentDaysCount = 0;
         $holidayDaysCount = 0;
+        $offDaysCount = 0;
+        $totalWorkingDaysCount = 0;
 
         while ($cursor->lte($gridEnd)) {
             $dateStr = $cursor->toDateString();
@@ -178,6 +184,8 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
             $isCurrentMonth = ($cursor->month === $this->currentMonth);
             $isToday = ($dateStr === now()->toDateString());
             $isOffDay = $this->user->isOffDay($cursor);
+            $isHoliday = (bool) $holiday;
+            $isWorkingDay = $isCurrentMonth && ! $isOffDay && ! $isHoliday;
 
             $workedMins = DailySlotTracking::calculateWorkedMinutesForDay($tr, $att);
             $formattedHours = $workedMins > 0 ? (floor($workedMins / 60).'h '.($workedMins % 60).'m') : null;
@@ -216,6 +224,14 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
                 if ($holiday) {
                     $holidayDaysCount++;
                 }
+
+                if ($isOffDay) {
+                    $offDaysCount++;
+                }
+
+                if ($isWorkingDay) {
+                    $totalWorkingDaysCount++;
+                }
             }
 
             $calendarDays[] = [
@@ -224,7 +240,8 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
                 'isCurrentMonth' => $isCurrentMonth,
                 'isToday' => $isToday,
                 'isWeekend' => $isOffDay,
-                'isHoliday' => (bool) $holiday,
+                'isHoliday' => $isHoliday,
+                'isWorkingDay' => $isWorkingDay,
                 'holiday' => $holiday,
                 'attendance' => $att,
                 'tracking' => $tr,
@@ -251,6 +268,8 @@ new #[Layout('layouts.admin')] #[Title('Employee Attendance & Leave Calendar - T
         return view('admin.employee-calendar.employee-calendar', [
             'calendarDays' => $calendarDays,
             'currentMonthLabel' => $currentMonthCarbon->format('F Y'),
+            'totalWorkingDaysCount' => $totalWorkingDaysCount,
+            'offDaysCount' => $offDaysCount,
             'presentDaysCount' => $presentDaysCount,
             'leaveDaysCount' => $leaveDaysCount,
             'halfDayDaysCount' => $halfDayDaysCount,

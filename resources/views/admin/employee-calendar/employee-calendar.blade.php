@@ -54,26 +54,68 @@
             </div>
 
             <!-- Month Quick Stats Cards -->
-            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 lg:w-auto w-full">
-                <div class="p-3.5 bg-emerald-50/70 rounded-md border border-emerald-200/60 text-center min-w-[100px]">
-                    <div class="text-xl font-bold text-emerald-700">{{ $presentDaysCount }}</div>
-                    <div class="text-[11px] font-medium text-emerald-600">Present Days</div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-7 gap-2.5 lg:w-auto w-full">
+                <!-- Total Working Days -->
+                <div class="p-3 bg-slate-900 text-white rounded-md border border-slate-800 text-center min-w-[105px] shadow-2xs flex flex-col justify-between">
+                    <div>
+                        <div class="text-xl font-bold tracking-tight text-white">{{ $totalWorkingDaysCount }}</div>
+                        <div class="text-[11px] font-semibold text-slate-200">Working Days</div>
+                    </div>
+                    <div class="text-[9px] text-slate-400 font-medium pt-1">Excl. Off & Holiday</div>
                 </div>
-                <div class="p-3.5 bg-purple-50/70 rounded-md border border-purple-200/60 text-center min-w-[100px]">
-                    <div class="text-xl font-bold text-purple-700">{{ $holidayDaysCount }}</div>
-                    <div class="text-[11px] font-medium text-purple-600">Holidays</div>
+
+                <!-- Present Days -->
+                <div class="p-3 bg-emerald-50/70 rounded-md border border-emerald-200/60 text-center min-w-[100px] flex flex-col justify-between">
+                    <div>
+                        <div class="text-xl font-bold text-emerald-700">{{ $presentDaysCount }}</div>
+                        <div class="text-[11px] font-semibold text-emerald-800">Present Days</div>
+                    </div>
+                    <div class="text-[9px] text-emerald-600/80 font-medium pt-1">Worked Days</div>
                 </div>
-                <div class="p-3.5 bg-amber-50/70 rounded-md border border-amber-200/60 text-center min-w-[100px]">
-                    <div class="text-xl font-bold text-amber-700">{{ $leaveDaysCount }}</div>
-                    <div class="text-[11px] font-medium text-amber-600">Full Leave Days</div>
+
+                <!-- Holidays -->
+                <div class="p-3 bg-purple-50/70 rounded-md border border-purple-200/60 text-center min-w-[100px] flex flex-col justify-between">
+                    <div>
+                        <div class="text-xl font-bold text-purple-700">{{ $holidayDaysCount }}</div>
+                        <div class="text-[11px] font-semibold text-purple-800">Holidays</div>
+                    </div>
+                    <div class="text-[9px] text-purple-600/80 font-medium pt-1">Official Off</div>
                 </div>
-                <div class="p-3.5 bg-blue-50/70 rounded-md border border-blue-200/60 text-center min-w-[100px]">
-                    <div class="text-xl font-bold text-blue-700">{{ $halfDayDaysCount }}</div>
-                    <div class="text-[11px] font-medium text-blue-600">Half Days</div>
+
+                <!-- Off Days -->
+                <div class="p-3 bg-slate-100/80 rounded-md border border-slate-200 text-center min-w-[100px] flex flex-col justify-between">
+                    <div>
+                        <div class="text-xl font-bold text-slate-700">{{ $offDaysCount }}</div>
+                        <div class="text-[11px] font-semibold text-slate-800">Off Days</div>
+                    </div>
+                    <div class="text-[9px] text-slate-500 font-medium pt-1">Weekly Offs</div>
                 </div>
-                <div class="p-3.5 bg-red-50/70 rounded-md border border-red-200/60 text-center min-w-[100px]">
-                    <div class="text-xl font-bold text-red-700">{{ $absentDaysCount }}</div>
-                    <div class="text-[11px] font-medium text-red-600">Absent Days</div>
+
+                <!-- Leave Days -->
+                <div class="p-3 bg-amber-50/70 rounded-md border border-amber-200/60 text-center min-w-[100px] flex flex-col justify-between">
+                    <div>
+                        <div class="text-xl font-bold text-amber-700">{{ $leaveDaysCount }}</div>
+                        <div class="text-[11px] font-semibold text-amber-800">Full Leaves</div>
+                    </div>
+                    <div class="text-[9px] text-amber-600/80 font-medium pt-1">Approved Off</div>
+                </div>
+
+                <!-- Half Days -->
+                <div class="p-3 bg-blue-50/70 rounded-md border border-blue-200/60 text-center min-w-[100px] flex flex-col justify-between">
+                    <div>
+                        <div class="text-xl font-bold text-blue-700">{{ $halfDayDaysCount }}</div>
+                        <div class="text-[11px] font-semibold text-blue-800">Half Days</div>
+                    </div>
+                    <div class="text-[9px] text-blue-600/80 font-medium pt-1">0.5 Day Leave</div>
+                </div>
+
+                <!-- Absent Days -->
+                <div class="p-3 bg-red-50/70 rounded-md border border-red-200/60 text-center min-w-[100px] flex flex-col justify-between">
+                    <div>
+                        <div class="text-xl font-bold text-red-700">{{ $absentDaysCount }}</div>
+                        <div class="text-[11px] font-semibold text-red-800">Absent Days</div>
+                    </div>
+                    <div class="text-[9px] text-red-600/80 font-medium pt-1">Unexcused Off</div>
                 </div>
             </div>
         </div>
@@ -105,7 +147,14 @@
                     <i class="ri-arrow-right-s-line text-lg"></i>
                 </button>
             </div>
-            <h3 class="text-lg font-bold text-slate-900">{{ $currentMonthLabel }}</h3>
+            <div class="flex items-center gap-2.5 flex-wrap">
+                <h3 class="text-lg font-bold text-slate-900">{{ $currentMonthLabel }}</h3>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold">
+                    <i class="ri-briefcase-4-line text-slate-500"></i>
+                    <span>Total Working Days: <strong class="text-slate-900">{{ $totalWorkingDaysCount }}</strong></span>
+                    <span class="text-[10px] text-slate-400 font-normal hidden md:inline">(Excl. Holidays & Off Days)</span>
+                </span>
+            </div>
         </div>
 
         <!-- View Switcher -->
@@ -232,9 +281,14 @@
     @else
         <!-- Log Table View -->
         <div class="bg-white rounded-md border border-slate-200/80 shadow-xs overflow-hidden">
-            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50/50 flex items-center justify-between">
-                <h3 class="font-bold text-slate-900 text-sm">Monthly Attendance & Leave Log List</h3>
-                <span class="text-xs text-slate-500 font-medium">{{ $monthlyLogs->count() }} Recorded Days</span>
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50/50 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                    <h3 class="font-bold text-slate-900 text-sm">Monthly Attendance & Leave Log List</h3>
+                    <p class="text-[11px] text-slate-500">Scheduled working days for {{ $currentMonthLabel }}: <strong>{{ $totalWorkingDaysCount }} Days</strong> (excluding holidays & weekly offs)</p>
+                </div>
+                <span class="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-xs text-slate-700 font-semibold shadow-2xs">
+                    {{ $monthlyLogs->count() }} Recorded Days
+                </span>
             </div>
 
             <div class="overflow-x-auto">
@@ -350,11 +404,17 @@
                 <!-- Modal Content -->
                 <div class="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
                     <!-- Summary Stats Bar -->
-                    <div class="grid grid-cols-3 gap-3 p-3 bg-slate-50 rounded-md border border-slate-200 text-center">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 bg-slate-50 rounded-md border border-slate-200 text-center">
                         <div>
                             <div class="text-[10px] font-semibold text-slate-500 uppercase">Status</div>
                             <div class="text-xs font-bold text-slate-800 capitalize mt-0.5">
                                 {{ str_replace('_', ' ', $selectedDateDetail['attendance']?->status ?: ($selectedDateDetail['tracking'] ? 'Present' : 'Not Logged')) }}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-semibold text-slate-500 uppercase">Day Type</div>
+                            <div class="text-xs font-bold mt-0.5 {{ $selectedDateDetail['holiday'] ? 'text-purple-700' : ($selectedDateDetail['isOffDay'] ? 'text-slate-600' : 'text-slate-900') }}">
+                                {{ $selectedDateDetail['holiday'] ? 'Holiday' : ($selectedDateDetail['isOffDay'] ? 'Weekly Off' : 'Working Day') }}
                             </div>
                         </div>
                         <div>

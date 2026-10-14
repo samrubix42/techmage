@@ -71,6 +71,11 @@
 
                 <!-- Right: Monthly Attendance Summary Pills -->
                 <div class="flex flex-wrap items-center gap-2">
+                    <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-900 text-white border border-slate-800 flex items-center gap-1.5 shadow-2xs">
+                        <i class="ri-briefcase-4-line text-slate-300"></i>
+                        Working Days: <strong>{{ $totalWorkingDaysCount }}d</strong>
+                    </span>
+
                     <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1.5">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         Present: <strong>{{ $presentDaysCount }}d</strong>
