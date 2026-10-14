@@ -58,6 +58,22 @@
         </div>
     @endif
 
+    @if (session()->has('error'))
+        <div class="bg-rose-50 border border-rose-200 text-rose-800 rounded-md p-4 flex items-center justify-between shadow-xs transition-all">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                    <i class="ri-error-warning-line text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold">{{ session('error') }}</p>
+                </div>
+            </div>
+            <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-800 p-1 cursor-pointer">
+                <i class="ri-close-line text-lg"></i>
+            </button>
+        </div>
+    @endif
+
     <!-- Key Metrics Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Metric 1: Total Holidays in Year -->
@@ -229,7 +245,7 @@
                                 <span class="text-[10px] font-bold text-amber-700 uppercase tracking-wider hidden sm:inline">Today</span>
                             @endif
 
-                            @if(!$day['holiday'])
+                            @if(!$day['holiday'] && !$day['isPast'])
                                 <button 
                                     wire:click="openCreateModalForDate('{{ $day['date'] }}')" 
                                     title="Add holiday on {{ $day['date'] }}"
@@ -310,7 +326,7 @@
                                         </button>
                                     </div>
                                 </div>
-                            @else
+                            @elseif(!$day['isPast'])
                                 <div 
                                     wire:click="openCreateModalForDate('{{ $day['date'] }}')" 
                                     class="h-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-slate-300 hover:text-slate-500 py-4"
@@ -742,6 +758,7 @@
                                     <input 
                                         type="date" 
                                         wire:model="holiday_date" 
+                                        min="{{ date('Y-m-d') }}"
                                         class="w-full px-3.5 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white {{ $errors->has('holiday_date') ? 'border-rose-400 bg-rose-50/30' : 'border-slate-300' }}"
                                     />
                                     @error('holiday_date') <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p> @enderror
@@ -757,6 +774,7 @@
                                             <input 
                                                 type="date" 
                                                 wire:model.live="start_date" 
+                                                min="{{ date('Y-m-d') }}"
                                                 class="w-full px-3 py-1.5 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white {{ $errors->has('start_date') ? 'border-rose-400 bg-rose-50/30' : 'border-slate-300' }}"
                                             />
                                             @error('start_date') <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p> @enderror
@@ -767,6 +785,7 @@
                                             <input 
                                                 type="date" 
                                                 wire:model.live="end_date" 
+                                                min="{{ !empty($start_date) && $start_date >= date('Y-m-d') ? $start_date : date('Y-m-d') }}"
                                                 class="w-full px-3 py-1.5 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white {{ $errors->has('end_date') ? 'border-rose-400 bg-rose-50/30' : 'border-slate-300' }}"
                                             />
                                             @error('end_date') <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p> @enderror
@@ -814,6 +833,7 @@
                                                 type="date" 
                                                 wire:model="new_multiple_date" 
                                                 wire:keydown.enter.prevent="addMultipleDate"
+                                                min="{{ date('Y-m-d') }}"
                                                 class="flex-1 px-3 py-1.5 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white"
                                             />
                                             <button 
@@ -984,6 +1004,7 @@
                             <input 
                                 type="date" 
                                 wire:model="holiday_date" 
+                                min="{{ date('Y-m-d') }}"
                                 class="w-full px-3.5 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 {{ $errors->has('holiday_date') ? 'border-rose-400 bg-rose-50/30' : 'border-slate-300' }}"
                             />
                             @error('holiday_date') <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p> @enderror

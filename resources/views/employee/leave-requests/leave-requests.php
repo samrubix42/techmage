@@ -76,9 +76,12 @@ new #[Layout('layouts.employee')] #[Title('My Leave Requests - TechMage')] class
 
         $this->validate([
             'request_type' => 'required|in:single_day,half_day,multiple_days',
-            'start_date' => 'required|date',
+            'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after_or_equal:start_date',
             'reason' => 'required|string|min:5|max:1000',
+        ], [
+            'start_date.after_or_equal' => 'Leave start date cannot be in the past.',
+            'end_date.after_or_equal' => 'Leave end date must be on or after the start date.',
         ]);
 
         if ($this->request_type === 'half_day') {

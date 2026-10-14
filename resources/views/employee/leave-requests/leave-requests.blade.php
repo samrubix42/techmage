@@ -311,6 +311,7 @@
                             <input 
                                 type="date" 
                                 wire:model.live="start_date" 
+                                min="{{ date('Y-m-d') }}"
                                 class="w-full px-3 py-2 text-xs font-medium rounded-md border border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 bg-white"
                             />
                             @error('start_date') <span class="text-red-500 text-[11px] block mt-1">{{ $message }}</span> @enderror
@@ -322,6 +323,7 @@
                                 <input 
                                     type="date" 
                                     wire:model.live="start_date" 
+                                    min="{{ date('Y-m-d') }}"
                                     class="w-full px-3 py-2 text-xs font-medium rounded-md border border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 bg-white"
                                 />
                                 @error('start_date') <span class="text-red-500 text-[11px] block mt-1">{{ $message }}</span> @enderror
@@ -331,6 +333,7 @@
                                 <input 
                                     type="date" 
                                     wire:model.live="end_date" 
+                                    min="{{ !empty($start_date) && $start_date >= date('Y-m-d') ? $start_date : date('Y-m-d') }}"
                                     class="w-full px-3 py-2 text-xs font-medium rounded-md border border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 bg-white"
                                 />
                                 @error('end_date') <span class="text-red-500 text-[11px] block mt-1">{{ $message }}</span> @enderror

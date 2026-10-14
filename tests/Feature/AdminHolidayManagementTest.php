@@ -215,17 +215,90 @@ test('admin can create multiple holidays using specific multiple dates list', fu
         ->call('openCreateModal')
         ->set('date_mode', 'multiple')
         ->set('name', 'National Observances')
-        ->set('new_multiple_date', '2026-08-15')
+        ->set('new_multiple_date', '2026-11-15')
         ->call('addMultipleDate')
-        ->assertSet('multiple_dates', ['2026-08-15'])
-        ->set('new_multiple_date', '2026-10-02')
+        ->assertSet('multiple_dates', ['2026-11-15'])
+        ->set('new_multiple_date', '2026-12-02')
         ->call('addMultipleDate')
-        ->assertSet('multiple_dates', ['2026-08-15', '2026-10-02'])
+        ->assertSet('multiple_dates', ['2026-11-15', '2026-12-02'])
         ->call('createHoliday')
         ->assertHasNoErrors()
         ->assertSet('showCreateModal', false);
 
     expect(Holiday::where('name', 'National Observances')->count())->toBe(2);
-    expect(Holiday::whereDate('holiday_date', '2026-08-15')->exists())->toBeTrue();
-    expect(Holiday::whereDate('holiday_date', '2026-10-02')->exists())->toBeTrue();
+    expect(Holiday::whereDate('holiday_date', '2026-11-15')->exists())->toBeTrue();
+    expect(Holiday::whereDate('holiday_date', '2026-12-02')->exists())->toBeTrue();
+});
+
+test('admin cannot create a holiday on a past date in single mode', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    // Test now is 2026-10-13
+    Livewire::actingAs($admin)
+        ->test('admin::holiday-management')
+        ->set('name', 'Past Holiday Attempt')
+        ->set('holiday_date', '2026-10-10')
+        ->set('type', 'public')
+        ->call('createHoliday')
+        ->assertHasErrors(['holiday_date' => 'after_or_equal']);
+
+    expect(Holiday::where('name', 'Past Holiday Attempt')->exists())->toBeFalse();
+});
+
+test('admin cannot create holidays with a past date in range mode', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    Livewire::actingAs($admin)
+        ->test('admin::holiday-management')
+        ->set('date_mode', 'range')
+        ->set('name', 'Past Range Attempt')
+        ->set('start_date', '2026-10-05')
+        ->set('end_date', '2026-10-08')
+        ->set('type', 'public')
+        ->call('createHoliday')
+        ->assertHasErrors(['start_date' => 'after_or_equal']);
+
+    expect(Holiday::where('name', 'Past Range Attempt')->exists())->toBeFalse();
+});
+
+test('admin cannot add a past date in multiple dates mode', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    Livewire::actingAs($admin)
+        ->test('admin::holiday-management')
+        ->set('date_mode', 'multiple')
+        ->set('new_multiple_date', '2026-10-05')
+        ->call('addMultipleDate')
+        ->assertHasErrors(['new_multiple_date'])
+        ->assertSet('multiple_dates', []);
+});
+
+test('admin cannot update holiday date to a past date', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    $holiday = Holiday::create([
+        'name' => 'Upcoming Holiday',
+        'holiday_date' => '2026-11-20',
+        'type' => 'company',
+    ]);
+
+    Livewire::actingAs($admin)
+        ->test('admin::holiday-management')
+        ->call('openEditModal', $holiday->id)
+        ->set('holiday_date', '2026-10-05') // Past date
+        ->call('updateHoliday')
+        ->assertHasErrors(['holiday_date' => 'after_or_equal']);
+
+    $holiday->refresh();
+    expect($holiday->holiday_date->toDateString())->toBe('2026-11-20');
+});
+
+test('admin cannot open create modal for a past date from calendar', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    Livewire::actingAs($admin)
+        ->test('admin::holiday-management')
+        ->call('openCreateModalForDate', '2026-10-05')
+        ->assertSet('showCreateModal', false)
+        ->assertSee('Cannot add holidays for past dates.');
 });

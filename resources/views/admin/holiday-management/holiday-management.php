@@ -98,6 +98,12 @@ new #[Layout('layouts.admin')] #[Title('Holiday Management - TechMage')] class e
 
     public function openCreateModalForDate(string $date): void
     {
+        if (Carbon::parse($date)->lt(today())) {
+            session()->flash('error', 'Cannot add holidays for past dates.');
+
+            return;
+        }
+
         $this->resetForm();
         $this->holiday_date = $date;
         $this->start_date = $date;
@@ -149,6 +155,12 @@ new #[Layout('layouts.admin')] #[Title('Holiday Management - TechMage')] class e
         }
 
         $dateStr = Carbon::parse($this->new_multiple_date)->toDateString();
+        if (Carbon::parse($dateStr)->lt(today())) {
+            $this->addError('new_multiple_date', 'Holiday date cannot be in the past.');
+
+            return;
+        }
+
         if (! in_array($dateStr, $this->multiple_dates)) {
             $this->multiple_dates[] = $dateStr;
             sort($this->multiple_dates);
@@ -156,6 +168,7 @@ new #[Layout('layouts.admin')] #[Title('Holiday Management - TechMage')] class e
 
         $this->new_multiple_date = '';
         $this->resetErrorBag('multiple_dates');
+        $this->resetErrorBag('new_multiple_date');
     }
 
     public function removeMultipleDate(string $date): void
@@ -193,9 +206,12 @@ new #[Layout('layouts.admin')] #[Title('Holiday Management - TechMage')] class e
 
         if ($this->date_mode === 'range') {
             $validated = $this->validate(array_merge($baseRules, [
-                'start_date' => ['required', 'date'],
+                'start_date' => ['required', 'date', 'after_or_equal:today'],
                 'end_date' => ['required', 'date', 'after_or_equal:start_date'],
-            ]));
+            ]), [
+                'start_date.after_or_equal' => 'Holiday start date cannot be in the past.',
+                'end_date.after_or_equal' => 'Holiday end date must be on or after the start date.',
+            ]);
 
             $start = Carbon::parse($validated['start_date']);
             $end = Carbon::parse($validated['end_date']);
@@ -254,6 +270,11 @@ new #[Layout('layouts.admin')] #[Title('Holiday Management - TechMage')] class e
         if ($this->date_mode === 'multiple') {
             if (! empty($this->new_multiple_date)) {
                 $dateStr = Carbon::parse($this->new_multiple_date)->toDateString();
+                if (Carbon::parse($dateStr)->lt(today())) {
+                    $this->addError('new_multiple_date', 'Holiday date cannot be in the past.');
+
+                    return;
+                }
                 if (! in_array($dateStr, $this->multiple_dates)) {
                     $this->multiple_dates[] = $dateStr;
                     sort($this->multiple_dates);
@@ -267,6 +288,14 @@ new #[Layout('layouts.admin')] #[Title('Holiday Management - TechMage')] class e
                 $this->addError('multiple_dates', 'Please add at least one holiday date.');
 
                 return;
+            }
+
+            foreach ($this->multiple_dates as $dateStr) {
+                if (Carbon::parse($dateStr)->lt(today())) {
+                    $this->addError('multiple_dates', 'Holiday dates cannot be in the past.');
+
+                    return;
+                }
             }
 
             $existingDates = Holiday::whereIn('holiday_date', $this->multiple_dates)
@@ -307,8 +336,10 @@ new #[Layout('layouts.admin')] #[Title('Holiday Management - TechMage')] class e
 
         // Single date mode (default)
         $validated = $this->validate(array_merge($baseRules, [
-            'holiday_date' => ['required', 'date'],
-        ]));
+            'holiday_date' => ['required', 'date', 'after_or_equal:today'],
+        ]), [
+            'holiday_date.after_or_equal' => 'Holiday date cannot be in the past.',
+        ]);
 
         $existing = Holiday::whereDate('holiday_date', $validated['holiday_date'])->exists();
         if ($existing) {
@@ -344,11 +375,22 @@ new #[Layout('layouts.admin')] #[Title('Holiday Management - TechMage')] class e
 
     public function updateHoliday(): void
     {
-        $validated = $this->validate([
+        $holiday = Holiday::findOrFail($this->holidayId);
+        $dateChanged = $holiday->holiday_date->toDateString() !== Carbon::parse($this->holiday_date)->toDateString();
+
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'holiday_date' => ['required', 'date'],
             'type' => ['required', 'in:public,company,optional'],
             'description' => ['nullable', 'string', 'max:1000'],
+        ];
+
+        if ($dateChanged) {
+            $rules['holiday_date'][] = 'after_or_equal:today';
+        }
+
+        $validated = $this->validate($rules, [
+            'holiday_date.after_or_equal' => 'Holiday date cannot be in the past.',
         ]);
 
         $existing = Holiday::whereDate('holiday_date', $validated['holiday_date'])
@@ -359,8 +401,6 @@ new #[Layout('layouts.admin')] #[Title('Holiday Management - TechMage')] class e
 
             return;
         }
-
-        $holiday = Holiday::findOrFail($this->holidayId);
 
         $holiday->update([
             'name' => trim($validated['name']),
@@ -541,6 +581,7 @@ new #[Layout('layouts.admin')] #[Title('Holiday Management - TechMage')] class e
                 'dayNumber' => $cursor->day,
                 'isCurrentMonth' => $isCurrentMonth,
                 'isToday' => $isToday,
+                'isPast' => $cursor->lt(today()),
                 'isWeekend' => $cursor->isWeekend(),
                 'holiday' => $holiday,
                 'workerCount' => $workerCount,

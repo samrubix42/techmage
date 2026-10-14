@@ -3,10 +3,34 @@
 use App\Models\LeaveRequest;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Livewire\Livewire;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
+
+beforeEach(function () {
+    Carbon::setTestNow('2026-09-15 10:00:00');
+});
+
+test('employee cannot apply for leave on a back date', function () {
+    $employee = User::factory()->create(['role' => 'employee']);
+
+    // Attempting leave on 2026-09-10 when today is 2026-09-15
+    Livewire::actingAs($employee)
+        ->test('employee::leave-requests')
+        ->set('request_type', 'single_day')
+        ->set('start_date', '2026-09-10')
+        ->set('end_date', '2026-09-10')
+        ->set('reason', 'Attempting past date leave')
+        ->call('submitLeaveRequest')
+        ->assertHasErrors(['start_date' => 'after_or_equal']);
+
+    $this->assertDatabaseMissing('leave_requests', [
+        'user_id' => $employee->id,
+        'reason' => 'Attempting past date leave',
+    ]);
+});
 
 test('employee can submit single day and multiple day leave requests', function () {
     $employee = User::factory()->create(['role' => 'employee']);
