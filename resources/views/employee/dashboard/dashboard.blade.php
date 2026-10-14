@@ -1,4 +1,4 @@
-<div class="space-y-6" wire:poll.10s x-data="{ showConfirmModal: false }">
+<div class="space-y-6" wire:poll.10s x-data="{ showConfirmModal: false, showStartLunchModal: false, showEndLunchModal: false }">
     <!-- Header Banner -->
     <div class="bg-white border border-slate-200/80 rounded-md p-6 sm:p-8 shadow-xs relative overflow-hidden">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -349,12 +349,11 @@
                     <p class="text-xs text-slate-600 mt-0.5">Lunch duration is strictly <strong>1 hour</strong>. Exceeding 1 hour will be flagged for Admin review.</p>
                 </div>
                 <button 
-                    wire:click="startLunch" 
-                    wire:loading.attr="disabled"
+                    type="button"
+                    @click="showStartLunchModal = true"
                     class="px-4 py-2.5 rounded-md text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 transition-all shadow-xs flex items-center gap-2 cursor-pointer shrink-0"
                 >
-                    <i wire:loading.remove wire:target="startLunch" class="ri-cup-line text-sm"></i>
-                    <i wire:loading wire:target="startLunch" class="ri-loader-4-line animate-spin text-sm"></i>
+                    <i class="ri-cup-line text-sm"></i>
                     <span>Start Lunch Break (1 Hour)</span>
                 </button>
             </div>
@@ -368,12 +367,11 @@
                         <p class="text-xs text-slate-700 mt-0.5">Lunch started at <strong class="text-slate-900">{{ $tracking->lunch_start_time?->format('g:i A') }}</strong>. Click below when returning to start 3rd slot.</p>
                     </div>
                     <button 
-                        wire:click="endLunchAndStartSlot3" 
-                        wire:loading.attr="disabled"
+                        type="button"
+                        @click="showEndLunchModal = true"
                         class="px-4 py-2.5 rounded-md text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 transition-all shadow-xs flex items-center gap-2 cursor-pointer shrink-0"
                     >
-                        <i wire:loading.remove wire:target="endLunchAndStartSlot3" class="ri-arrow-right-line text-sm"></i>
-                        <i wire:loading wire:target="endLunchAndStartSlot3" class="ri-loader-4-line animate-spin text-sm"></i>
+                        <i class="ri-arrow-right-line text-sm"></i>
                         <span>Return From Lunch & Start 3rd Slot</span>
                     </button>
                 </div>
@@ -691,4 +689,107 @@
             </div>
         </div>
     @endif
+
+    <!-- Confirm Start Lunch Modal -->
+    <div 
+        x-show="showStartLunchModal" 
+        x-cloak
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto"
+        @keydown.escape.window="showStartLunchModal = false"
+    >
+        <div 
+            class="bg-white rounded-lg border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-4 text-left relative my-8"
+            @click.outside="showStartLunchModal = false"
+        >
+            <div class="flex items-start gap-3.5">
+                <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center font-bold text-xl shrink-0">
+                    <i class="ri-cup-line"></i>
+                </div>
+                <div class="space-y-1">
+                    <h3 class="text-base font-bold text-slate-900">Start Lunch Break?</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Are you sure you want to begin your lunch break now?
+                    </p>
+                    
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                <button 
+                    type="button" 
+                    @click="showStartLunchModal = false" 
+                    class="px-4 py-2 text-xs font-medium rounded-md border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                    Cancel
+                </button>
+                <button 
+                    type="button" 
+                    wire:click="startLunch" 
+                    @click="showStartLunchModal = false"
+                    wire:loading.attr="disabled"
+                    class="px-4 py-2 text-xs font-semibold rounded-md text-white bg-amber-600 hover:bg-amber-700 transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
+                >
+                    <i wire:loading.remove wire:target="startLunch" class="ri-check-line text-sm"></i>
+                    <i wire:loading wire:target="startLunch" class="ri-loader-4-line animate-spin text-sm"></i>
+                    <span>Yes, Start Lunch Break</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm End Lunch Modal -->
+    <div 
+        x-show="showEndLunchModal" 
+        x-cloak
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto"
+        @keydown.escape.window="showEndLunchModal = false"
+    >
+        <div 
+            class="bg-white rounded-lg border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-4 text-left relative my-8"
+            @click.outside="showEndLunchModal = false"
+        >
+            <div class="flex items-start gap-3.5">
+                <div class="w-10 h-10 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-xl shrink-0">
+                    <i class="ri-arrow-right-line"></i>
+                </div>
+                <div class="space-y-1">
+                    <h3 class="text-base font-bold text-slate-900">End Lunch & Start 3rd Slot?</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Are you sure you want to complete your lunch break and begin your 3rd working slot?
+                    </p>
+                    @if($tracking && $tracking->lunch_start_time)
+                        @php
+                            $elapsedMinutes = (int) $tracking->lunch_start_time->diffInMinutes(now());
+                            $isExceeded = $elapsedMinutes > 60;
+                        @endphp
+                        <div class="p-3 {{ $isExceeded ? 'bg-red-50 border-red-200 text-red-900' : 'bg-slate-50 border-slate-200 text-slate-700' }} border rounded-md text-[11px] font-medium mt-2 space-y-0.5">
+                            <div>Lunch Started: <strong>{{ $tracking->lunch_start_time->format('g:i A') }}</strong></div>
+                            <div>Current Duration: <strong>{{ $elapsedMinutes }} minutes</strong> {{ $isExceeded ? '(exceeded 1h limit)' : '(within 1h limit)' }}</div>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                <button 
+                    type="button" 
+                    @click="showEndLunchModal = false" 
+                    class="px-4 py-2 text-xs font-medium rounded-md border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                    Cancel
+                </button>
+                <button 
+                    type="button" 
+                    wire:click="endLunchAndStartSlot3" 
+                    @click="showEndLunchModal = false"
+                    wire:loading.attr="disabled"
+                    class="px-4 py-2 text-xs font-semibold rounded-md text-white bg-slate-900 hover:bg-slate-800 transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
+                >
+                    <i wire:loading.remove wire:target="endLunchAndStartSlot3" class="ri-check-line text-sm"></i>
+                    <i wire:loading wire:target="endLunchAndStartSlot3" class="ri-loader-4-line animate-spin text-sm"></i>
+                    <span>Yes, End Lunch & Start Slot 3</span>
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
