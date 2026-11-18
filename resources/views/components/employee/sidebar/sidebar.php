@@ -159,6 +159,9 @@ new class extends Component
             }
         }
 
+        // Minutes already worked today in completed (clocked-out) sessions
+        $completedWorkMinutes = (int) $logs->whereNotNull('clock_out_time')->sum('duration_minutes');
+
         $todayHoliday = Holiday::whereDate('holiday_date', now()->toDateString())->first();
 
         return view('components.employee.sidebar.sidebar', [
@@ -166,6 +169,8 @@ new class extends Component
             'todayLogs' => $logs,
             'activeLog' => $activeLog,
             'todayHoliday' => $todayHoliday,
+            'completedWorkMinutes' => $completedWorkMinutes,
+            'requiredWorkMinutes' => 8 * 60,
             'todayDateFormatted' => now()->format('D, M d, Y'),
         ]);
     }

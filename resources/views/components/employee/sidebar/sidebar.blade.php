@@ -83,15 +83,100 @@
                             <span>Clock In Now</span>
                         </button>
                     @else
-                        <button 
-                            wire:click="clockOut" 
-                            wire:loading.attr="disabled"
-                            class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-md text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                        <div
+                            wire:key="clock-out-{{ $activeLog->id }}"
+                            x-data="{
+                                open: false,
+                                completedMinutes: {{ (int) $completedWorkMinutes }},
+                                requiredMinutes: {{ (int) $requiredWorkMinutes }},
+                                activeSince: {{ $activeLog->clock_in_time ? $activeLog->clock_in_time->getTimestamp() * 1000 : 'null' }},
+                                workedMinutes: 0,
+                                calc() {
+                                    const active = this.activeSince ? Math.max(0, Math.floor((Date.now() - this.activeSince) / 60000)) : 0;
+                                    this.workedMinutes = this.completedMinutes + active;
+                                },
+                                fmt(m) {
+                                    const h = Math.floor(m / 60), r = m % 60;
+                                    return h + 'h ' + String(r).padStart(2, '0') + 'm';
+                                },
+                                get isShort() { return this.workedMinutes < this.requiredMinutes; },
+                                ask() { this.calc(); this.open = true; },
+                                confirm() { this.open = false; $wire.clockOut(); },
+                            }"
+                            @keydown.escape.window="open = false"
                         >
-                            <i wire:loading.remove wire:target="clockOut" class="ri-logout-box-r-line text-sm"></i>
-                            <i wire:loading wire:target="clockOut" class="ri-loader-4-line animate-spin text-sm"></i>
-                            <span>Clock Out Now</span>
-                        </button>
+                            <button
+                                type="button"
+                                @click="ask()"
+                                wire:loading.attr="disabled"
+                                wire:target="clockOut"
+                                class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-md text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                            >
+                                <i wire:loading.remove wire:target="clockOut" class="ri-logout-box-r-line text-sm"></i>
+                                <i wire:loading wire:target="clockOut" class="ri-loader-4-line animate-spin text-sm"></i>
+                                <span>Clock Out Now</span>
+                            </button>
+
+                            <!-- Clock Out Confirmation Modal (teleported so the sidebar transform doesn't clip it) -->
+                            <template x-teleport="body">
+                                <div
+                                    x-show="open"
+                                    x-transition.opacity
+                                    x-cloak
+                                    class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50"
+                                    @click.self="open = false"
+                                >
+                                    <div class="w-full max-w-sm bg-white rounded-lg border border-slate-200 shadow-xl p-5 space-y-4">
+                                        <div class="flex items-start gap-3">
+                                            <div
+                                                class="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                                                :class="isShort ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-700'"
+                                            >
+                                                <i class="text-xl" :class="isShort ? 'ri-error-warning-line' : 'ri-logout-box-r-line'"></i>
+                                            </div>
+                                            <div class="space-y-1">
+                                                <h3 class="text-sm font-semibold text-slate-900">Confirm Clock Out</h3>
+                                                <p class="text-xs text-slate-600">Are you sure you want to clock out?</p>
+                                            </div>
+                                        </div>
+
+                                        <template x-if="isShort">
+                                            <div class="text-xs bg-amber-50 border border-amber-200 text-amber-800 rounded-md p-3 space-y-1">
+                                                <p class="font-semibold">You are clocking out before completing 8 hours.</p>
+                                                <p>
+                                                    Worked today: <span class="font-semibold" x-text="fmt(workedMinutes)"></span>
+                                                    &middot; Remaining: <span class="font-semibold" x-text="fmt(requiredMinutes - workedMinutes)"></span>
+                                                </p>
+                                            </div>
+                                        </template>
+
+                                        <template x-if="!isShort">
+                                            <div class="text-xs bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-md p-3">
+                                                You have completed your 8 hours today
+                                                (<span class="font-semibold" x-text="fmt(workedMinutes)"></span> worked).
+                                            </div>
+                                        </template>
+
+                                        <div class="flex items-center justify-end gap-2 pt-1">
+                                            <button
+                                                type="button"
+                                                @click="open = false"
+                                                class="px-3.5 py-2 rounded-md text-xs font-medium text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 cursor-pointer"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                type="button"
+                                                @click="confirm()"
+                                                class="px-3.5 py-2 rounded-md text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 cursor-pointer"
+                                            >
+                                                Yes, Clock Out
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
                     @endif
                 </div>
             </div>
