@@ -203,6 +203,11 @@
                 <i class="ri-calendar-check-line text-base {{ request()->routeIs('employee.leave-requests') ? 'text-white' : 'text-slate-400' }}"></i>
                 <span>Leave Requests</span>
             </a>
+
+            <a href="{{ route('employee.salary-slips') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-xs font-medium transition-all {{ request()->routeIs('employee.salary-slips') ? 'bg-slate-900 text-white font-semibold shadow-xs' : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900' }}">
+                <i class="ri-wallet-3-line text-base {{ request()->routeIs('employee.salary-slips') ? 'text-white' : 'text-slate-400' }}"></i>
+                <span>Salary Slips</span>
+            </a>
         </nav>
     </div>
 

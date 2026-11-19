@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SalarySlipController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -50,6 +51,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->as('admin.')->group(
     Route::livewire('/attendance-logs', 'admin::attendance-logs')->name('attendance-logs');
     Route::livewire('/leave-requests', 'admin::leave-requests')->name('leave-requests');
     Route::livewire('/holidays', 'admin::holiday-management')->name('holidays');
+    Route::livewire('/salaries', 'admin::salary-management')->name('salaries');
     Route::livewire('/change-password', 'admin::change-password')->name('change-password');
 });
 
@@ -61,4 +63,10 @@ Route::middleware(['auth', 'role:employee'])->prefix('employee')->as('employee.'
     Route::livewire('/daily-task-reports/{report}/edit', 'employee::daily-task-report-create')->name('daily-task-report-edit');
     Route::livewire('/attendance-logs', 'employee::attendance-logs')->name('attendance-logs');
     Route::livewire('/leave-requests', 'employee::leave-requests')->name('leave-requests');
+    Route::livewire('/salary-slips', 'employee::salary-slips')->name('salary-slips');
 });
+
+// Salary slip PDF (employees: own slips only, admins: any slip)
+Route::get('/salary-slips/{payment}/download', SalarySlipController::class)
+    ->middleware('auth')
+    ->name('salary-slips.download');

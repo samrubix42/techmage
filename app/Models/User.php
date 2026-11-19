@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'is_active', 'role', 'department_id', 'saturday_off_policy'])]
+#[Fillable(['name', 'email', 'password', 'is_active', 'role', 'department_id', 'saturday_off_policy', 'salary'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -31,6 +31,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'salary' => 'decimal:2',
         ];
     }
 
@@ -99,5 +100,10 @@ class User extends Authenticatable
     public function leaveRequests(): HasMany
     {
         return $this->hasMany(LeaveRequest::class);
+    }
+
+    public function salaryPayments(): HasMany
+    {
+        return $this->hasMany(SalaryPayment::class);
     }
 }
