@@ -21,6 +21,8 @@
 /storage/*.key
 /storage/pail
 /vendor
+/vendor.zip
+/vendor-server-dompdf.zip
 _ide_helper.php
 Homestead.json
 Homestead.yaml
