@@ -81,7 +81,7 @@
                     @endforeach
                 </select>
             </div>
-            <p class="text-[11px] text-slate-500">Only {{ $days(\App\Services\SalaryCalculator::PAID_LEAVE_LIMIT) }} paid leave days per month are payable; extra leave is deducted as loss of pay.</p>
+            <p class="text-[11px] text-slate-500">Paid leave is not deducted. Only unpaid leave and absent days are deducted as loss of pay.</p>
         </div>
 
         <div class="overflow-x-auto border border-slate-200 rounded-md">

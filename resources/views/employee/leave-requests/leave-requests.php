@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Holiday;
 use App\Models\LeaveRequest;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -87,9 +88,26 @@ new #[Layout('layouts.employee')] #[Title('My Leave Requests - TechMage')] class
         if ($this->request_type === 'half_day') {
             $totalDays = 0.5;
         } else {
-            $start = Carbon::parse($this->start_date);
-            $end = Carbon::parse($this->end_date);
-            $totalDays = (float) ($start->diffInDays($end) + 1);
+            // Count only working days: skip week offs and holidays.
+            $start = Carbon::parse($this->start_date)->startOfDay();
+            $end = Carbon::parse($this->end_date)->startOfDay();
+            $user = Auth::user();
+            $holidayDates = Holiday::forDateRange($start, $end)->get()
+                ->map(fn ($h) => $h->holiday_date->toDateString())
+                ->all();
+
+            $totalDays = 0.0;
+            for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
+                if (! $user->isOffDay($date) && ! in_array($date->toDateString(), $holidayDates, true)) {
+                    $totalDays++;
+                }
+            }
+
+            if ($totalDays === 0.0) {
+                $this->addError('start_date', 'The selected dates fall only on week offs or holidays.');
+
+                return;
+            }
         }
 
         LeaveRequest::create([

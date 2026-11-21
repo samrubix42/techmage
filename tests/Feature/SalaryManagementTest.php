@@ -59,22 +59,24 @@ test('salary calculator excludes holidays and week offs and counts leaves', func
         ->and($result['calculated_salary'])->toBe(21500.0);
 });
 
-test('only two paid leave days per month are payable', function () {
+test('paid leave has no monthly limit and leave on week offs or holidays is not counted', function () {
     $employee = User::factory()->create(['role' => 'employee', 'salary' => 26000, 'saturday_off_policy' => 'sunday_only']);
+    Holiday::create(['name' => 'Gandhi Jayanti', 'holiday_date' => '2026-10-02', 'type' => 'public']);
 
-    foreach (['05', '06', '07'] as $day) {
+    foreach (['05', '06', '07', '08'] as $day) {
         Attendance::create(['user_id' => $employee->id, 'attendance_date' => "2026-10-{$day}", 'status' => 'on_leave', 'leave_category' => 'sick', 'leave_payment_type' => 'paid']);
     }
-    Attendance::create(['user_id' => $employee->id, 'attendance_date' => '2026-10-08', 'status' => 'on_leave', 'leave_category' => 'unpaid', 'leave_payment_type' => 'unpaid']);
+    // Leave on a holiday (Oct 2) and a Sunday (Oct 4) must be ignored.
+    Attendance::create(['user_id' => $employee->id, 'attendance_date' => '2026-10-02', 'status' => 'on_leave', 'leave_category' => 'sick', 'leave_payment_type' => 'paid']);
+    Attendance::create(['user_id' => $employee->id, 'attendance_date' => '2026-10-04', 'status' => 'on_leave', 'leave_category' => 'sick', 'leave_payment_type' => 'paid']);
+    Attendance::create(['user_id' => $employee->id, 'attendance_date' => '2026-10-09', 'status' => 'on_leave', 'leave_category' => 'unpaid', 'leave_payment_type' => 'unpaid']);
 
     $result = app(SalaryCalculator::class)->calculate($employee, 2026, 10);
 
-    expect($result['paid_leave_days'])->toBe(2.0)
-        ->and($result['unpaid_leave_days'])->toBe(2.0)
-        ->and($result['excess_leave_days'])->toBe(1.0)
-        ->and($result['payable_days'])->toBe(2.0)
-        ->and(collect($result['leaves'])->firstWhere('date', '2026-10-07'))
-        ->toMatchArray(['paid' => false, 'over_limit' => true]);
+    expect($result['paid_leave_days'])->toBe(4.0)
+        ->and($result['unpaid_leave_days'])->toBe(1.0)
+        ->and($result['payable_days'])->toBe(4.0)
+        ->and(collect($result['leaves'])->pluck('date')->all())->not->toContain('2026-10-02', '2026-10-04');
 });
 
 test('admin can pay salary and the record is stored once per month', function () {

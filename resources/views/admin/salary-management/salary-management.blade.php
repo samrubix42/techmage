@@ -332,7 +332,7 @@
                                             <span class="flex items-center gap-1.5">
                                                 <span class="capitalize text-slate-500">{{ str_replace('_', ' ', $leave['category']) }}{{ $leave['days'] < 1 ? ' (½)' : '' }}</span>
                                                 <span class="px-1.5 py-0.5 rounded text-[10px] font-bold {{ $leave['paid'] ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700' }}">
-                                                    {{ $leave['paid'] ? 'PAID' : (($leave['over_limit'] ?? false) ? 'UNPAID · OVER LIMIT' : 'UNPAID') }}
+                                                    {{ $leave['paid'] ? 'PAID' : 'UNPAID' }}
                                                 </span>
                                             </span>
                                         </li>
@@ -341,10 +341,7 @@
                                     @endforelse
                                 </ul>
                                 <p class="px-3 py-1.5 border-t border-slate-200 text-[11px] text-slate-500">
-                                    Only {{ $days($b['paid_leave_limit'] ?? 2) }} paid leave days per month are payable.
-                                    @if(($b['excess_leave_days'] ?? 0) > 0)
-                                        <span class="text-rose-700 font-medium">{{ $days($b['excess_leave_days']) }} day(s) over the limit counted as unpaid.</span>
-                                    @endif
+                                    All paid leave is payable. Leave on week offs and holidays is not counted.
                                 </p>
                             </div>
 

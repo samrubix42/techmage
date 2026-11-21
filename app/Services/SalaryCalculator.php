@@ -15,19 +15,13 @@ use Carbon\Carbon;
  *  - Total working days = days in month - week offs - holidays.
  *  - Present days only count attendance on working days (work done on a holiday/week off is ignored).
  *  - A half day counts as 0.5 present; the other half is leave (if approved) or absent.
- *  - Paid leave is paid only up to PAID_LEAVE_LIMIT days per month (in date order);
- *    any paid leave beyond that becomes unpaid. Unpaid leave and absent days are not paid.
+ *  - Leave falling on a week off or holiday is ignored (those days are already non-working).
+ *  - All approved paid leave is paid (no monthly limit). Unpaid leave and absent days are not paid.
  *  - Per day salary = monthly salary / total working days.
  *  - Calculated salary = per day salary * (present days + paid leave days).
  */
 class SalaryCalculator
 {
-    /** Maximum number of leave days per month that are paid. */
-    public const PAID_LEAVE_LIMIT = 2.0;
-
-    /** Paid leave days already used in the month currently being calculated. */
-    private float $paidLeaveUsed = 0.0;
-
     public function calculate(User $user, int $year, int $month): array
     {
         $start = Carbon::create($year, $month, 1)->startOfDay();
@@ -51,8 +45,6 @@ class SalaryCalculator
         $unpaidLeaveDays = 0.0;
         $absentDays = 0.0;
         $upcomingDays = 0;
-        $excessLeaveDays = 0.0;
-        $this->paidLeaveUsed = 0.0;
 
         $holidayList = [];
         $leaveList = [];
@@ -96,7 +88,7 @@ class SalaryCalculator
                 case 'half_day':
                     $presentDays += 0.5;
                     if ($attendance->leave_request_id) {
-                        $this->addLeave($key, $attendance, 0.5, $isPaidLeave, $paidLeaveDays, $unpaidLeaveDays, $excessLeaveDays, $leaveList);
+                        $this->addLeave($key, $attendance, 0.5, $isPaidLeave, $paidLeaveDays, $unpaidLeaveDays, $leaveList);
                     } else {
                         $absentDays += 0.5;
                     }
@@ -104,7 +96,7 @@ class SalaryCalculator
 
                 case 'on_leave':
                 case 'holiday': // leave approved under the "holiday" category
-                    $this->addLeave($key, $attendance, 1.0, $isPaidLeave, $paidLeaveDays, $unpaidLeaveDays, $excessLeaveDays, $leaveList);
+                    $this->addLeave($key, $attendance, 1.0, $isPaidLeave, $paidLeaveDays, $unpaidLeaveDays, $leaveList);
                     break;
 
                 default: // absent / anything else
@@ -134,8 +126,6 @@ class SalaryCalculator
             'paid_leave_days' => $paidLeaveDays,
             'unpaid_leave_days' => $unpaidLeaveDays,
             'leave_days' => $paidLeaveDays + $unpaidLeaveDays,
-            'paid_leave_limit' => self::PAID_LEAVE_LIMIT,
-            'excess_leave_days' => $excessLeaveDays,
             'absent_days' => $absentDays,
             'upcoming_days' => $upcomingDays,
             'payable_days' => $payableDays,
@@ -147,8 +137,7 @@ class SalaryCalculator
     }
 
     /**
-     * Record a leave, paying it only while the monthly paid-leave limit has room.
-     * A leave that crosses the limit is split into a paid and an unpaid part.
+     * Record a leave as paid or unpaid based on its payment type (no monthly limit).
      */
     private function addLeave(
         string $date,
@@ -157,40 +146,19 @@ class SalaryCalculator
         bool $isPaidLeave,
         float &$paidLeaveDays,
         float &$unpaidLeaveDays,
-        float &$excessLeaveDays,
         array &$leaveList,
     ): void {
-        if (! $isPaidLeave) {
+        if ($isPaidLeave) {
+            $paidLeaveDays += $days;
+        } else {
             $unpaidLeaveDays += $days;
-            $leaveList[] = $this->leaveRow($date, $attendance, $days, false);
-
-            return;
         }
 
-        $paidPart = min($days, max(0.0, self::PAID_LEAVE_LIMIT - $this->paidLeaveUsed));
-        $unpaidPart = $days - $paidPart;
-
-        if ($paidPart > 0) {
-            $this->paidLeaveUsed += $paidPart;
-            $paidLeaveDays += $paidPart;
-            $leaveList[] = $this->leaveRow($date, $attendance, $paidPart, true);
-        }
-
-        if ($unpaidPart > 0) {
-            $unpaidLeaveDays += $unpaidPart;
-            $excessLeaveDays += $unpaidPart;
-            $leaveList[] = $this->leaveRow($date, $attendance, $unpaidPart, false, true);
-        }
-    }
-
-    private function leaveRow(string $date, Attendance $attendance, float $days, bool $paid, bool $overLimit = false): array
-    {
-        return [
+        $leaveList[] = [
             'date' => $date,
             'category' => $attendance->leave_category ?: 'leave',
             'days' => $days,
-            'paid' => $paid,
-            'over_limit' => $overLimit,
+            'paid' => $isPaidLeave,
         ];
     }
 }

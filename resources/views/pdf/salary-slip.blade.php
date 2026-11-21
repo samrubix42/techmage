@@ -129,9 +129,7 @@
     </table>
     <div class="policy">
         Week offs: {{ $payment->week_off_days }} &nbsp;·&nbsp; Holidays: {{ $payment->holiday_days }}
-        &nbsp;·&nbsp; Unpaid leave: {{ $days($payment->unpaid_leave_days) }} &nbsp;·&nbsp; Absent: {{ $days($payment->absent_days) }}
-        &nbsp;·&nbsp; Only {{ $days(\App\Services\SalaryCalculator::PAID_LEAVE_LIMIT) }} paid leave days are allowed per month.
-    </div>
+        &nbsp;·&nbsp; Unpaid leave: {{ $days($payment->unpaid_leave_days) }} &nbsp;·&nbsp; Absent: {{ $days($payment->absent_days) }}    </div>
 
     <!-- Earnings & deductions -->
     <table class="pay" style="margin-top: 14px;">

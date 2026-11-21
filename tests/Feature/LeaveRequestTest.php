@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Holiday;
 use App\Models\LeaveRequest;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -39,8 +40,8 @@ test('employee can submit single day and multiple day leave requests', function 
     Livewire::actingAs($employee)
         ->test('employee::leave-requests')
         ->set('request_type', 'single_day')
-        ->set('start_date', '2026-09-20')
-        ->set('end_date', '2026-09-20')
+        ->set('start_date', '2026-09-18')
+        ->set('end_date', '2026-09-18')
         ->set('reason', 'Fever and medical checkup')
         ->call('submitLeaveRequest')
         ->assertHasNoErrors();
@@ -48,8 +49,8 @@ test('employee can submit single day and multiple day leave requests', function 
     $this->assertDatabaseHas('leave_requests', [
         'user_id' => $employee->id,
         'request_type' => 'single_day',
-        'start_date' => '2026-09-20 00:00:00',
-        'end_date' => '2026-09-20 00:00:00',
+        'start_date' => '2026-09-18 00:00:00',
+        'end_date' => '2026-09-18 00:00:00',
         'total_days' => 1,
         'status' => 'pending',
     ]);
@@ -91,6 +92,36 @@ test('employee can submit single day and multiple day leave requests', function 
         'total_days' => 3,
         'status' => 'pending',
     ]);
+});
+
+test('leave days skip week offs and holidays', function () {
+    $employee = User::factory()->create(['role' => 'employee', 'saturday_off_policy' => 'sunday_only']);
+    Holiday::create(['name' => 'Test Holiday', 'holiday_date' => '2026-09-29', 'type' => 'public']);
+
+    // Sat 26 → Wed 30: Sunday 27 and holiday 29 are skipped => 3 days.
+    Livewire::actingAs($employee)
+        ->test('employee::leave-requests')
+        ->set('request_type', 'multiple_days')
+        ->set('start_date', '2026-09-26')
+        ->set('end_date', '2026-09-30')
+        ->set('reason', 'Trip out of station')
+        ->call('submitLeaveRequest')
+        ->assertHasNoErrors();
+
+    $this->assertDatabaseHas('leave_requests', [
+        'user_id' => $employee->id,
+        'reason' => 'Trip out of station',
+        'total_days' => 3,
+    ]);
+
+    // A request only on a Sunday is rejected.
+    Livewire::actingAs($employee)
+        ->test('employee::leave-requests')
+        ->set('request_type', 'single_day')
+        ->set('start_date', '2026-09-27')
+        ->set('reason', 'Sunday only leave')
+        ->call('submitLeaveRequest')
+        ->assertHasErrors(['start_date']);
 });
 
 test('admin can cancel a leave request via confirmation check modal', function () {
